@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,24 +16,25 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [{"name": "next"}],
-    "paths": {"@/*": ["./src/*"]}
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "supabase/**", "supabase/functions/**"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase"
+  ]
 }
-```
-
----
-
-**2. Criar arquivo** `.vercelignore` (novo):
-```
-# Supabase Edge Functions — deployed separately via Supabase CLI
-supabase/functions/
-```
-
----
-
-**3. Editar** `package.json` — linha do Next.js:
-```
-"next": "14.2.0"  →  "next": "14.2.29"S
