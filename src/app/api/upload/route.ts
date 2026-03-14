@@ -1,0 +1,98 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+export async function POST(req: NextRequest) {
+  // Verificar autenticação
+  const authCookie = req.cookies.get('admin_auth')
+  if (!authCookie || authCookie.value !== process.env.ADMIN_PASSWORD) {
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
+  try {
+    const formData = await req.formData()
+    const file = formData.get('file') as File
+    const periodo = formData.get('periodo') as string
+
+    if (!file || !periodo) {
+      return NextResponse.json({ error: 'Arquivo e período são obrigatórios' }, { status: 400 })
+    }
+
+    // Validar tipo de arquivo
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['xlsx', 'docx'].includes(ext || '')) {
+      return NextResponse.json({ error: 'Apenas arquivos xlsx ou docx são aceitos' }, { status: 400 })
+    }
+
+    // Validar tamanho (max 50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Arquivo muito grande (máx 50MB)' }, { status: 400 })
+    }
+
+    // Path no Storage: uploads-cbf/2025-12/DFS_CBF_2025_V07.xlsx
+    const timestamp = Date.now()
+    const storagePath = `${periodo}/${timestamp}_${file.name}`
+
+    // Upload para Supabase Storage
+    const bytes = await file.arrayBuffer()
+    const { error: storageError } = await supabase.storage
+      .from('uploads-cbf')
+      .upload(storagePath, bytes, {
+        contentType: file.type,
+        upsert: false
+      })
+
+    if (storageError) {
+      throw new Error(`Erro no Storage: ${storageError.message}`)
+    }
+
+    // Registrar upload no banco
+    const { data: uploadRecord, error: dbError } = await supabase
+      .from('uploads')
+      .insert({
+        filename: file.name,
+        file_type: ext,
+        storage_path: storagePath,
+        periodo,
+        status: 'pending'
+      })
+      .select()
+      .single()
+
+    if (dbError || !uploadRecord) {
+      throw new Error(`Erro ao registrar: ${dbError?.message}`)
+    }
+
+    // Disparar Edge Function de processamento (assíncrono)
+    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/process-upload`
+    
+    fetch(edgeFunctionUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+      },
+      body: JSON.stringify({
+        upload_id: uploadRecord.id,
+        storage_path: storagePath,
+        periodo,
+        filename: file.name
+      })
+    }).catch(err => console.error('Erro ao disparar Edge Function:', err))
+    // Não await — processamento é assíncrono
+
+    return NextResponse.json({
+      ok: true,
+      upload_id: uploadRecord.id,
+      message: 'Upload recebido. Processamento iniciado.'
+    })
+
+  } catch (err: any) {
+    console.error('Erro no upload:', err)
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
