@@ -1420,19 +1420,42 @@ initCharts();
   }
 
   try {
-    // Buscar período atual
-    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?chave=eq.periodo_atual&select=valor', { headers });
-    const cfg = await cfgRes.json();
-    const periodo = cfg[0]?.valor || '2025-12';
+    // Buscar configurações
+    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?select=chave,valor', { headers });
+    const cfgList = await cfgRes.json();
+    const cfgMap = Object.fromEntries((cfgList || []).map((c) => [c.chave, c.valor]));
+    const periodo = cfgMap['periodo_atual'] || '2025-12';
+    const ultimoBalancete = cfgMap['ultimo_balancete'] || null;
 
-    // Buscar todos os dados do Supabase
+    // Buscar DFs anuais
     const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.asc', { headers });
     const supa = await dadosRes.json();
 
-    if (!supa || supa.length === 0) { console.warn('[CBF] Sem dados no Supabase'); return; }
+    // Buscar balancetes (se existirem)
+    const balRes = await fetch(SUPA_URL + '/rest/v1/balancetes?select=*&order=periodo.asc', { headers });
+    const balancetes = await balRes.json();
+    const temBalancete = Array.isArray(balancetes) && balancetes.length > 0;
 
-    // Dado mais recente (período atual)
-    const d = supa.find(x => x.periodo === periodo) || supa[supa.length - 1];
+    // Decidir fonte de dados principal:
+    // - Se há balancete mais recente que as DFs → usar balancete como dado atual
+    // - Caso contrário → usar DFs anuais
+    let d, fonteAtual;
+    if (temBalancete && ultimoBalancete) {
+      const bal = balancetes.find(x => x.periodo === ultimoBalancete) || balancetes[balancetes.length - 1];
+      const dfAnual = (supa || []).find(x => x.periodo === periodo) || (supa || [])[supa.length - 1];
+      // Balancete prevalece se for de um período mais recente
+      if (!dfAnual || bal.periodo > dfAnual.periodo) {
+        d = bal; fonteAtual = 'balancete';
+      } else {
+        d = dfAnual; fonteAtual = 'dfs';
+      }
+    } else {
+      if (!supa || supa.length === 0) { console.warn('[CBF] Sem dados no Supabase'); return; }
+      d = supa.find(x => x.periodo === periodo) || supa[supa.length - 1];
+      fonteAtual = 'dfs';
+    }
+
+    console.log('[CBF] Fonte:', fonteAtual, '| Período:', d?.periodo);
 
     // ── Merge histórico: hardcode (anos anteriores) + Supabase (2025+) ──
     // Montar mapa de anos do Supabase
@@ -1468,7 +1491,7 @@ initCharts();
       // KPIs do período atual
       receita_bruta:       +d.receita_bruta,
       receita_liquida:     +d.receita_liquida,
-      resultado_exercicio: +d.resultado_exercicio,
+      resultado_exercicio: +(d.resultado_exercicio ?? d.resultado_periodo ?? 0),
       custos_futebol:      Math.abs(+d.custos_futebol),
       caixa_equivalentes:  +d.caixa_equivalentes,
       ativo_total:         +d.ativo_total,
@@ -1562,7 +1585,8 @@ initCharts();
     const bar = document.createElement('div');
     bar.id = 'cbf-info-bar';
     bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,112,60,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
-    bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(periodo) + '</strong> · ' + (d.source_file||'DFS CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C800;text-decoration:none;font-weight:600">⚙️ Admin</a>';
+    const tipoLabel = fonteAtual === 'balancete' ? '📋 Balancete' : '📊 DFS';
+    bar.innerHTML = '<span>' + tipoLabel + ' <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C800;text-decoration:none;font-weight:600">⚙️ Admin</a>';
     document.body.appendChild(bar);
 
     console.log('[CBF] ✅ Dados carregados. Período:', periodo, '| Série:', anos.join(','));

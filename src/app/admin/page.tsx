@@ -8,6 +8,7 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState('')
 
   const [file, setFile] = useState<File | null>(null)
+  const [tipoDoc, setTipoDoc] = useState<'dfs'|'balancete'>('dfs')
   const [periodo, setPeriodo] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -53,6 +54,7 @@ export default function AdminPage() {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('periodo', periodo)
+    formData.append('tipo_documento', tipoDoc)
 
     try {
       const res = await fetch('/api/upload', {
@@ -154,7 +156,31 @@ export default function AdminPage() {
             </div>
 
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Arquivo DFS (xlsx)</label>
+              <label style={styles.label}>Tipo de documento</label>
+              <div style={{display:'flex', gap:12}}>
+                {['dfs','balancete'].map(t => (
+                  <label key={t} style={{display:'flex',alignItems:'center',gap:6,cursor:'pointer',fontSize:13,color:'#FAFAFA'}}>
+                    <input
+                      type="radio"
+                      name="tipo"
+                      value={t}
+                      checked={tipoDoc === t}
+                      onChange={() => setTipoDoc(t as 'dfs'|'balancete')}
+                      style={{accentColor:'#F5C800'}}
+                    />
+                    {t === 'dfs' ? '📊 DFS Anual' : '📋 Balancete Mensal'}
+                  </label>
+                ))}
+              </div>
+              <p style={{fontSize:11,color:'#8B949E',margin:'4px 0 0'}}>
+                {tipoDoc === 'dfs'
+                  ? 'Demonstrações Financeiras completas (anual)'
+                  : 'Balancete mensal — valores acumulados do ano até o mês'}
+              </p>
+            </div>
+
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Arquivo {tipoDoc === 'dfs' ? 'DFS' : 'Balancete'} (xlsx)</label>
               <input
                 ref={fileRef}
                 type="file"

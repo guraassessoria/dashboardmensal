@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData()
     const file = formData.get('file') as File
     const periodo = formData.get('periodo') as string
+    const tipoDocumento = (formData.get('tipo_documento') as string) || 'dfs'
 
     if (!file || !periodo) {
       return NextResponse.json({ error: 'Arquivo e período são obrigatórios' }, { status: 400 })
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
         file_type: ext,
         storage_path: storagePath,
         periodo,
+        tipo_documento: tipoDocumento,
         status: 'pending'
       })
       .select()
@@ -68,7 +70,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Disparar Edge Function de processamento (assíncrono)
-    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/process-upload`
+    const funcName = tipoDocumento === 'balancete' ? 'process-balancete' : 'process-upload'
+    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/${funcName}`
     
     fetch(edgeFunctionUrl, {
       method: 'POST',
