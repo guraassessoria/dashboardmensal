@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
 
     // Validar tipo de arquivo
     const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!['xlsx', 'docx'].includes(ext || '')) {
-      return NextResponse.json({ error: 'Apenas arquivos xlsx ou docx são aceitos' }, { status: 400 })
+    if (!['xlsx', 'docx', 'csv'].includes(ext || '')) {
+      return NextResponse.json({ error: 'Apenas arquivos xlsx, csv ou docx são aceitos' }, { status: 400 })
     }
 
     // Validar tamanho (max 50MB)
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
         storage_path: storagePath,
         periodo,
         tipo_documento: tipoDocumento,
+        file_type: ['csv'].includes(ext || '') ? 'xlsx' : ext, // csv tratado como xlsx no banco
         status: 'pending'
       })
       .select()
