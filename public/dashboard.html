@@ -1388,6 +1388,140 @@ function exportPDF() {
 }
 initCharts();
 </script>
+<script>
+// ══════════════════════════════════════════════
+// AUTO-FETCH: busca dados do Supabase no browser
+// Popula window.__CBF_DADOS__ e atualiza dashboard
+// ══════════════════════════════════════════════
+(async function() {
+  const SUPA_URL  = 'https://uqthbzqpsgfflljxepen.supabase.co';
+  const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdGhienFwc2dmZmxsanhlcGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkyMTYsImV4cCI6MjA4OTA4NTIxNn0.bdZUNrd9TlErrs4uhCzzas9cKnUhzSKGOpkVQXIK1yA';
+
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json'
+  };
+
+  function fmtPeriodo(p) {
+    if (!p) return '';
+    const [ano, mes] = p.split('-');
+    const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return m[parseInt(mes)-1] + '/' + ano;
+  }
+
+  try {
+    // Buscar período atual
+    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?chave=eq.periodo_atual&select=valor', { headers });
+    const cfg = await cfgRes.json();
+    const periodo = cfg[0]?.valor || '2025-12';
+
+    // Buscar todos os dados financeiros
+    const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.asc', { headers });
+    const todos = await dadosRes.json();
+
+    if (!todos || todos.length === 0) return;
+
+    const d = todos.find(x => x.periodo === periodo) || todos[todos.length - 1];
+
+    // Montar objeto compatível com window.__CBF_DADOS__
+    window.__CBF_DADOS__ = {
+      periodo,
+      periodoFormatado: fmtPeriodo(periodo),
+      source_file: d.source_file,
+      geradoEm: d.updated_at,
+
+      receita_bruta:       +d.receita_bruta,
+      receita_liquida:     +d.receita_liquida,
+      resultado_exercicio: +d.resultado_exercicio,
+      custos_futebol:      Math.abs(+d.custos_futebol),
+      caixa_equivalentes:  +d.caixa_equivalentes,
+      ativo_total:         +d.ativo_total,
+      rec_financeiras:     +d.rec_financeiras,
+      patrimonio_liquido:  +d.patrimonio_liquido,
+      liquidez_corrente:   +d.liquidez_corrente,
+      liquidez_imediata:   +d.liquidez_imediata,
+      fluxo_operacional:   +d.fluxo_operacional,
+      fluxo_investimento:  +d.fluxo_investimento,
+
+      labels:          todos.map(h => fmtPeriodo(h.periodo)),
+      receita_serie:   todos.map(h => Math.round(+h.receita_bruta / 1000)),
+      resultado_serie: todos.map(h => Math.round(+h.resultado_exercicio / 1000)),
+      custos_serie:    todos.map(h => Math.round(Math.abs(+h.custos_futebol) / 1000)),
+      caixa_serie:     todos.map(h => Math.round(+h.caixa_equivalentes / 1000)),
+
+      receitas_composicao: [
+        Math.round(Math.abs(+d.rec_transmissao) / 1000),
+        Math.round(Math.abs(+d.rec_patrocinio) / 1000),
+        Math.round(Math.abs(+d.rec_bilheteria) / 1000),
+        Math.round(Math.abs(+d.rec_registros) / 1000),
+        Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000),
+      ],
+      custos_composicao: [
+        Math.round(Math.abs(+d.custo_fomento) / 1000),
+        Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
+        Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
+        Math.round(Math.abs(+d.custo_selecao_base) / 1000),
+      ],
+
+      custo_selecao_principal: Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
+      custo_selecao_base:      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
+      custo_selecao_femininas: Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
+      custo_fomento:           Math.round(Math.abs(+d.custo_fomento) / 1000),
+      desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) / 1000),
+      desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) / 1000),
+      desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) / 1000),
+
+      ativo_circulante:      +d.ativo_circulante,
+      passivo_circulante:    +d.passivo_circulante,
+      contas_receber:        +d.contas_receber,
+      tributos_recuperar:    +d.tributos_recuperar,
+      depositos_judiciais:   +d.depositos_judiciais,
+      imobilizado:           +d.imobilizado,
+      receitas_diferidas_cp: +d.receitas_diferidas_cp,
+      receitas_diferidas_lp: +d.receitas_diferidas_lp,
+      prov_contingencias:    +d.prov_contingencias,
+      patrimonio_social:     +d.patrimonio_social,
+    };
+
+    // Atualizar KPIs no DOM
+    if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
+
+    // Recriar gráficos com dados reais
+    if (typeof done !== 'undefined') done.clear();
+    if (typeof chartInstances !== 'undefined') {
+      Object.keys(chartInstances).forEach(id => {
+        try { chartInstances[id].destroy(); } catch(e) {}
+        delete chartInstances[id];
+      });
+    }
+    if (typeof initCharts === 'function') initCharts();
+
+    // Atualizar GD com dados reais
+    if (typeof GD !== 'undefined') {
+      GD.rec_composicao   = window.__CBF_DADOS__.receitas_composicao;
+      GD.cus_composicao   = window.__CBF_DADOS__.custos_composicao;
+      GD.hist_labels      = window.__CBF_DADOS__.labels;
+      GD.hist_resultado   = window.__CBF_DADOS__.resultado_serie;
+      GD.hist_receita     = window.__CBF_DADOS__.receita_serie;
+      GD.hist_custos      = window.__CBF_DADOS__.custos_serie;
+      GD.hist_caixa       = window.__CBF_DADOS__.caixa_serie;
+    }
+
+    // Barra de info no rodapé
+    const bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,112,60,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
+    bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(periodo) + '</strong> · ' + (d.source_file || 'DFS CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C800;text-decoration:none;font-weight:600">⚙️ Admin</a>';
+    document.body.appendChild(bar);
+
+    console.log('[CBF] Dados carregados do Supabase:', periodo, 'receita_bruta:', +d.receita_bruta);
+
+  } catch(err) {
+    console.warn('[CBF] Erro ao buscar dados do Supabase:', err);
+  }
+})();
+</script>
+
 
 </body>
 </html>
