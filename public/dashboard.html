@@ -1389,10 +1389,10 @@ function exportPDF() {
 initCharts();
 </script>
 <script>
-// ══════════════════════════════════════════════
-// AUTO-FETCH: busca dados do Supabase no browser
-// Popula window.__CBF_DADOS__ e atualiza dashboard
-// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// AUTO-FETCH: busca dados do Supabase e faz merge com histórico
+// Dados anteriores a 2025 mantidos do hardcode; Supabase completa
+// ══════════════════════════════════════════════════════════
 (async function() {
   const SUPA_URL  = 'https://uqthbzqpsgfflljxepen.supabase.co';
   const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdGhienFwc2dmZmxsanhlcGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkyMTYsImV4cCI6MjA4OTA4NTIxNn0.bdZUNrd9TlErrs4uhCzzas9cKnUhzSKGOpkVQXIK1yA';
@@ -1403,9 +1403,18 @@ initCharts();
     'Content-Type': 'application/json'
   };
 
+  // Dados históricos hardcoded (2021-2024) — fonte: DFS auditadas
+  const HIST = {
+    '2021': { label:'2021', receita:1070, resultado:69,  custos:620,  caixa:1040 },
+    '2022': { label:'2022', receita:1070, resultado:143, custos:700,  caixa:1040 },
+    '2023': { label:'2023', receita:1302, resultado:238, custos:723,  caixa:1041 },
+    '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433 },
+  };
+
   function fmtPeriodo(p) {
-    if (!p) return '';
+    if (!p) return p;
     const [ano, mes] = p.split('-');
+    if (!mes) return p; // já é só ano
     const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     return m[parseInt(mes)-1] + '/' + ano;
   }
@@ -1416,21 +1425,47 @@ initCharts();
     const cfg = await cfgRes.json();
     const periodo = cfg[0]?.valor || '2025-12';
 
-    // Buscar todos os dados financeiros
+    // Buscar todos os dados do Supabase
     const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.asc', { headers });
-    const todos = await dadosRes.json();
+    const supa = await dadosRes.json();
 
-    if (!todos || todos.length === 0) return;
+    if (!supa || supa.length === 0) { console.warn('[CBF] Sem dados no Supabase'); return; }
 
-    const d = todos.find(x => x.periodo === periodo) || todos[todos.length - 1];
+    // Dado mais recente (período atual)
+    const d = supa.find(x => x.periodo === periodo) || supa[supa.length - 1];
 
-    // Montar objeto compatível com window.__CBF_DADOS__
+    // ── Merge histórico: hardcode (anos anteriores) + Supabase (2025+) ──
+    // Montar mapa de anos do Supabase
+    const supaMap = {};
+    supa.forEach(row => {
+      const ano = row.periodo.split('-')[0];
+      supaMap[ano] = {
+        label: fmtPeriodo(row.periodo),
+        receita:   Math.round(+row.receita_bruta / 1000),
+        resultado: Math.round(+row.resultado_exercicio / 1000),
+        custos:    Math.round(Math.abs(+row.custos_futebol) / 1000),
+        caixa:     Math.round(+row.caixa_equivalentes / 1000),
+      };
+    });
+
+    // Combinar hardcode + Supabase (Supabase prevalece quando existe)
+    const merged = { ...HIST, ...supaMap };
+    const anos = Object.keys(merged).sort();
+
+    const labels      = anos.map(a => merged[a].label);
+    const rec_serie   = anos.map(a => merged[a].receita);
+    const res_serie   = anos.map(a => merged[a].resultado);
+    const cus_serie   = anos.map(a => merged[a].custos);
+    const caixa_serie = anos.map(a => merged[a].caixa);
+
+    // Montar __CBF_DADOS__ com dados do período atual + série completa
     window.__CBF_DADOS__ = {
       periodo,
       periodoFormatado: fmtPeriodo(periodo),
       source_file: d.source_file,
       geradoEm: d.updated_at,
 
+      // KPIs do período atual
       receita_bruta:       +d.receita_bruta,
       receita_liquida:     +d.receita_liquida,
       resultado_exercicio: +d.resultado_exercicio,
@@ -1444,12 +1479,14 @@ initCharts();
       fluxo_operacional:   +d.fluxo_operacional,
       fluxo_investimento:  +d.fluxo_investimento,
 
-      labels:          todos.map(h => fmtPeriodo(h.periodo)),
-      receita_serie:   todos.map(h => Math.round(+h.receita_bruta / 1000)),
-      resultado_serie: todos.map(h => Math.round(+h.resultado_exercicio / 1000)),
-      custos_serie:    todos.map(h => Math.round(Math.abs(+h.custos_futebol) / 1000)),
-      caixa_serie:     todos.map(h => Math.round(+h.caixa_equivalentes / 1000)),
+      // Série histórica completa (hardcode + Supabase merged)
+      labels,
+      receita_serie:   rec_serie,
+      resultado_serie: res_serie,
+      custos_serie:    cus_serie,
+      caixa_serie,
 
+      // Doughnuts período atual
       receitas_composicao: [
         Math.round(Math.abs(+d.rec_transmissao) / 1000),
         Math.round(Math.abs(+d.rec_patrocinio) / 1000),
@@ -1484,10 +1521,34 @@ initCharts();
       patrimonio_social:     +d.patrimonio_social,
     };
 
+    // Atualizar GD com série completa (merged)
+    if (typeof GD !== 'undefined') {
+      GD.hist_labels      = labels;
+      GD.hist_resultado   = res_serie;
+      GD.hist_receita     = rec_serie;
+      GD.hist_custos      = cus_serie;
+      GD.hist_caixa       = caixa_serie;
+      GD.rec_composicao   = window.__CBF_DADOS__.receitas_composicao;
+      GD.cus_composicao   = window.__CBF_DADOS__.custos_composicao;
+      GD.sel_2025 = [
+        window.__CBF_DADOS__.custo_selecao_principal,
+        window.__CBF_DADOS__.custo_selecao_base,
+        window.__CBF_DADOS__.custo_selecao_femininas
+      ];
+      GD.cus_barras = [
+        window.__CBF_DADOS__.custo_fomento,
+        window.__CBF_DADOS__.custo_selecao_principal,
+        window.__CBF_DADOS__.desp_administrativas,
+        window.__CBF_DADOS__.custo_selecao_femininas,
+        window.__CBF_DADOS__.desp_pessoal,
+        window.__CBF_DADOS__.custo_selecao_base,
+      ];
+    }
+
     // Atualizar KPIs no DOM
     if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
 
-    // Recriar gráficos com dados reais
+    // Recriar gráficos com dados completos
     if (typeof done !== 'undefined') done.clear();
     if (typeof chartInstances !== 'undefined') {
       Object.keys(chartInstances).forEach(id => {
@@ -1497,27 +1558,17 @@ initCharts();
     }
     if (typeof initCharts === 'function') initCharts();
 
-    // Atualizar GD com dados reais
-    if (typeof GD !== 'undefined') {
-      GD.rec_composicao   = window.__CBF_DADOS__.receitas_composicao;
-      GD.cus_composicao   = window.__CBF_DADOS__.custos_composicao;
-      GD.hist_labels      = window.__CBF_DADOS__.labels;
-      GD.hist_resultado   = window.__CBF_DADOS__.resultado_serie;
-      GD.hist_receita     = window.__CBF_DADOS__.receita_serie;
-      GD.hist_custos      = window.__CBF_DADOS__.custos_serie;
-      GD.hist_caixa       = window.__CBF_DADOS__.caixa_serie;
-    }
-
     // Barra de info no rodapé
     const bar = document.createElement('div');
+    bar.id = 'cbf-info-bar';
     bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,112,60,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
-    bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(periodo) + '</strong> · ' + (d.source_file || 'DFS CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C800;text-decoration:none;font-weight:600">⚙️ Admin</a>';
+    bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(periodo) + '</strong> · ' + (d.source_file||'DFS CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C800;text-decoration:none;font-weight:600">⚙️ Admin</a>';
     document.body.appendChild(bar);
 
-    console.log('[CBF] Dados carregados do Supabase:', periodo, 'receita_bruta:', +d.receita_bruta);
+    console.log('[CBF] ✅ Dados carregados. Período:', periodo, '| Série:', anos.join(','));
 
   } catch(err) {
-    console.warn('[CBF] Erro ao buscar dados do Supabase:', err);
+    console.warn('[CBF] ⚠️ Erro ao buscar dados do Supabase:', err.message);
   }
 })();
 </script>
