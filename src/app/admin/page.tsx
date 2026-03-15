@@ -180,11 +180,11 @@ export default function AdminPage() {
             </div>
 
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Arquivo {tipoDoc === 'dfs' ? 'DFS' : 'Balancete'} (xlsx)</label>
+              <label style={styles.label}>Arquivo {tipoDoc === 'dfs' ? 'DFS (xlsx)' : 'Balancete (xlsx ou csv)'}</label>
               <input
                 ref={fileRef}
                 type="file"
-                accept=".xlsx,.docx"
+                accept=".xlsx,.csv,.docx"
                 onChange={e => setFile(e.target.files?.[0] || null)}
                 style={styles.fileInput}
                 required
