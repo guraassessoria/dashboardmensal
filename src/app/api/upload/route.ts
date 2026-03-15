@@ -56,11 +56,10 @@ export async function POST(req: NextRequest) {
       .from('uploads')
       .insert({
         filename: file.name,
-        file_type: ext,
+        file_type: ['csv'].includes(ext || '') ? 'xlsx' : ext,
         storage_path: storagePath,
         periodo,
         tipo_documento: tipoDocumento,
-        file_type: ['csv'].includes(ext || '') ? 'xlsx' : ext, // csv tratado como xlsx no banco
         status: 'pending'
       })
       .select()
