@@ -181,6 +181,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   [style*="font-size:70px"] { font-size: 30px !important; }
   .kcard { break-inside: avoid !important; }
 }</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1371,10 +1373,22 @@ function exportPDF() {
   btn.innerHTML = '⏳ Gerando PDF...';
   btn.disabled = true;
 
+  // Detectar browser — Firefox usa window.print (funciona bem),
+  // Chrome/Edge/Safari usam html2canvas (evita problema de cores)
+  const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+
+  if (isFirefox) {
+    _exportViaPrint(btn, origHTML);
+  } else {
+    _exportViaCanvas(btn, origHTML);
+  }
+}
+
+// ── Método 1: window.print() — Firefox ──
+function _exportViaPrint(btn, origHTML) {
   const pages = document.querySelectorAll('.page');
   pages.forEach(p => { p.style.display = 'block'; });
 
-  // Normalizar styles inline problemáticos
   const _fixed = [];
   document.querySelectorAll('[style]').forEach(el => {
     const orig = el.getAttribute('style') || '';
@@ -1389,7 +1403,6 @@ function exportPDF() {
     if (Object.keys(patch).length) { Object.assign(el.style, patch); _fixed.push({ el, orig }); }
   });
 
-  // Forçar largura de impressão nos cwrap e recriar charts
   const PRINT_W = 1122;
   const cwraps = document.querySelectorAll('.cwrap');
   const origWrapStyles = [];
@@ -1417,7 +1430,6 @@ function exportPDF() {
     setTimeout(() => {
       window.print();
       setTimeout(() => {
-        // Restaurar tudo
         _fixed.forEach(({ el, orig }) => el.setAttribute('style', orig));
         cwraps.forEach((cw, i) => {
           if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
@@ -1432,6 +1444,114 @@ function exportPDF() {
       }, 800);
     }, 600);
   }, 2500);
+}
+
+// ── Método 2: html2canvas + jsPDF — Chrome/Edge/Safari ──
+async function _exportViaCanvas(btn, origHTML) {
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const activeId = document.querySelector('.ntab.active')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'overview';
+
+  // Mostrar todas as páginas
+  pages.forEach(p => { p.style.display = 'block'; });
+
+  // Normalizar styles inline
+  const _fixed = [];
+  document.querySelectorAll('[style]').forEach(el => {
+    const orig = el.getAttribute('style') || '';
+    const patch = {};
+    if (/display\s*:\s*flex/.test(orig) || /grid-template-columns/.test(orig)) { patch.width = '100%'; patch.boxSizing = 'border-box'; }
+    if (/flex-shrink\s*:\s*0/.test(orig)) patch.flexShrink = '1';
+    if (/min-width\s*:\s*240px/.test(orig)) { patch.minWidth = '0'; patch.flex = '1'; }
+    if (/gap\s*:\s*32px/.test(orig)) patch.gap = '8px';
+    if (/font-size\s*:\s*56px/.test(orig)) patch.fontSize = '26px';
+    if (/font-size\s*:\s*80px/.test(orig)) patch.fontSize = '32px';
+    if (/font-size\s*:\s*70px/.test(orig)) patch.fontSize = '30px';
+    if (Object.keys(patch).length) { Object.assign(el.style, patch); _fixed.push({ el, orig }); }
+  });
+
+  // Recriar charts em largura de captura
+  const CAPTURE_W = 1400;
+  const cwraps = document.querySelectorAll('.cwrap');
+  const origWrapStyles = [];
+  cwraps.forEach((cw, i) => {
+    origWrapStyles[i] = cw.getAttribute('style') || '';
+    cw.style.width = CAPTURE_W + 'px';
+    cw.style.display = 'block';
+  });
+
+  done.clear();
+  Object.keys(chartInstances).forEach(id => { try { chartInstances[id].destroy(); } catch(e) {} delete chartInstances[id]; });
+  initCharts();
+
+  // Aguardar render dos charts
+  await new Promise(r => setTimeout(r, 2500));
+
+  // Pintar fundo nos canvas
+  document.querySelectorAll('canvas').forEach(cv => {
+    if (!cv.width || !cv.height) return;
+    const ctx2 = cv.getContext('2d'); if (!ctx2) return;
+    ctx2.save(); ctx2.globalCompositeOperation = 'destination-over';
+    ctx2.fillStyle = '#0D1117'; ctx2.fillRect(0,0,cv.width,cv.height); ctx2.restore();
+  });
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const PDF_W = 297, PDF_H = 210;
+
+    for (let i = 0; i < pages.length; i++) {
+      btn.innerHTML = `⏳ Página ${i+1}/${pages.length}...`;
+      const canvas = await html2canvas(pages[i], {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#0D1117',
+        logging: false,
+        onclone: (doc, el) => {
+          doc.body.style.background = '#0D1117';
+          doc.documentElement.style.background = '#0D1117';
+          el.style.background = '#0D1117';
+          el.style.backgroundColor = '#0D1117';
+          // Garantir que grids não colapsam
+          Array.from(doc.querySelectorAll('.two,.cgrid,.c32')).forEach(g => {
+            g.style.overflow = 'visible';
+            Array.from(g.children).forEach(c => { c.style.minWidth = '0'; c.style.overflow = 'visible'; });
+          });
+        }
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const ratio = canvas.width / canvas.height;
+      let w = PDF_W, h = PDF_W / ratio;
+      if (h > PDF_H) { h = PDF_H; w = PDF_H * ratio; }
+      const x = (PDF_W - w) / 2, y = (PDF_H - h) / 2;
+
+      if (i > 0) pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', x, y, w, h);
+    }
+
+    btn.innerHTML = '⏳ Salvando...';
+    pdf.save('CBF-DFS-2025.pdf');
+
+  } catch(err) {
+    console.error('Erro ao gerar PDF:', err);
+    btn.innerHTML = '❌ Erro — tente novamente';
+    setTimeout(() => { btn.innerHTML = origHTML; btn.disabled = false; }, 3000);
+    return;
+  }
+
+  // Restaurar
+  _fixed.forEach(({ el, orig }) => el.setAttribute('style', orig));
+  cwraps.forEach((cw, i) => {
+    if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
+    else cw.removeAttribute('style');
+  });
+  pages.forEach(p => { p.style.display = (p.id === activeId) ? 'block' : ''; });
+  done.clear();
+  Object.keys(chartInstances).forEach(id => { try { chartInstances[id].destroy(); } catch(e) {} delete chartInstances[id]; });
+  initCharts();
+  btn.innerHTML = origHTML;
+  btn.disabled = false;
 }
 initCharts();
 </script>
