@@ -114,8 +114,22 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 @media print {
   @page          { size: A4 landscape; margin: 8mm 12mm; }
   @page portrait { size: A4 portrait;  margin: 8mm 12mm; }
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-  html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: #0D1117 !important; background-color: #0D1117 !important; margin: 0 !important; padding: 0 !important; color: #FAFAFA !important; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    forced-color-adjust: none !important;
+  }
+  html, body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    forced-color-adjust: none !important;
+    background: #0D1117 !important;
+    background-color: #0D1117 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #FAFAFA !important;
+  }
   .sticky-chrome, nav, footer, .pdf-btn { display: none !important; }
   .main { padding: 0 !important; margin: 0 auto !important; max-width: 100% !important; width: 100% !important; }
   .page { display: block !important; width: 100% !important; padding: 10px 12px !important; margin: 0 !important; box-sizing: border-box !important; page-break-before: always !important; break-before: page !important; background: #0D1117 !important; background-color: #0D1117 !important; color: #FAFAFA !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -129,6 +143,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   .kval { font-size: 14px !important; line-height: 1 !important; margin-bottom: 2px !important; }
   .klabel { font-size: 7.5px !important; margin-bottom: 3px !important; color: #8B949E !important; }
   .kdelta { font-size: 7.5px !important; } .ksub { font-size: 7px !important; }
+  canvas { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; forced-color-adjust: none !important; }
   .ccard { background: #161B22 !important; background-color: #161B22 !important; border: 1px solid rgba(255,255,255,.08) !important; padding: 8px 10px !important; margin-bottom: 6px !important; width: 100% !important; box-sizing: border-box !important; overflow: hidden !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; break-inside: auto !important; page-break-inside: auto !important; }
   .ctitle { font-size: 10px !important; margin-bottom: 2px !important; } .csub { font-size: 8.5px !important; margin-bottom: 6px !important; }
   .two, .cgrid, .c32 { display: grid !important; gap: 7px !important; width: 100% !important; box-sizing: border-box !important; }
@@ -931,10 +946,15 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 function sp(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('active');
   const ids = ['overview','receitas','despesas','balanco','bp','indicadores','historico'];
-  document.querySelectorAll('.ntab')[ids.indexOf(id)].classList.add('active');
+  const tabIdx = ids.indexOf(id);
+  if (tabIdx >= 0) document.querySelectorAll('.ntab')[tabIdx].classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+  // Limpar done para forçar recriação dos charts desta página
+  done.clear();
   setTimeout(initCharts, 80);
 }
 
