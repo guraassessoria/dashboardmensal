@@ -1374,7 +1374,7 @@ async function exportPDF() {
     if (Object.keys(patch).length) { Object.assign(el.style, patch); _fixed.push({ el, orig }); }
   });
 
-  // Recriar charts na largura de impressão A4 landscape
+  // Recriar charts na largura de impressão
   const PRINT_W = 1122;
   const cwraps = document.querySelectorAll('.cwrap');
   const origWrapStyles = [];
@@ -1383,30 +1383,68 @@ async function exportPDF() {
     cw.style.width = PRINT_W + 'px';
     cw.style.display = 'block';
   });
-
   done.clear();
   Object.keys(chartInstances).forEach(id => { try { chartInstances[id].destroy(); } catch(e) {} delete chartInstances[id]; });
   initCharts();
 
-  // Aguardar render dos charts e acionar impressão
+  // Pintar fundo nos canvas (para todos os browsers)
+  function paintBg() {
+    document.querySelectorAll('canvas').forEach(cv => {
+      if (!cv.width || !cv.height) return;
+      const ctx2 = cv.getContext('2d'); if (!ctx2) return;
+      ctx2.save(); ctx2.globalCompositeOperation = 'destination-over';
+      ctx2.fillStyle = '#0D1117'; ctx2.fillRect(0,0,cv.width,cv.height); ctx2.restore();
+    });
+  }
+
+  // Injetar style de impressão que usa box-shadow para backgrounds
+  // box-shadow é sempre impresso pelo Chrome/Edge independente das configurações
+  const printStyle = document.createElement('style');
+  printStyle.id = '__cbf_print_fix__';
+  printStyle.textContent = `
+    @media print {
+      html, body, .main { background: #0D1117 !important; }
+      .page {
+        background: #0D1117 !important;
+        box-shadow: inset 0 0 0 9999px #0D1117 !important;
+      }
+      .kcard, .ccard {
+        box-shadow: inset 0 0 0 9999px #161B22 !important;
+      }
+      .insight {
+        box-shadow: inset 0 0 0 9999px rgba(0,112,60,0.15) !important;
+      }
+      .insight.warn {
+        box-shadow: inset 0 0 0 9999px rgba(248,81,73,0.1) !important;
+      }
+    }
+  `;
+  document.head.appendChild(printStyle);
+
   setTimeout(() => {
-    window.print();
-    // Restaurar após o diálogo de impressão fechar
+    paintBg();
     setTimeout(() => {
-      _fixed.forEach(({ el, orig }) => el.setAttribute('style', orig));
-      cwraps.forEach((cw, i) => {
-        if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
-        else cw.removeAttribute('style');
-      });
-      const activeId = document.querySelector('.ntab.active')
-        ?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'overview';
-      pages.forEach(p => { p.style.display = (p.id === activeId) ? 'block' : ''; });
-      done.clear();
-      Object.keys(chartInstances).forEach(id => { try { chartInstances[id].destroy(); } catch(e) {} delete chartInstances[id]; });
-      initCharts();
-      btn.innerHTML = origHTML;
-      btn.disabled = false;
-    }, 1000);
+      window.print();
+      setTimeout(() => {
+        // Remover style injetado
+        const s = document.getElementById('__cbf_print_fix__');
+        if (s) s.remove();
+        // Restaurar tudo
+        _fixed.forEach(({ el, orig }) => el.setAttribute('style', orig));
+        cwraps.forEach((cw, i) => {
+          if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
+          else cw.removeAttribute('style');
+        });
+        const activeId = document.querySelector('.ntab.active')
+          ?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'overview';
+        pages.forEach(p => { p.style.display = (p.id === activeId) ? 'block' : ''; });
+        done.clear();
+        Object.keys(chartInstances).forEach(id => { try { chartInstances[id].destroy(); } catch(e) {} delete chartInstances[id]; });
+        initCharts();
+        btn.innerHTML = origHTML;
+        btn.disabled = false;
+      }, 1000);
+    }, 600);
   }, 2500);
 }
 initCharts();
