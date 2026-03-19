@@ -1425,7 +1425,7 @@ function initCharts() {
       backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':C.g,
       borderColor:(ctx)=>ctx.raw<0?C.neg:'transparent',
       borderWidth:1, borderRadius:6}]
-  }, options:{maintainAspectRatio:false, layout:{padding:{bottom:45}}, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{suggestedMin:-250, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
+  }, options:{maintainAspectRatio:false, layout:{padding:{bottom:60}}, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{suggestedMin:-300, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
 
   // c4 - Comp 2024 vs 2025 - dados reais
   safeChart('c4', {type:'bar', data:{
