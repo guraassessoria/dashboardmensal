@@ -1976,11 +1976,12 @@ initCharts();
   document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
     var user = document.getElementById('login-user').value.trim().toLowerCase();
-    var pass = document.getElementById('login-pass').value;
-    if (CREDENTIALS[user] && CREDENTIALS[user] === pass) {
+    var pass = document.getElementById('login-pass').value.trim();
+    console.log('[LOGIN] user:', JSON.stringify(user), 'pass:', JSON.stringify(pass));
+    if (CREDENTIALS.hasOwnProperty(user) && CREDENTIALS[user] === pass) {
       showDashboard();
     } else {
-      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos';
+      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos (user: "' + user + '")';
       document.getElementById('login-pass').value = '';
       document.getElementById('login-pass').focus();
     }
