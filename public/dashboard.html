@@ -238,6 +238,31 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 </head>
 <body>
 
+<!-- ═ LOGIN OVERLAY ═ -->
+<div id="login-overlay" style="position:fixed;inset:0;z-index:9999;background:#0D1117;display:flex;align-items:center;justify-content:center;">
+  <div style="background:rgba(22,27,34,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(12px);">
+    <div style="margin-bottom:28px;">
+      <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;color:#F5C900;letter-spacing:2px;margin-bottom:6px;">CBF DASHBOARD</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.5);font-weight:300;">Demonstrações Financeiras</div>
+    </div>
+    <form id="login-form" autocomplete="off" style="display:flex;flex-direction:column;gap:14px;">
+      <input id="login-user" type="text" placeholder="Usuário" required
+        style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:15px;font-family:var(--font-body);outline:none;box-sizing:border-box;transition:border-color .2s;"
+        onfocus="this.style.borderColor='rgba(245,201,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+      <input id="login-pass" type="password" placeholder="Senha" required
+        style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:15px;font-family:var(--font-body);outline:none;box-sizing:border-box;transition:border-color .2s;"
+        onfocus="this.style.borderColor='rgba(245,201,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
+      <div id="login-error" style="color:#C0392B;font-size:13px;min-height:20px;"></div>
+      <button type="submit"
+        style="width:100%;padding:12px;background:#003087;border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background .2s;font-family:var(--font-heading);"
+        onmouseover="this.style.background='#F5C900';this.style.color='#000'" onmouseout="this.style.background='#003087';this.style.color='#fff'">
+        ENTRAR
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="dashboard-content" style="display:none;">
 <div class="sticky-chrome">
 <header>
   <div class="hbg"></div>
@@ -322,13 +347,12 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       <div style="font-family:var(--font-heading);font-size:56px;color:var(--yellow);line-height:1;flex-shrink:0;">NIKE</div>
       <div style="flex:1;min-width:240px;">
-        <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;">Contrato Histórico · Vigência a partir de 2027</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Adiantamento de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Contrato com <strong style="color:var(--white)">vigência operacional a partir de 2027</strong> até 2038. Em 2025, a Nike segue sendo o maior patrocinador via contrato anterior, registrando <strong style="color:var(--white)">R$ 218 milhões no ano</strong> em patrocínio — com entrada em vigor do novo contrato prevista para <strong style="color:var(--yellow)">2027</strong>.</div>
+        <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;">Contrato</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de<strong style="color:var(--white)">R$ 218 milhões no ano</strong>.</strong>.</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:1px;">NOVO CONTRATO · VIGÊNCIA</div>
         <div style="font-family:var(--font-heading);font-size:30px;color:var(--pos);">2027 → 2038</div>
-        <div style="font-size:11px;color:var(--gray);margin-top:4px;">Adiantamento recebido em 2024</div>
       </div>
     </div>
   </div>
@@ -349,7 +373,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="csub" style="margin-bottom:18px;">Superávit/Déficit por exercício fiscal</div>
     <div class="cwrap" style="height:200px;"><canvas id="c3"></canvas></div>
     <div class="insight warn">
-      <div class="ilabel">⚠️ Atenção · Déficit</div>
+      <div class="ilabel">Déficit</div>
       <p>O déficit de <strong>R$ 182 milhões</strong> em 2025 reflete custos com futebol (R$1,18 bilhões) superando a receita bruta (R$1,19 bilhões) pelo efeito combinado de aumento de investimento e queda de receitas operacionais. A CBF mantém saúde financeira pelo <strong>caixa robusto de R$2 bilhões</strong> e receitas financeiras de R$318 milhões geradas principalmente pelo adiantamento Nike.</p>
     </div>
   </div>
@@ -382,7 +406,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="klabel">Registros e Transferências</div>
       <div class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
       <div class="kdelta up">▲ +32,9% vs 2024 (R$38,4 milhões)</div>
-      <div class="ksub">Movimentação de atletas no mercado</div>
+      <div class="ksub">Transferências de atletas e clubes no mercado</div>
     </div>
     <div class="kcard">
       <div class="klabel">Prog. Desenvolvimento + Academy</div>
@@ -406,7 +430,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="ccard">
     <div class="ctitle" style="margin-bottom:14px;">📡 Direitos de Transmissão e Comerciais</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:20px;">A receita de direitos de transmissão e comerciais totalizou <strong style="color:var(--yellow);">R$ 637,9 milhões</strong> em 2025, registrando redução de <strong style="color:var(--neg);">R$ 86,0 milhões (12%)</strong> em relação ao exercício anterior, resultado líquido entre <strong style="color:var(--neg);">R$ 126,2 milhões</strong> em reduções e <strong style="color:var(--pos);">R$ 40,6 milhões</strong> em crescimentos no período.</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:20px;">A receita de direitos de transmissão e comerciais totalizou <strong style="color:var(--yellow);">R$ 637,9 milhões</strong> em 2025, registrando redução de <strong style="color:var(--neg);">R$ 86,0 milhões (12%)</strong> em relação ao exercício anterior.</div>
 
     <div class="two" style="gap:24px;margin-bottom:0;">
       <!-- REDUÇÕES -->
@@ -431,35 +455,30 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <strong style="color:var(--white);font-size:14px;">Campeonato Brasileiro Série A</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--neg);">−R$ 18,7 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Redução associada à transição de ciclo contratual.</div>
         </div>
         <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Categoria de Base</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--neg);">−R$ 4,1 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Redução na receita de direitos de transmissão das categorias de base.</div>
         </div>
         <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Outras Competições</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--neg);">−R$ 3,1 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Queda nas receitas de competições diversas.</div>
         </div>
         <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Copa do Nordeste</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--neg);">−R$ 0,8 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Leve redução nos direitos comerciais da competição.</div>
         </div>
         <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:10px;padding:16px 18px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">E-Brasileirão</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--neg);">−R$ 0,4 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Descontinuação da receita no exercício.</div>
         </div>
       </div>
 
@@ -471,49 +490,43 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <strong style="color:var(--white);font-size:14px;">Seleções de Base e Feminina</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 17,6 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Crescimento expressivo no período.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Copa do Brasil — Masculina</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 9,8 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Expansão da receita no exercício.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Brasileiro Feminino</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 4,9 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Avanço da receita no período.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Copa do Brasil — Feminina</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 3,9 mi (nova receita)</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Estreia como nova linha de receita no exercício.</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Estreia como nova competição.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Super Copa do Brasil</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 2,7 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Crescimento nos direitos da competição.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Campeonato Brasileiro Série D</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 1,0 mi (nova receita)</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Estreia como linha de receita no exercício.</div>
         </div>
         <div style="background:rgba(0,150,63,.1);border:1px solid rgba(0,150,63,.25);border-radius:10px;padding:16px 18px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Campeonato Brasileiro Série C</strong>
             <span style="font-family:var(--font-mono);font-size:13px;color:var(--pos);">+R$ 0,7 mi</span>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;">Leve expansão da receita no período.</div>
         </div>
       </div>
     </div>
@@ -566,19 +579,16 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="klabel">Seleção Principal</div>
       <div class="kval">R$ 281,1 Mi</div>
       <div class="kdelta dn">▲ +39,7% vs 2024 (R$201,1 milhões)</div>
-      <div class="ksub">Preparação Copa 2026 · maior alocação</div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleções Femininas</div>
       <div class="kval">R$ 94,3 Mi</div>
       <div class="kdelta up">▼ −19,1% vs 2024 (R$116,5 milhões)</div>
-      <div class="ksub">Investimento pós-ciclo Copa Feminina</div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleções de Base</div>
       <div class="kval">R$ 44,7 Mi</div>
       <div class="kdelta dn">▲ +65,6% vs 2024 (R$27,0 milhões)</div>
-      <div class="ksub">Expansão das categorias de base</div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Desp. Administrativas</div>
@@ -590,7 +600,6 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="klabel">Desp. com Pessoal</div>
       <div class="kval">R$ 58,2 Mi</div>
       <div class="kdelta dn">▲ +15,6% vs 2024 (R$50,3 milhões)</div>
-      <div class="ksub">Reajustes e ampliação do quadro</div>
     </div>
   </div>
 
@@ -858,19 +867,17 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="klabel">Ativo Total</div>
       <div class="kval" id="kv-ativo">R$ 3,39 Bi</div>
       <div class="kdelta dn">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
-      <div class="ksub">Redução por consumo do caixa Nike</div>
     </div>
     <div class="kcard">
       <div class="klabel">Caixa e Equivalentes</div>
       <div class="kval">R$ 1,997 Bi</div>
       <div class="kdelta dn">▼ −18% vs 2024 (R$2,43 bilhões)</div>
-      <div class="ksub">Redução de R$436 milhões em disponibilidades</div>
+      <div class="ksub">Redução de R$436 milhões</div>
     </div>
     <div class="kcard">
       <div class="klabel">Contas a Receber</div>
       <div class="kval">R$ 291,6 Mi</div>
       <div class="kdelta up">▲ +10,6% vs 2024 (R$264 milhões)</div>
-      <div class="ksub">Normalização do ciclo de recebimentos</div>
     </div>
     <div class="kcard">
       <div class="klabel">Ativo Circulante</div>
@@ -888,7 +895,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="klabel">Receitas Diferidas (CP+LP)</div>
       <div class="kval">R$ 1,21 Bi</div>
       <div class="kdelta up">▼ −11,6% vs 2024 (R$1,37 bilhões)</div>
-      <div class="ksub">Adiantamento Nike sendo amortizado</div>
+      <div class="ksub">Amortização contrato NIKE</div>
     </div>
   </div>
 
@@ -943,7 +950,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="cwrap" style="height:260px;"><canvas id="cbp1"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">📋 Composição</div>
-        <p>Ativo dominado por <strong>Caixa e Equivalentes (2 Bi)</strong> — legado do adiantamento Nike. Depósitos Judiciais somam R$607 milhões (18% do ativo). Imobilizado modesto (R$309 milhões) reflete perfil de entidade de gestão, não industrial.</p>
+        <p>Ativo dominado por <strong>Caixa e Equivalentes (2 Bi)</strong>. Depósitos Judiciais somam R$607 milhões (18% do ativo). Imobilizado representa R$309 milhões na estrutura.</p>
       </div>
     </div>
     <div class="ccard">
@@ -952,7 +959,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="cwrap" style="height:260px;"><canvas id="cbp2"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">⚖️ Nota</div>
-        <p>Fornecedores e Contas a Pagar incluem <strong>R$86 milhões de repasses acumulados a clubes</strong>. Provisão para Contingências cresceu para R$672 milhões (+14% vs 2024), refletindo processos judiciais ativos — inclui Icasa e acordos trabalhistas.</p>
+        <p>Fornecedores e Contas a Pagar incluem <strong>R$86 milhões de repasses acumulados a clubes</strong>. Provisão para Contingências cresceu 14% no ano (R$672 milhões), refletindo processos judiciais tributários, cíveis e trabalhistas ativos.</p>
       </div>
     </div>
   </div>
@@ -1040,7 +1047,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="cwrap" style="height:260px;"><canvas id="cind2"></canvas></div>
       <div style="margin-top:16px;">
         <table>
-          <thead><tr><th>Linha da DFC</th><th style="text-align:right;">R$ Mi</th><th style="text-align:right;">Efeito</th></tr></thead>
+          <thead><tr><th>DFC</th><th style="text-align:right;">R$ Mi</th><th style="text-align:right;">Efeito</th></tr></thead>
           <tbody>
             <tr class="dre-header"><td colspan="3">Atividades Operacionais — (R$ 330 milhões)</td></tr>
             <tr><td>Déficit do Exercício</td><td class="num">(182,5)</td><td class="num dd">−</td></tr>
@@ -1143,6 +1150,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <footer>
   <p>Confederação Brasileira de Futebol · Demonstrações Financeiras 2025 </p>
 </footer>
+</div><!-- /dashboard-content -->
 
 <script>
 function sp(id) {
@@ -1939,5 +1947,45 @@ initCharts();
 })();
 </script>
 -->
+
+<script>
+// ═ LOGIN SYSTEM ═
+(function(){
+  const CREDENTIALS = {
+    'cbf': 'cbf2025',
+    'admin': 'dashboard2025'
+  };
+  const SESSION_KEY = 'cbf_dashboard_auth';
+
+  function isAuthenticated() {
+    return sessionStorage.getItem(SESSION_KEY) === 'true';
+  }
+
+  function showDashboard() {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('dashboard-content').style.display = 'block';
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    if (typeof done !== 'undefined') done.clear();
+    if (typeof initCharts === 'function') setTimeout(initCharts, 100);
+  }
+
+  if (isAuthenticated()) {
+    showDashboard();
+  }
+
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var user = document.getElementById('login-user').value.trim().toLowerCase();
+    var pass = document.getElementById('login-pass').value;
+    if (CREDENTIALS[user] && CREDENTIALS[user] === pass) {
+      showDashboard();
+    } else {
+      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }
+  });
+})();
+</script>
 </body>
 </html>
