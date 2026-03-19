@@ -1373,6 +1373,27 @@ function _atualizarKPIs() {
 // Executar atualização de KPIs imediatamente
 _atualizarKPIs();
 
+// ── Helpers para doughnut interativo ──
+function _doughnutLabels(showVal) {
+  return function(chart) {
+    const ds = chart.data.datasets[0];
+    const total = ds.data.reduce((a, v, i) => a + (chart.getDataVisibility(i) ? v : 0), 0);
+    return chart.data.labels.map((lbl, i) => {
+      const vis = chart.getDataVisibility(i);
+      const pct = total > 0 ? ((ds.data[i] / total) * 100).toFixed(1) : '0.0';
+      const txt = showVal ? lbl + ' R$' + ds.data[i] + 'Mi (' + pct + '%)' : lbl + ' (' + pct + '%)';
+      return { text: txt, fillStyle: vis ? ds.backgroundColor[i] : 'rgba(255,255,255,.15)', strokeStyle: vis ? ds.backgroundColor[i] : 'rgba(255,255,255,.15)', hidden: !vis, lineWidth: 0, index: i, fontColor: vis ? '#ffffff' : 'rgba(255,255,255,.35)' };
+    });
+  };
+}
+function _doughnutClick(e, item, legend) { legend.chart.toggleDataVisibility(item.index); legend.chart.update(); }
+function _doughnutTooltip(ctx) {
+  const chart = ctx.chart, ds = ctx.dataset;
+  const total = ds.data.reduce((a, v, i) => a + (chart.getDataVisibility(i) ? v : 0), 0);
+  const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : '0.0';
+  return ' R$ ' + ctx.parsed + ' Mi (' + pct + '%)';
+}
+
 function initCharts() {
   // c1 - Receita 2025 doughnut - dados reais
   safeChart('c1', {type:'doughnut', data:{
@@ -1380,20 +1401,8 @@ function initCharts() {
     datasets:[{data:GD.rec_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:0}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
-      legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
-        generateLabels:function(chart){
-          const ds=chart.data.datasets[0]; const total=ds.data.reduce((a,b)=>a+b,0);
-          return chart.data.labels.map((lbl,i)=>{
-            const pct=((ds.data[i]/total)*100).toFixed(1);
-            return {text:lbl+' R$'+ds.data[i]+'Mi ('+pct+'%)', fillStyle:ds.backgroundColor[i], strokeStyle:ds.backgroundColor[i], hidden:false, lineWidth:0, index:i, fontColor:'#ffffff', color:'#ffffff', textColor:'#ffffff'};
-          });
-        }
-      }},
-      tooltip:{callbacks:{label:function(ctx){
-        const total=ctx.dataset.data.reduce((a,b)=>a+b,0);
-        const pct=((ctx.parsed/total)*100).toFixed(1);
-        return ' R$ '+ctx.parsed+' Mi ('+pct+'%)';
-      }}}
+      legend:{position:'bottom', onClick:_doughnutClick, labels:{padding:12, boxWidth:10, color:'#ffffff', generateLabels:_doughnutLabels(true)}},
+      tooltip:{callbacks:{label:_doughnutTooltip}}
     }
   }});
 
@@ -1403,20 +1412,8 @@ function initCharts() {
     datasets:[{data:GD.cus_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:0}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
-      legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
-        generateLabels:function(chart){
-          const ds=chart.data.datasets[0]; const total=ds.data.reduce((a,b)=>a+b,0);
-          return chart.data.labels.map((lbl,i)=>{
-            const pct=((ds.data[i]/total)*100).toFixed(1);
-            return {text:lbl+' R$'+ds.data[i]+'Mi ('+pct+'%)', fillStyle:ds.backgroundColor[i], strokeStyle:ds.backgroundColor[i], hidden:false, lineWidth:0, index:i, fontColor:'#ffffff', color:'#ffffff', textColor:'#ffffff'};
-          });
-        }
-      }},
-      tooltip:{callbacks:{label:function(ctx){
-        const total=ctx.dataset.data.reduce((a,b)=>a+b,0);
-        const pct=((ctx.parsed/total)*100).toFixed(1);
-        return ' R$ '+ctx.parsed+' Mi ('+pct+'%)';
-      }}}
+      legend:{position:'bottom', onClick:_doughnutClick, labels:{padding:12, boxWidth:10, color:'#ffffff', generateLabels:_doughnutLabels(true)}},
+      tooltip:{callbacks:{label:_doughnutTooltip}}
     }
   }});
 
@@ -1509,12 +1506,18 @@ function initCharts() {
   safeChart('cbp1', {type:'doughnut', data:{
     labels:['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'],
     datasets:[{data:GD.ativo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:0}]
-  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
+  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{
+    legend:{position:'bottom', onClick:_doughnutClick, labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}, generateLabels:_doughnutLabels(false)}},
+    tooltip:{callbacks:{label:_doughnutTooltip}}
+  }}});
 
   safeChart('cbp2', {type:'doughnut', data:{
     labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'],
     datasets:[{data:GD.passivo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:0}]
-  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
+  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{
+    legend:{position:'bottom', onClick:_doughnutClick, labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}, generateLabels:_doughnutLabels(false)}},
+    tooltip:{callbacks:{label:_doughnutTooltip}}
+  }}});
 
   safeChart('cbp3', {type:'line', data:{
     labels:GD.bp_labels_10yr,
