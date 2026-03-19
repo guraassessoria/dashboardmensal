@@ -53,7 +53,7 @@ nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relat
 /* Padronização global de fonte – CBF Brand (Prometo + Noka) */
 *{font-family:var(--font-body) !important}
 .kval,.yr,.htitles h1,.stitle,.ctitle,h1,h2,h3,h4,[style*="font-family:'Bebas Neue'"]{font-family:var(--font-heading) !important;font-weight:700}
-.num,.pv,.td,.mono,td.num,td.dd,td.du,.du,.dd,.ph .pv,td,.kdelta,[style*="font-family:'DM Mono'"],[style*="font-family:var(--font-mono)"]{font-family:var(--font-heading) !important;font-weight:300}
+.num,.pv,.td,.mono,td.num,td.dd,td.du,.du,.dd,.ph .pv,.kdelta,[style*="font-family:'DM Mono'"],[style*="font-family:var(--font-mono)"]{font-family:var(--font-heading) !important;font-weight:300}
 .klabel,.csub,.airole,.ksub,.tx,th,footer p,.mono{color:#FAFAFA !important}
 .kdelta.neu{color:#FAFAFA !important}
 .htitles p{color:#FAFAFA !important}
@@ -580,13 +580,13 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="kdelta dn">▲ +65,6% vs 2024 (R$27,0 milhões)</div>
       <div class="ksub">Expansão das categorias de base</div>
     </div>
-    <div class="kcard" style="background:rgba(160,165,175,0.18);">
+    <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Desp. Administrativas</div>
       <div class="kval">R$ 369,1 Mi</div>
       <div class="kdelta dn">▲ +153% vs 2024 (R$145,8 milhões)</div>
       <div class="ksub">Inclui provisões e gastos extraordinários</div>
     </div>
-    <div class="kcard" style="background:rgba(160,165,175,0.18);">
+    <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Desp. com Pessoal</div>
       <div class="kval">R$ 58,2 Mi</div>
       <div class="kdelta dn">▲ +15,6% vs 2024 (R$50,3 milhões)</div>
@@ -1416,7 +1416,7 @@ function initCharts() {
   safeChart('c3', {type:'bar', data:{
     labels:GD.hist_labels,
     datasets:[{label:'Resultado (R$Mi)', data:GD.hist_resultado,
-      backgroundColor:(ctx)=>ctx.raw<0?'rgba(192,57,43,.7)':C.g,
+      backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':C.g,
       borderColor:(ctx)=>ctx.raw<0?C.neg:'transparent',
       borderWidth:1, borderRadius:6}]
   }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
@@ -1444,7 +1444,7 @@ function initCharts() {
   // c7 - Estrutura custos 2025 horizontal
   safeChart('c7', {type:'bar', data:{
     labels:['Fomento','Sel. Principal','Desp. Admin.','Sel. Femininas','Pessoal','Sel. Base'],
-    datasets:[{label:'R$Mi', data:GD.cus_barras, backgroundColor:[C.g,C.y,'rgba(110,168,254,.7)',C.b,C.gray,C.purple], borderRadius:6}]
+    datasets:[{label:'R$Mi', data:GD.cus_barras, backgroundColor:[C.g,C.y,'#6EA8FE',C.b,C.gray,C.purple], borderRadius:6}]
   }, options:{indexAxis:'y', maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
@@ -1481,9 +1481,9 @@ function initCharts() {
   safeChart('c11', {type:'bar', data:{
     labels:GD.hist_labels,
     datasets:[{label:'Receita Bruta (R$Mi)', data:GD.hist_receita,
-      backgroundColor:(ctx)=>ctx.dataIndex===4?'rgba(245,201,0,.5)':C.g,
-      borderColor:(ctx)=>ctx.dataIndex===4?C.y:'transparent',
-      borderWidth:(ctx)=>ctx.dataIndex===4?2:0, borderRadius:6}]
+      backgroundColor:(ctx)=>ctx.dataIndex===4?C.y:C.g,
+      borderColor:'transparent',
+      borderWidth:0, borderRadius:6}]
   }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
 
   // c12 - DRE Histórica 2021-2025 (Receita, Custos, Despesas, Resultado)
@@ -1525,7 +1525,7 @@ function initCharts() {
   safeChart('cind2', {type:'bar', data:{
     labels:GD.dfc_labels,
     datasets:[{label:'R$ Mi', data:GD.dfc_data,
-      backgroundColor:(ctx)=>ctx.raw<0?'rgba(192,57,43,.7)':'rgba(0,156,59,.7)', borderRadius:4}]
+      backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':'#009C3B', borderRadius:4}]
   }, options:{maintainAspectRatio:false,
     plugins:{legend:{display:false},
       tooltip:{callbacks:{label:function(ctx){return ' R$ '+ctx.parsed.y.toFixed(1)+' Mi';}}}
@@ -1556,7 +1556,7 @@ function initCharts() {
   safeChart('cdespop1', {type:'bar', data:{
     labels:['Desp. Administrativas','Desp. Pessoal','Total OPEX'],
     datasets:[
-      {label:'2025', data:[369.1,58.2,427.3], backgroundColor:'rgba(192,57,43,.7)', borderRadius:5},
+      {label:'2025', data:[369.1,58.2,427.3], backgroundColor:'#C0392B', borderRadius:5},
       {label:'2024', data:[145.8,50.3,196.1], backgroundColor:'#009C3B', borderRadius:4}
     ]
   }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
@@ -1565,9 +1565,9 @@ function initCharts() {
   safeChart('corc1', {type:'bar', data:{
     labels:['Receita Total','Invest. Futebol','Desp. Op+Fin','Tributos','Resultado'],
     datasets:[
-      {label:'Orçado (R$Mi)', data:[1685,1037,244,223,181], backgroundColor:'rgba(255,255,255,.18)', borderRadius:5},
+      {label:'Orçado (R$Mi)', data:[1685,1037,244,223,181], backgroundColor:'#4A4A4A', borderRadius:5},
       {label:'Realizado (R$Mi)', data:[1539,1177,460,84,-182],
-        backgroundColor:['rgba(192,57,43,.75)','rgba(0,156,59,.75)','rgba(192,57,43,.75)','rgba(0,156,59,.75)','rgba(192,57,43,.75)'], borderRadius:5}
+        backgroundColor:['#C0392B','#009C3B','#C0392B','#009C3B','#C0392B'], borderRadius:5}
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
@@ -1584,7 +1584,7 @@ function initCharts() {
   safeChart('corc2', {type:'bar', data:{
     labels:['Transmissão','Patrocínios','Bilheteria','Registros','Rec. Financeira'],
     datasets:[{label:'Desvio vs Orçado (R$Mi)', data:[-82,-12,-15,13,118],
-      backgroundColor:(ctx)=>ctx.raw<0?'rgba(192,57,43,.7)':'rgba(0,156,59,.7)', borderRadius:4}]
+      backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':'#009C3B', borderRadius:4}]
   }, options:{indexAxis:'y', maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
