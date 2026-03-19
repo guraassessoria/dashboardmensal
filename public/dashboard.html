@@ -29,7 +29,7 @@ header{position:relative;overflow:hidden;background:linear-gradient(135deg,var(-
 .htitles h1 span{color:var(--yellow)}
 .htitles p{font-size:8px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:300}
 .hr{text-align:right}
-.yr{font-family:var(--font-heading);font-size:26px;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 40px rgba(245,201,0,.4)}
+.yr{font-family:var(--font-heading);font-size:52px;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 40px rgba(245,201,0,.4)}
 .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:7px;color:var(--pos);font-weight:500;margin-top:8px}
 .badge::before{content:'●';font-size:5px}
 nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relative;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding-right:16px;flex-wrap:wrap}
@@ -246,15 +246,6 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 </head>
 <body>
 
-<div id="dev-banner">
-  <span>🔧 DEV MODE — Alterações de layout aqui não afetam produção</span>
-  <span>
-    <button onclick="document.body.classList.toggle('dev-grid-on')" title="Mostra bordas dos elementos">Grid Debug</button>
-    <button onclick="window.open('dashboard.html','_blank')" title="Abre a versão original para comparar">Ver Original</button>
-    <button onclick="location.reload()" title="Recarregar">↻ Reload</button>
-  </span>
-</div>
-
 <div class="sticky-chrome">
 <header>
   <div class="hbg"></div>
@@ -267,7 +258,6 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
     </div>
     <div class="hr">
-      <div class="yr">2025</div>
       <div class="yr">2025</div>
     </div>
   </div>
