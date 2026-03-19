@@ -13,7 +13,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.sticky-chrome{position:sticky;top:30px;z-index:200;}
+.sticky-chrome{position:sticky;top:0;z-index:200;}
 
 :root{--green:#009C3B;--gl:#009C3B;--gd:#004D26;--yellow:#F5C900;--blue:#003087;--bm:#003087;--white:#FFFFFF;--dark:#0D1117;--d2:#161B22;--gray:#B0B0B0;--g2:#6E7681;--bdr:rgba(255,255,255,0.08);--card:rgba(22,27,34,0.85);--pos:#009C3B;--neg:#C0392B;--font-heading:'Prometo','Bebas Neue',sans-serif;--font-body:'Noka','DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--cbf-yellow:#F5C900;--cbf-blue:#003087;--cbf-green:#009C3B;--cbf-white:#FFFFFF;--cbf-dark:#1A1A1A;--cbf-gray-light:#F4F4F4;--cbf-gray-mid:#B0B0B0;--cbf-neg:#C0392B}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -25,25 +25,25 @@ header{position:relative;overflow:hidden;background:linear-gradient(135deg,var(-
 .logo-a{display:flex;align-items:center;gap:20px}
 .emblem{width:110px;height:110px;flex-shrink:0;filter:drop-shadow(0 0 20px rgba(245,201,0,.35))}
 .emblem img{width:100%;height:100%;object-fit:contain}
-.htitles h1{font-family:var(--font-heading);font-size:clamp(16px,2.3vw,27px);font-weight:700;letter-spacing:2px;color:var(--white);line-height:1}
+.htitles h1{font-family:var(--font-heading);font-size:clamp(19px,2.8vw,32px);font-weight:700;letter-spacing:2px;color:var(--white);line-height:1}
 .htitles h1 span{color:var(--yellow)}
-.htitles p{font-size:8px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:300}
+.htitles p{font-size:10px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:300}
 .hr{text-align:right}
 .yr{font-family:var(--font-heading);font-size:52px;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 40px rgba(245,201,0,.4)}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:7px;color:var(--pos);font-weight:500;margin-top:8px}
-.badge::before{content:'●';font-size:5px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:8px;color:var(--pos);font-weight:500;margin-top:8px}
+.badge::before{content:'●';font-size:6px}
 nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relative;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding-right:16px;flex-wrap:wrap}
 .ni{flex:1;min-width:0;max-width:1400px;margin:0 auto;padding:0 40px;display:flex;flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
 .ni::-webkit-scrollbar{display:none}
-.ntab{padding:8px 11px;font-size:10px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-heading)}
+.ntab{padding:10px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-heading)}
 .ntab:hover{color:var(--white)}
 .ntab.active{color:var(--cbf-yellow);border-bottom-color:var(--cbf-yellow)}
 .main{max-width:1400px;margin:0 auto;padding:40px;position:relative;z-index:1}
 .page{display:none;animation:fi .4s ease;min-height:0}
 .page.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.slabel{font-family:var(--font-mono);font-size:7px;letter-spacing:2px;color:var(--yellow);text-transform:uppercase;margin-bottom:8px}
-.stitle{font-family:var(--font-heading);font-size:clamp(18px,1.9vw,27px);font-weight:700;letter-spacing:1px;line-height:1.1;margin-bottom:32px}
+.slabel{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--yellow);text-transform:uppercase;margin-bottom:8px}
+.stitle{font-family:var(--font-heading);font-size:clamp(22px,2.3vw,32px);font-weight:700;letter-spacing:1px;line-height:1.1;margin-bottom:32px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
 .kcard{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:22px;position:relative;backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
 .kcard:hover{transform:translateY(-2px);border-color:rgba(245,201,0,.2)}
@@ -80,42 +80,42 @@ strong[style*="color:var(--white)"]{color:var(--yellow) !important}
 strong[style*="color:#fff"]{color:var(--yellow) !important}
 strong[style*="color: #fff"]{color:var(--yellow) !important}
 
-/* ══ BODY FONT SIZES (−20% again) ══ */
-.klabel{font-size:10px !important}
-.kval{font-size:clamp(22px,3vw,32px) !important}
-.kdelta{font-size:10px !important}
-.ksub{font-size:9px !important}
-.ctitle{font-size:13px !important}
-.csub{font-size:10px !important}
-.insight p{font-size:11px !important}
-.ilabel{font-size:9px !important}
-table{font-size:11px !important}
-th{font-size:9px !important}
-td{font-size:10px !important}
-.slabel{font-size:9px !important}
-.stitle{font-size:clamp(22px,2.4vw,34px) !important}
-.pl{font-size:11px !important}
-.pv{font-size:10px !important}
-.tt{font-size:11px !important}
-.tx{font-size:10px !important}
-.td{font-size:9px !important}
-.airole{font-size:10px !important}
-.aiuse{font-size:10px !important}
-.ainame{font-size:14px !important}
-footer p{font-size:10px !important}
-.mono{font-size:9px !important}
+/* ══ BODY FONT SIZES (+20%) ══ */
+.klabel{font-size:12px !important}
+.kval{font-size:clamp(26px,3.6vw,38px) !important}
+.kdelta{font-size:12px !important}
+.ksub{font-size:11px !important}
+.ctitle{font-size:16px !important}
+.csub{font-size:12px !important}
+.insight p{font-size:13px !important}
+.ilabel{font-size:11px !important}
+table{font-size:13px !important}
+th{font-size:11px !important}
+td{font-size:12px !important}
+.slabel{font-size:11px !important}
+.stitle{font-size:clamp(26px,2.9vw,41px) !important}
+.pl{font-size:13px !important}
+.pv{font-size:12px !important}
+.tt{font-size:13px !important}
+.tx{font-size:12px !important}
+.td{font-size:11px !important}
+.airole{font-size:12px !important}
+.aiuse{font-size:12px !important}
+.ainame{font-size:17px !important}
+footer p{font-size:12px !important}
+.mono{font-size:11px !important}
 
-/* Padronizar inline font-sizes (−20% again) */
-[style*="font-size:10px"]{font-size:9px !important}
-[style*="font-size:11px"]{font-size:9px !important}
-[style*="font-size:12px"]{font-size:10px !important}
-[style*="font-size:13px"]{font-size:11px !important}
-[style*="font-size:14px"]{font-size:11px !important}
-[style*="font-size:16px"]{font-size:14px !important}
-[style*="font-size:28px"]{font-size:22px !important}
-[style*="font-size:30px"]{font-size:25px !important}
-[style*="font-size:56px"]{font-size:45px !important}
-[style*="font-size:80px"]{font-size:64px !important}
+/* Padronizar inline font-sizes (+20%) */
+[style*="font-size:10px"]{font-size:12px !important}
+[style*="font-size:11px"]{font-size:13px !important}
+[style*="font-size:12px"]{font-size:14px !important}
+[style*="font-size:13px"]{font-size:16px !important}
+[style*="font-size:14px"]{font-size:17px !important}
+[style*="font-size:16px"]{font-size:19px !important}
+[style*="font-size:28px"]{font-size:34px !important}
+[style*="font-size:30px"]{font-size:36px !important}
+[style*="font-size:56px"]{font-size:67px !important}
+[style*="font-size:80px"]{font-size:96px !important}
 
 .kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--yellow))}
 .klabel{font-size:12px;color:var(--gray);margin-bottom:10px}
@@ -179,7 +179,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 @media(max-width:768px){.main{padding:22px 16px}.hi{padding:22px 16px 18px}.ni{padding:0 16px}.two{grid-template-columns:1fr}footer{padding:18px 16px;flex-direction:column;text-align:center}}
 
 /* ── PDF EXPORT BUTTON ── */
-.pdf-btn{flex-shrink:0;margin-right:16px;padding:7px 16px;background:transparent;border:1px solid var(--yellow);border-radius:6px;color:var(--yellow);font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.pdf-btn{flex-shrink:0;margin-right:16px;padding:7px 16px;background:transparent;border:1px solid var(--yellow);border-radius:6px;color:var(--yellow);font-size:14px;font-weight:600;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
 .pdf-btn:hover{background:var(--yellow);color:#000}
 
 /* ── PRINT / PDF STYLES ── */
