@@ -13,7 +13,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.sticky-chrome{position:sticky;top:30px;z-index:200;}
+.sticky-chrome{position:sticky;top:0;z-index:200;}
 
 :root{--green:#009C3B;--gl:#009C3B;--gd:#004D26;--yellow:#F5C900;--blue:#003087;--bm:#003087;--white:#FFFFFF;--dark:#0D1117;--d2:#161B22;--gray:#B0B0B0;--g2:#6E7681;--bdr:rgba(255,255,255,0.08);--card:rgba(22,27,34,0.85);--pos:#009C3B;--neg:#C0392B;--font-heading:'Prometo','Bebas Neue',sans-serif;--font-body:'Noka','DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--cbf-yellow:#F5C900;--cbf-blue:#003087;--cbf-green:#009C3B;--cbf-white:#FFFFFF;--cbf-dark:#1A1A1A;--cbf-gray-light:#F4F4F4;--cbf-gray-mid:#B0B0B0;--cbf-neg:#C0392B}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -49,9 +49,9 @@ nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relat
 .kcard:hover{transform:translateY(-2px);border-color:rgba(245,201,0,.2)}
 
 /* ══ DEV MODE STYLES ══ */
-#dev-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#e74c3c,#c0392b);color:#fff;font:bold 12px var(--font-mono);padding:6px 16px;display:flex;justify-content:space-between;align-items:center;letter-spacing:1px}
-#dev-banner button{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-left:8px}
-#dev-banner button:hover{background:rgba(255,255,255,.35)}
+#dev-banner{position:fixed;top:0;right:0;z-index:9999;padding:6px 12px;display:flex;align-items:center}
+#dev-banner button{background:rgba(0,48,135,.85);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.5px}
+#dev-banner button:hover{background:rgba(0,48,135,1)}
 body.dev-grid-on *{outline:1px solid rgba(255,0,0,.15) !important}
 body.dev-grid-on .kcard,body.dev-grid-on .ccard{outline:2px solid rgba(0,200,255,.4) !important}
 body{padding-top:32px}
@@ -247,12 +247,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <body>
 
 <div id="dev-banner">
-  <span>🔧 DEV MODE — Alterações de layout aqui não afetam produção</span>
-  <span>
-    <button onclick="document.body.classList.toggle('dev-grid-on')" title="Mostra bordas dos elementos">Grid Debug</button>
-    <button onclick="window.open('dashboard.html','_blank')" title="Abre a versão original para comparar">Ver Original</button>
-    <button onclick="location.reload()" title="Recarregar">↻ Reload</button>
-  </span>
+  <button onclick="window.location.href='/admin'" title="Painel administrativo">Admin</button>
 </div>
 
 <div class="sticky-chrome">
