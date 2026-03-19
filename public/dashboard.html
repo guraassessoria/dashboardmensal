@@ -6,13 +6,11 @@
 <meta name="color-scheme" content="dark">
 <title>⚙️ CBF Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* CBF Official Typefaces – Dalton Maag */
 /* Prometo: headings, titles, highlights | Noka: body, captions, labels */
 /* When font files are available, add @font-face declarations here */
-</style>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
 .sticky-chrome{position:sticky;top:0;z-index:200;}
 
 :root{--green:#009C3B;--gl:#009C3B;--gd:#004D26;--yellow:#F5C900;--blue:#003087;--bm:#003087;--white:#FFFFFF;--dark:#0D1117;--d2:#161B22;--gray:#B0B0B0;--g2:#6E7681;--bdr:rgba(255,255,255,0.08);--card:rgba(22,27,34,0.85);--pos:#009C3B;--neg:#C0392B;--font-heading:'Prometo','Bebas Neue',sans-serif;--font-body:'Noka','DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--cbf-yellow:#F5C900;--cbf-blue:#003087;--cbf-green:#009C3B;--cbf-white:#FFFFFF;--cbf-dark:#1A1A1A;--cbf-gray-light:#F4F4F4;--cbf-gray-mid:#B0B0B0;--cbf-neg:#C0392B}
@@ -55,9 +53,6 @@ nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relat
    sem escalonamento frágil por atributo inline.
    ──────────────────────────────────────────────────────── */
 
-/* Fonte base no body — sem !important desnecessário */
-body{font-family:var(--font-body)}
-
 /* Headings e valores numéricos grandes → fonte de título */
 .kval,.yr,.htitles h1,.stitle,.ctitle,.ntab,
 h1,h2,h3,h4{font-family:var(--font-heading);font-weight:700}
@@ -70,7 +65,6 @@ h1,h2,h3,h4{font-family:var(--font-heading);font-weight:700}
 .kdelta.neu{color:var(--gray)}
 .htitles p{color:rgba(255,255,255,.55)}
 .insight p,.aiuse{color:rgba(255,255,255,.82)}
-td{color:rgba(255,255,255,.85)}
 td.dd,td[style*="color:var(--neg)"]{color:var(--neg)}
 td.du{color:var(--pos)}
 .pl{color:rgba(255,255,255,.78)}
@@ -78,34 +72,6 @@ td.du{color:var(--pos)}
 /* Negrito/strong → amarelo CBF nos blocos de insight */
 .insight p strong,.aiuse strong{color:var(--yellow)}
 
-/* ══ TAMANHOS DE FONTE — classes semânticas ══ */
-.klabel{font-size:12px}
-.kval{font-size:clamp(26px,3.5vw,38px);letter-spacing:1px}
-.kdelta{font-size:12px}
-.ksub{font-size:11px}
-.ctitle{font-size:15px}
-.csub{font-size:12px}
-.insight p{font-size:13px}
-.ilabel{font-size:10px}
-table{font-size:13px}
-th{font-size:11px}
-td{font-size:13px}
-.slabel{font-size:9px}
-.stitle{font-size:clamp(24px,2.5vw,35px)}
-.pl{font-size:13px}
-.pv{font-size:12px}
-.tt{font-size:14px}
-.tx{font-size:12px}
-.airole{font-size:12px}
-.aiuse{font-size:12px}
-.ainame{font-size:17px}
-footer p{font-size:12px}
-.mono{font-size:11px}
-
-/* Breakpoint intermediário: grid 5 colunas → 3 colunas entre 900-1200px */
-@media(max-width:1200px){
-  .kgrid[style*="repeat(5"]{grid-template-columns:repeat(3,1fr) !important}
-}
 
 .kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--yellow))}
 .klabel{font-size:12px;color:var(--gray);margin-bottom:10px}
@@ -128,16 +94,16 @@ footer p{font-size:12px}
 .ilabel{font-size:10px;letter-spacing:2px;color:var(--gl);font-weight:600;text-transform:uppercase;margin-bottom:6px}
 .insight.warn .ilabel{color:var(--neg)}
 .insight p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.72);font-weight:300}
-.insight p strong{color:var(--white);font-weight:500}
+.insight p strong{color:var(--yellow);font-weight:500}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:10px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);border-bottom:1px solid var(--bdr);font-weight:500}
-td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.8)}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(255,255,255,.85);font-size:13px}
 tr:hover td{background:rgba(255,255,255,.03)}
 .num{font-family:var(--font-mono);font-size:12px;text-align:right}
 .du{color:var(--pos);font-size:12px}.dd{color:var(--neg);font-size:12px}
 .pi{margin-bottom:14px}
 .ph{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px}
-.pl{color:rgba(255,255,255,.75)}.pv{font-family:var(--font-mono);color:var(--white)}
+.pl{color:rgba(255,255,255,.75);font-size:13px}.pv{font-family:var(--font-mono);color:var(--white);font-size:12px}
 .pb{height:6px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden}
 .pf{height:100%;border-radius:100px;transition:width 1s cubic-bezier(.4,0,.2,1)}
 .tl{position:relative;padding-left:28px}
