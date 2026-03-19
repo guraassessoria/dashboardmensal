@@ -25,17 +25,17 @@ header{position:relative;overflow:hidden;background:linear-gradient(135deg,var(-
 .logo-a{display:flex;align-items:center;gap:20px}
 .emblem{width:110px;height:110px;flex-shrink:0;filter:drop-shadow(0 0 20px rgba(245,201,0,.35))}
 .emblem img{width:100%;height:100%;object-fit:contain}
-.htitles h1{font-family:var(--font-heading);font-size:clamp(31px,4.5vw,53px);font-weight:700;letter-spacing:2px;color:var(--white);line-height:1}
+.htitles h1{font-family:var(--font-heading);font-size:clamp(25px,3.6vw,42px);font-weight:700;letter-spacing:2px;color:var(--white);line-height:1}
 .htitles h1 span{color:var(--yellow)}
-.htitles p{font-size:16px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:300}
+.htitles p{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px;font-weight:300}
 .hr{text-align:right}
-.yr{font-family:var(--font-heading);font-size:51px;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 40px rgba(245,201,0,.4)}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:14px;color:var(--pos);font-weight:500;margin-top:8px}
-.badge::before{content:'●';font-size:10px}
+.yr{font-family:var(--font-heading);font-size:41px;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 40px rgba(245,201,0,.4)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:11px;color:var(--pos);font-weight:500;margin-top:8px}
+.badge::before{content:'●';font-size:8px}
 nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relative;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding-right:16px;flex-wrap:wrap}
 .ni{flex:1;min-width:0;max-width:1400px;margin:0 auto;padding:0 40px;display:flex;flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
 .ni::-webkit-scrollbar{display:none}
-.ntab{padding:12px 18px;font-size:19px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-heading)}
+.ntab{padding:12px 18px;font-size:15px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font-heading)}
 .ntab:hover{color:var(--white)}
 .ntab.active{color:var(--cbf-yellow);border-bottom-color:var(--cbf-yellow)}
 .main{max-width:1400px;margin:0 auto;padding:40px;position:relative;z-index:1}
@@ -80,42 +80,42 @@ strong[style*="color:var(--white)"]{color:var(--yellow) !important}
 strong[style*="color:#fff"]{color:var(--yellow) !important}
 strong[style*="color: #fff"]{color:var(--yellow) !important}
 
-/* ══ DEV FONT SIZE BOOST (+30% over previous) ══ */
-.klabel{font-size:20px !important}           /* 15→20 */
-.kval{font-size:clamp(42px,5.9vw,62px) !important} /* 32→42, 48→62 */
-.kdelta{font-size:20px !important}           /* 15→20 */
-.ksub{font-size:18px !important}             /* 14→18 */
-.ctitle{font-size:25px !important}           /* 19→25 */
-.csub{font-size:20px !important}             /* 15→20 */
-.insight p{font-size:21px !important}        /* 16→21 */
-.ilabel{font-size:17px !important}           /* 13→17 */
-table{font-size:21px !important}             /* 16→21 */
-th{font-size:18px !important}                /* 14→18 */
-td{font-size:20px !important}                /* 15→20 */
-.slabel{font-size:18px !important}           /* 14→18 */
-.stitle{font-size:clamp(44px,4.6vw,68px) !important} /* 34→44, 52→68 */
-.pl{font-size:21px !important}               /* 16→21 */
-.pv{font-size:20px !important}               /* 15→20 */
-.tt{font-size:23px !important}               /* 18→23 */
-.tx{font-size:20px !important}               /* 15→20 */
-.td{font-size:18px !important}               /* 14→18 */
-.airole{font-size:20px !important}           /* 15→20 */
-.aiuse{font-size:20px !important}            /* 15→20 */
-.ainame{font-size:27px !important}           /* 21→27 */
-footer p{font-size:20px !important}          /* 15→20 */
-.mono{font-size:18px !important}             /* 14→18 */
+/* ══ BODY FONT SIZES (−20% from boost) ══ */
+.klabel{font-size:16px !important}
+.kval{font-size:clamp(34px,4.7vw,50px) !important}
+.kdelta{font-size:16px !important}
+.ksub{font-size:14px !important}
+.ctitle{font-size:20px !important}
+.csub{font-size:16px !important}
+.insight p{font-size:17px !important}
+.ilabel{font-size:14px !important}
+table{font-size:17px !important}
+th{font-size:14px !important}
+td{font-size:16px !important}
+.slabel{font-size:14px !important}
+.stitle{font-size:clamp(35px,3.7vw,54px) !important}
+.pl{font-size:17px !important}
+.pv{font-size:16px !important}
+.tt{font-size:18px !important}
+.tx{font-size:16px !important}
+.td{font-size:14px !important}
+.airole{font-size:16px !important}
+.aiuse{font-size:16px !important}
+.ainame{font-size:22px !important}
+footer p{font-size:16px !important}
+.mono{font-size:14px !important}
 
-/* Padronizar inline font-sizes (+30%) */
-[style*="font-size:10px"]{font-size:17px !important}
-[style*="font-size:11px"]{font-size:18px !important}
-[style*="font-size:12px"]{font-size:20px !important}
-[style*="font-size:13px"]{font-size:21px !important}
-[style*="font-size:14px"]{font-size:23px !important}
-[style*="font-size:16px"]{font-size:26px !important}
-[style*="font-size:28px"]{font-size:44px !important}
-[style*="font-size:30px"]{font-size:49px !important}
-[style*="font-size:56px"]{font-size:88px !important}
-[style*="font-size:80px"]{font-size:125px !important}
+/* Padronizar inline font-sizes (−20%) */
+[style*="font-size:10px"]{font-size:14px !important}
+[style*="font-size:11px"]{font-size:14px !important}
+[style*="font-size:12px"]{font-size:16px !important}
+[style*="font-size:13px"]{font-size:17px !important}
+[style*="font-size:14px"]{font-size:18px !important}
+[style*="font-size:16px"]{font-size:21px !important}
+[style*="font-size:28px"]{font-size:35px !important}
+[style*="font-size:30px"]{font-size:39px !important}
+[style*="font-size:56px"]{font-size:70px !important}
+[style*="font-size:80px"]{font-size:100px !important}
 
 .kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--yellow))}
 .klabel{font-size:12px;color:var(--gray);margin-bottom:10px}
