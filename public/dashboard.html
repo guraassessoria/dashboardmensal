@@ -45,73 +45,72 @@ nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relat
 .slabel{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--yellow);text-transform:uppercase;margin-bottom:8px}
 .stitle{font-family:var(--font-heading);font-size:clamp(24px,2.5vw,35px);font-weight:700;letter-spacing:1px;line-height:1.1;margin-bottom:32px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.cbf-grid-5{grid-template-columns:repeat(5,1fr)}
 .kcard{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:22px;position:relative;backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
 .kcard:hover{transform:translateY(-2px);border-color:rgba(245,201,0,.2)}
 
-/* ══ DEV LAYOUT OVERRIDES ══ */
-:root{--neg:#C0392B;--gray:#FAFAFA;--g2:#FAFAFA}
-/* Padronização global de fonte – CBF Brand (Prometo + Noka) */
-*{font-family:var(--font-body) !important}
-.kval,.yr,.htitles h1,.stitle,.ctitle,h1,h2,h3,h4,[style*="font-family:'Bebas Neue'"]{font-family:var(--font-heading) !important;font-weight:700}
-.num,.pv,.td,.mono,[style*="font-family:'DM Mono'"]{font-family:var(--font-mono) !important}
-.klabel,.csub,.airole,.ksub,.tx,th,footer p,.mono{color:#FAFAFA !important}
-.kdelta.neu{color:#FAFAFA !important}
-.htitles p{color:#FAFAFA !important}
-.insight p,.aiuse{color:#FAFAFA !important}
-td{color:#FAFAFA !important}
-td.dd,td[style*="color:var(--neg)"]{color:#C0392B !important}
-td.du{color:var(--pos) !important}
-.pl{color:#FAFAFA !important}
-[style*="color:rgba(255,255,255,."]{color:#FAFAFA !important}
-[style*="color:#B0B0B0"]{color:#FAFAFA !important}
-[style*="color:var(--gray)"]{color:#FAFAFA !important}
-/* Negrito/strong → amarelo */
-.insight p strong,.aiuse strong,td strong,p strong,div strong,span strong{color:var(--yellow) !important}
-[style*="color:var(--white)"] strong,[style*="color:#FAFAFA"] strong{color:var(--yellow) !important}
-strong[style*="color:var(--white)"]{color:var(--yellow) !important}
-strong[style*="color:#fff"]{color:var(--yellow) !important}
-strong[style*="color: #fff"]{color:var(--yellow) !important}
+/* ══ CBF BRAND OVERRIDES ══
+   Aplicação limpa da tipografia CBF sem regra nuclear (*).
+   Fontes aplicadas por seletor específico; tamanhos via classes,
+   sem escalonamento frágil por atributo inline.
+   ──────────────────────────────────────────────────────── */
 
-/* ══ BODY FONT SIZES (+10%) ══ */
-.klabel{font-size:13px !important}
-.kval{font-size:clamp(29px,4vw,42px) !important}
-.kdelta{font-size:13px !important}
-.ksub{font-size:12px !important}
-.ctitle{font-size:18px !important}
-.csub{font-size:13px !important}
-.insight p{font-size:14px !important}
-.ilabel{font-size:12px !important}
-table{font-size:14px !important}
-th{font-size:12px !important}
-td{font-size:13px !important}
-.slabel{font-size:12px !important}
-.stitle{font-size:clamp(29px,3.2vw,45px) !important}
-.pl{font-size:14px !important}
-.pv{font-size:13px !important}
-.tt{font-size:14px !important}
-.tx{font-size:13px !important}
-.td{font-size:12px !important}
-.airole{font-size:13px !important}
-.aiuse{font-size:13px !important}
-.ainame{font-size:19px !important}
-footer p{font-size:13px !important}
-.mono{font-size:12px !important}
+/* Fonte base no body — sem !important desnecessário */
+body{font-family:var(--font-body)}
 
-/* Padronizar inline font-sizes (+10%) */
-[style*="font-size:10px"]{font-size:13px !important}
-[style*="font-size:11px"]{font-size:14px !important}
-[style*="font-size:12px"]{font-size:15px !important}
-[style*="font-size:13px"]{font-size:18px !important}
-[style*="font-size:14px"]{font-size:19px !important}
-[style*="font-size:16px"]{font-size:21px !important}
-[style*="font-size:28px"]{font-size:37px !important}
-[style*="font-size:30px"]{font-size:40px !important}
-[style*="font-size:56px"]{font-size:74px !important}
-[style*="font-size:80px"]{font-size:106px !important}
+/* Headings e valores numéricos grandes → fonte de título */
+.kval,.yr,.htitles h1,.stitle,.ctitle,.ntab,
+h1,h2,h3,h4{font-family:var(--font-heading);font-weight:700}
+
+/* Monospace → DM Mono */
+.num,.pv,.td,.mono,code{font-family:var(--font-mono)}
+
+/* Cores de texto padronizadas — usando variáveis, sem sobrescrever tudo */
+.klabel,.csub,.airole,.ksub,.tx,th,footer p{color:var(--gray)}
+.kdelta.neu{color:var(--gray)}
+.htitles p{color:rgba(255,255,255,.55)}
+.insight p,.aiuse{color:rgba(255,255,255,.82)}
+td{color:rgba(255,255,255,.85)}
+td.dd,td[style*="color:var(--neg)"]{color:var(--neg)}
+td.du{color:var(--pos)}
+.pl{color:rgba(255,255,255,.78)}
+
+/* Negrito/strong → amarelo CBF nos blocos de insight */
+.insight p strong,.aiuse strong{color:var(--yellow)}
+
+/* ══ TAMANHOS DE FONTE — classes semânticas ══ */
+.klabel{font-size:12px}
+.kval{font-size:clamp(26px,3.5vw,38px);letter-spacing:1px}
+.kdelta{font-size:12px}
+.ksub{font-size:11px}
+.ctitle{font-size:15px}
+.csub{font-size:12px}
+.insight p{font-size:13px}
+.ilabel{font-size:10px}
+table{font-size:13px}
+th{font-size:11px}
+td{font-size:13px}
+.slabel{font-size:9px}
+.stitle{font-size:clamp(24px,2.5vw,35px)}
+.pl{font-size:13px}
+.pv{font-size:12px}
+.tt{font-size:14px}
+.tx{font-size:12px}
+.airole{font-size:12px}
+.aiuse{font-size:12px}
+.ainame{font-size:17px}
+footer p{font-size:12px}
+.mono{font-size:11px}
+
+/* Breakpoint intermediário: grid 5 colunas → 3 colunas entre 900-1200px */
+@media(max-width:1200px){
+  .kgrid[style*="repeat(5"]{grid-template-columns:repeat(3,1fr) !important}
+}
 
 .kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--yellow))}
 .klabel{font-size:12px;color:var(--gray);margin-bottom:10px}
 .kval{font-family:var(--font-heading);font-size:clamp(26px,3.5vw,38px);letter-spacing:1px;color:var(--white);line-height:1;margin-bottom:8px}
+.kval-sm{font-size:clamp(20px,2.2vw,28px) !important}
 .kval.y{color:var(--yellow)}.kval.g{color:var(--pos)}.kval.r{color:var(--neg)}
 .kdelta{font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
 .kdelta.up{color:var(--pos)}.kdelta.dn{color:var(--neg)}.kdelta.neu{color:var(--gray)}
@@ -153,7 +152,7 @@ tr:hover td{background:rgba(255,255,255,.03)}
 .aicard:hover{border-color:rgba(245,201,0,.3);transform:translateY(-2px)}
 .aibadge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
 .an{background:rgba(0,156,59,.15);color:var(--pos);border:1px solid rgba(0,156,59,.3)}
-.af{background:rgba(0,55,165,.25);color:#6ea8fe;border:1px solid rgba(110,168,254,.3)}
+.af{background:rgba(0,48,135,.25);color:rgba(100,160,255,.9);border:1px solid rgba(0,48,135,.4)}
 .al{background:rgba(245,201,0,.12);color:var(--yellow);border:1px solid rgba(245,201,0,.3)}
 .av{background:rgba(188,140,255,.12);color:#bc8cff;border:1px solid rgba(188,140,255,.3)}
 .ainame{font-size:17px;font-weight:700;color:var(--white);margin-bottom:6px}
@@ -168,7 +167,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;min-width:0}
 .dre-row-total td{font-weight:600;background:rgba(255,255,255,.04);border-top:1px solid rgba(255,255,255,.12)!important}
 .dre-header td{color:var(--yellow);font-weight:600;padding-top:18px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
-@media(max-width:768px){.main{padding:22px 16px}.hi{padding:22px 16px 18px}.ni{padding:0 16px}.two{grid-template-columns:1fr}footer{padding:18px 16px;flex-direction:column;text-align:center}}
+@media(max-width:1200px){.main{padding:32px 24px}.cbf-grid-5{grid-template-columns:repeat(3,1fr) !important}}
+@media(max-width:900px){.cbf-grid-5{grid-template-columns:repeat(2,1fr) !important}}
+@media(max-width:768px){.main{padding:22px 16px}.hi{padding:22px 16px 18px}.ni{padding:0 16px}.two{grid-template-columns:1fr}.cbf-grid-5{grid-template-columns:1fr !important}footer{padding:18px 16px;flex-direction:column;text-align:center}}
 
 /* ── PDF EXPORT BUTTON ── */
 .pdf-btn{flex-shrink:0;margin-right:16px;padding:7px 16px;background:transparent;border:1px solid var(--yellow);border-radius:6px;color:var(--yellow);font-size:15px;font-weight:600;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
@@ -361,34 +362,34 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <div id="receitas" class="page landscape">
   <div class="stitle">Receitas</div>
 
-  <div class="kgrid" style="grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
+  <div class="kgrid cbf-grid-5" style="gap:12px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel">Direitos de Transmissão e Comerciais</div>
-      <div class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
+      <div class="kval kval-sm">R$ 637,9 Mi</div>
       <div class="kdelta dn">▼ −11,9% vs 2024 (R$723,9 milhões)</div>
       <div class="ksub">Maior fonte — 53% da receita bruta</div>
     </div>
     <div class="kcard">
       <div class="klabel">Patrocínios</div>
-      <div class="kval" style="font-size:28px;">R$ 437,9 Mi</div>
+      <div class="kval kval-sm">R$ 437,9 Mi</div>
       <div class="kdelta dn">▼ −3,0% vs 2024 (R$451,4 milhões)</div>
       <div class="ksub">Nike vigência nova: a partir de 2027</div>
     </div>
     <div class="kcard">
       <div class="klabel">Bilheteria e Premiações</div>
-      <div class="kval" style="font-size:28px;">R$ 54,8 Mi</div>
+      <div class="kval kval-sm">R$ 54,8 Mi</div>
       <div class="kdelta dn">▼ −18,1% vs 2024 (R$67,0 milhões)</div>
       <div class="ksub">Jogos da Seleção e competições</div>
     </div>
     <div class="kcard">
       <div class="klabel">Registros e Transferências</div>
-      <div class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
+      <div class="kval kval-sm">R$ 51,0 Mi</div>
       <div class="kdelta up">▲ +32,9% vs 2024 (R$38,4 milhões)</div>
       <div class="ksub">Movimentação de atletas no mercado</div>
     </div>
     <div class="kcard">
       <div class="klabel">Prog. Desenvolvimento + Academy</div>
-      <div class="kval" style="font-size:28px;">R$ 11,6 Mi</div>
+      <div class="kval kval-sm">R$ 11,6 Mi</div>
       <div class="kdelta dn">▼ −46% vs 2024 (R$21,7 milhões)</div>
       <div class="ksub">CBF Academy e programas de base</div>
     </div>
@@ -1164,14 +1165,15 @@ function sp(id) {
 
 // Sticky chrome handled by CSS wrapper
 
+// ── Chart.js globals — definição única canônica ──
 Chart.defaults.color = '#ffffff';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.borderColor = 'rgba(255,255,255,0.07)';
+Chart.defaults.font.family = "var(--font-body, 'DM Sans', sans-serif)";
 Chart.defaults.responsive = true;
-  Chart.defaults.maintainAspectRatio = false;
-  Chart.defaults.plugins.legend.labels.color = '#ffffff';
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.labels.color = '#ffffff';
 Chart.defaults.plugins.legend.labels.boxWidth = 12;
-Chart.defaults.plugins.legend.labels.font = {size:15};
+Chart.defaults.plugins.legend.labels.font = {size: 11};
 
 const C = {y:'#F5C900',g:'#009C3B',b:'#003087',pos:'#009C3B',neg:'#C0392B',gray:'#B0B0B0',purple:'#bc8cff'};
 const done = new Set();
@@ -1222,9 +1224,7 @@ function safeChart(id, cfg) {
 }
 
 
-  // Force white text on all chart elements
-  Chart.defaults.color = '#ffffff';
-  Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
+  // Force white text on all chart elements — já definido globalmente acima
 
 
 // ══════════════════════════════════════════════════════
@@ -1502,13 +1502,13 @@ function initCharts() {
   // ── BALANÇO PATRIMONIAL ──
   safeChart('cbp1', {type:'doughnut', data:{
     labels:['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'],
-    datasets:[{data:GD.ativo_composicao, backgroundColor:[C.y,'#58A6FF',C.g,'#ffffff','#1F6FEB'], borderWidth:2, borderColor:'#161B22'}]
-  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
+    datasets:[{data:GD.ativo_composicao, backgroundColor:[C.y,'#58A6FF',C.g,'rgba(255,255,255,.7)',C.b], borderWidth:2, borderColor:'#161B22'}]
+  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:11}}}}}});
 
   safeChart('cbp2', {type:'doughnut', data:{
     labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'],
-    datasets:[{data:GD.passivo_composicao, backgroundColor:[C.y,C.g,'#ffffff','#1F6FEB'], borderWidth:2, borderColor:'#161B22'}]
-  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
+    datasets:[{data:GD.passivo_composicao, backgroundColor:[C.y,C.g,'rgba(255,255,255,.7)',C.b], borderWidth:2, borderColor:'#161B22'}]
+  }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:11}}}}}});
 
   safeChart('cbp3', {type:'line', data:{
     labels:GD.bp_labels_10yr,
