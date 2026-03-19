@@ -45,7 +45,7 @@ nav{background:var(--cbf-blue);border-bottom:1px solid var(--bdr);position:relat
 .slabel{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--yellow);text-transform:uppercase;margin-bottom:8px}
 .stitle{font-family:var(--font-heading);font-size:clamp(24px,2.5vw,35px);font-weight:700;letter-spacing:1px;line-height:1.1;margin-bottom:32px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
-.kcard{background:rgba(200,205,215,0.08);border:1px solid var(--bdr);border-radius:12px;padding:22px;position:relative;backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
+.kcard{background:rgba(220,225,230,0.15);border:1px solid var(--bdr);border-radius:12px;padding:22px;position:relative;backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
 .kcard:hover{transform:translateY(-2px);border-color:rgba(245,201,0,.2)}
 
 /* ══ DEV LAYOUT OVERRIDES ══ */
@@ -1369,7 +1369,7 @@ function initCharts() {
   // c1 - Receita 2025 doughnut - dados reais
   safeChart('c1', {type:'doughnut', data:{
     labels:['Transmissão/Comercial','Patrocínios','Bilheteria','Registros','PD + Academy'],
-    datasets:[{data:GD.rec_composicao, backgroundColor:[C.y,C.g,C.b,C.purple,C.gray], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.rec_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:2, borderColor:'#161B22'}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
       legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
@@ -1392,7 +1392,7 @@ function initCharts() {
   // c2 - Custos Futebol 2025
   safeChart('c2', {type:'doughnut', data:{
     labels:['Fomento Estados','Sel. Principal','Sel. Femininas','Sel. Base'],
-    datasets:[{data:GD.cus_composicao, backgroundColor:[C.g,C.y,C.b,C.purple], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.cus_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:2, borderColor:'#161B22'}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
       legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
@@ -1500,12 +1500,12 @@ function initCharts() {
   // ── BALANÇO PATRIMONIAL ──
   safeChart('cbp1', {type:'doughnut', data:{
     labels:['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'],
-    datasets:[{data:GD.ativo_composicao, backgroundColor:[C.y,'#58A6FF',C.g,'#ffffff','#1F6FEB'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.ativo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:2, borderColor:'#161B22'}]
   }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
 
   safeChart('cbp2', {type:'doughnut', data:{
     labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'],
-    datasets:[{data:GD.passivo_composicao, backgroundColor:[C.y,C.g,'#ffffff','#1F6FEB'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.passivo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:2, borderColor:'#161B22'}]
   }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
 
   safeChart('cbp3', {type:'line', data:{
