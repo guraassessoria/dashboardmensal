@@ -124,10 +124,10 @@ footer p{font-size:13px !important}
 .ctitle{font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
 .csub{font-size:12px;color:var(--gray);font-weight:300}
 .cwrap{position:relative;width:100%}
-.insight{background:rgba(0,156,59,.08);border:1px solid rgba(0,156,59,.25);border-left:3px solid var(--gl);border-radius:0 8px 8px 0;padding:14px 18px;margin-top:14px}
-.insight.warn{background:rgba(192,57,43,.07);border-color:rgba(192,57,43,.3);border-left-color:var(--neg)}
+.insight{background:rgba(220,225,230,0.25);border:1px solid rgba(220,225,230,0.3);border-left:3px solid rgba(220,225,230,0.5);border-radius:0 8px 8px 0;padding:14px 18px;margin-top:14px}
+.insight.warn{background:rgba(220,225,230,0.25);border-color:rgba(220,225,230,0.3);border-left-color:rgba(220,225,230,0.5)}
 .ilabel{font-size:10px;letter-spacing:2px;color:var(--gl);font-weight:600;text-transform:uppercase;margin-bottom:6px}
-.insight.warn .ilabel{color:var(--neg)}
+.insight.warn .ilabel{color:var(--gl)}
 .insight p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.72);font-weight:300}
 .insight p strong{color:var(--white);font-weight:500}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -210,8 +210,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   .num { color: rgba(255,255,255,.8) !important; } .du { color: #009C3B !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .dd { color: #C0392B !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .dre-row-total td { background: rgba(255,255,255,.04) !important; font-weight: 600 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .dre-header td { color: #F5C900 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .insight { background: rgba(0,156,59,.08) !important; border-left: 3px solid #009C3B !important; padding: 5px 8px !important; margin-top: 4px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; break-inside: avoid !important; }
-  .insight.warn { background: rgba(192,57,43,.07) !important; border-left-color: #C0392B !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .insight { background: rgba(220,225,230,0.25) !important; border-left: 3px solid rgba(220,225,230,0.5) !important; padding: 5px 8px !important; margin-top: 4px !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; break-inside: avoid !important; }
+  .insight.warn { background: rgba(220,225,230,0.25) !important; border-left-color: rgba(220,225,230,0.5) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .insight p { font-size: 8.5px !important; line-height: 1.4 !important; } .ilabel { font-size: 7.5px !important; margin-bottom: 2px !important; }
   #bp .kgrid { grid-template-columns: repeat(3,1fr) !important; } #bp .kval { font-size: 12px !important; }
   #indicadores .kgrid { grid-template-columns: repeat(3,1fr) !important; }
@@ -631,20 +631,20 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </tbody>
     </table>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELEÇÃO PRINCIPAL</div>
-      <p>+R$ 79,9Mi Serviços Contratados +R$ 92,7Mi, Pessoal +R$ 5,9Mi, Gerais -R$ 13,9Mi, Util. e Serviços -R$ 4,7Mi, Ocupação -R$ 0,1Mi.</p>
+      <div class="ilabel">SELEÇÃO PRINCIPAL +R$ 79,9Mi</div>
+      <p>Serviços Contratados +R$ 92,7Mi, Pessoal +R$ 5,9Mi, Gerais -R$ 13,9Mi, Util. e Serviços -R$ 4,7Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELEÇÕES DE BASE</div>
-      <p>+R$ 17,7Mi Serviços Contratados +R$ 11,3Mi, Pessoal +R$ 4,2Mi, Gerais +R$ 1,7Mi, Util. e Serviços +R$ 0,5Mi.</p>
+      <div class="ilabel">SELEÇÕES DE BASE +R$ 17,7Mi</div>
+      <p>Serviços Contratados +R$ 11,3Mi, Pessoal +R$ 4,2Mi, Gerais +R$ 1,7Mi, Util. e Serviços +R$ 0,5Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELEÇÕES FEMININAS</div>
-      <p>-R$ 22,2Mi Gerais -R$ 15,0Mi, Serviços Contratados -R$ 11,9Mi, Pessoal +R$ 4,5Mi, Util. e Serviços +R$ 0,3Mi, Ocupação -R$ 0,1Mi.</p>
+      <div class="ilabel">SELEÇÕES FEMININAS -R$ 22,2Mi</div>
+      <p>Gerais -R$ 15,0Mi, Serviços Contratados -R$ 11,9Mi, Pessoal +R$ 4,5Mi, Util. e Serviços +R$ 0,3Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">CONTRIBUIÇÃO AO FOMENTO DO FUTEBOL</div>
-      <p>+R$ 22,6Mi Gerais +R$ 29,8Mi, Serviços Contratados +R$ 4,4Mi, Pessoal +R$ 2,5Mi, Util. e Serviços +R$ 3,0Mi, Competições -R$ 10,4Mi, Ocupação -R$ 6,5Mi, PAF -R$ 0,2Mi.</p>
+      <div class="ilabel">CONTRIBUIÇÃO AO FOMENTO DO FUTEBOL +R$ 22,6Mi</div>
+      <p>Gerais +R$ 29,8Mi, Serviços Contratados +R$ 4,4Mi, Pessoal +R$ 2,5Mi, Util. e Serviços +R$ 3,0Mi, Competições -R$ 10,4Mi, Ocupação -R$ 6,5Mi, PAF -R$ 0,2Mi.</p>
     </div>
   </div>
 
@@ -700,7 +700,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:22%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.5);font-style:italic;">Outros</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.5);">Outros</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+3,0M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:3%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -780,7 +780,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.5);font-style:italic;">Outros</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.5);">Outros</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+1,5M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:15%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -959,7 +959,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="cwrap" style="height:260px;"><canvas id="cbp2"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">⚖️ Nota</div>
-        <p>Fornecedores e Contas a Pagar incluem <strong>R$86 milhões de repasses acumulados a clubes</strong>. Provisão para Contingências cresceu 14% no ano (R$672 milhões), refletindo processos judiciais tributários, cíveis e trabalhistas ativos.</p>
+        <p>Fornecedores e Contas a Pagar incluem obrigações contratuais e operacionais em curso. Provisão para Contingências cresceu 14% no ano (R$672 milhões), refletindo processos judiciais tributários, cíveis e trabalhistas ativos.</p>
       </div>
     </div>
   </div>
@@ -1377,7 +1377,7 @@ function initCharts() {
   // c1 - Receita 2025 doughnut - dados reais
   safeChart('c1', {type:'doughnut', data:{
     labels:['Transmissão/Comercial','Patrocínios','Bilheteria','Registros','PD + Academy'],
-    datasets:[{data:GD.rec_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.rec_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:0}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
       legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
@@ -1400,7 +1400,7 @@ function initCharts() {
   // c2 - Custos Futebol 2025
   safeChart('c2', {type:'doughnut', data:{
     labels:['Fomento Estados','Sel. Principal','Sel. Femininas','Sel. Base'],
-    datasets:[{data:GD.cus_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.cus_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:0}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
       legend:{position:'bottom', labels:{padding:12, boxWidth:10, color:'#ffffff',
@@ -1508,12 +1508,12 @@ function initCharts() {
   // ── BALANÇO PATRIMONIAL ──
   safeChart('cbp1', {type:'doughnut', data:{
     labels:['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'],
-    datasets:[{data:GD.ativo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.ativo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:0}]
   }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
 
   safeChart('cbp2', {type:'doughnut', data:{
     labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'],
-    datasets:[{data:GD.passivo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:2, borderColor:'#161B22'}]
+    datasets:[{data:GD.passivo_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF'], borderWidth:0}]
   }, options:{cutout:'62%', maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{padding:12, boxWidth:12, color:'#ffffff', font:{size:15}}}}}});
 
   safeChart('cbp3', {type:'line', data:{
@@ -1677,12 +1677,12 @@ async function exportPDF() {
         background-color: #161B22 !important;
       }
       .insight {
-        background: rgba(0,156,59,0.15) !important;
-        background-color: rgba(0,156,59,0.15) !important;
+        background: rgba(220,225,230,0.25) !important;
+        background-color: rgba(220,225,230,0.25) !important;
       }
       .insight.warn {
-        background: rgba(192,57,43,0.1) !important;
-        background-color: rgba(192,57,43,0.1) !important;
+        background: rgba(220,225,230,0.25) !important;
+        background-color: rgba(220,225,230,0.25) !important;
       }
     }
   `;
