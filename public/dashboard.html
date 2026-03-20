@@ -348,7 +348,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div style="font-family:var(--font-heading);font-size:56px;color:var(--yellow);line-height:1;flex-shrink:0;">NIKE</div>
       <div style="flex:1;min-width:240px;">
         <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;">Contrato</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de<strong style="color:var(--white)">R$ 218 milhões no ano</strong>.</strong>.</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de<strong style="color:var(--white)">R$ 218 milhões no ano.</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:1px;">NOVO CONTRATO · VIGÊNCIA</div>
@@ -374,7 +374,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="cwrap" style="height:320px;"><canvas id="c3"></canvas></div>
     <div class="insight warn">
       <div class="ilabel">Déficit</div>
-      <p>O déficit de <strong>R$ 182 milhões</strong> em 2025 reflete custos com futebol (R$1,18 bilhões) superando a receita bruta (R$1,19 bilhões) pelo efeito combinado de aumento de investimento e queda de receitas operacionais. A CBF mantém saúde financeira pelo <strong>caixa robusto de R$2 bilhões</strong> e receitas financeiras de R$318 milhões geradas principalmente pelo adiantamento Nike.</p>
+      <p>O déficit de <strong>R$ 182 milhões</strong> em 2025 decorre da compressão da margem operacional, com os custos do futebol, de R$ 1,18 bilhão, em patamar próximo à receita bruta, de R$ 1,19 bilhão, em um contexto de maior nível de investimento e retração das receitas operacionais. Ainda assim, a CBF preserva sólida posição financeira, sustentada por<strong> caixa de R$ 2 bilhões</strong> e receitas financeiras de R$ 318 milhões, impulsionadas principalmente pelo adiantamento contratual da Nike.</p>
     </div>
   </div>
 </div>
@@ -1398,7 +1398,7 @@ function _doughnutTooltip(ctx) {
 function initCharts() {
   // c1 - Receita 2025 doughnut - dados reais
   safeChart('c1', {type:'doughnut', data:{
-    labels:['Transmissão/Comercial','Patrocínios','Bilheteria','Registros','PD + Academy'],
+    labels:['Transmissão/Comercial','Patrocínios','Bilheteria','Registros','Programa Desenvolvimento + Academy'],
     datasets:[{data:GD.rec_composicao, backgroundColor:['#003087','#1F6FEB','#58A6FF','#8CC8FF','#B8DEFF'], borderWidth:0}]
   }, options:{cutout:'65%', maintainAspectRatio:false,
     plugins:{
