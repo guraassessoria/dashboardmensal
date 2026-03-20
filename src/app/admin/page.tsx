@@ -1,11 +1,21 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+
+interface DashUser {
+  id: string
+  username: string
+  nome_completo: string | null
+  ativo: boolean
+  created_at: string
+  updated_at?: string
+}
 
 export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
   const [authError, setAuthError] = useState('')
+  const [activeTab, setActiveTab] = useState<'upload' | 'users' | 'insights'>('upload')
 
   const [file, setFile] = useState<File | null>(null)
   const [tipoDoc, setTipoDoc] = useState<'dfs'|'balancete'>('dfs')
@@ -18,6 +28,166 @@ export default function AdminPage() {
   const [uploads, setUploads] = useState<any[]>([])
   const fileRef = useRef<HTMLInputElement>(null)
 
+  // ── User Management State ──
+  const [users, setUsers] = useState<DashUser[]>([])
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [userMsg, setUserMsg] = useState('')
+  const [newUser, setNewUser] = useState({ username: '', password: '', nome_completo: '' })
+  const [editingUser, setEditingUser] = useState<string | null>(null)
+  const [editFields, setEditFields] = useState({ password: '', nome_completo: '', ativo: true })
+
+  // ── Insights Editor State ──
+  const [insPeriodos, setInsPeriodos] = useState<{periodo:string,updated_at:string}[]>([])
+  const [insPeriodo, setInsPeriodo] = useState('')
+  const [insConteudo, setInsConteudo] = useState<Record<string,any>>({})
+  const [insLoading, setInsLoading] = useState(false)
+  const [insSaving, setInsSaving] = useState(false)
+  const [insMsg, setInsMsg] = useState('')
+
+  // ── Insights CRUD ──
+  async function loadInsPeriodos() {
+    const res = await fetch('/api/insights')
+    if (res.ok) {
+      const data = await res.json()
+      setInsPeriodos(data)
+      if (data.length > 0 && !insPeriodo) {
+        loadInsight(data[0].periodo)
+      }
+    }
+  }
+
+  async function loadInsight(per: string) {
+    setInsPeriodo(per)
+    setInsLoading(true)
+    setInsMsg('')
+    try {
+      const res = await fetch(`/api/insights?periodo=${per}`)
+      if (res.ok) {
+        const d = await res.json()
+        setInsConteudo(d.conteudo || {})
+      } else {
+        setInsConteudo({})
+        setInsMsg('Nenhum insight encontrado para este período.')
+      }
+    } finally {
+      setInsLoading(false)
+    }
+  }
+
+  async function saveInsights() {
+    setInsSaving(true)
+    setInsMsg('')
+    try {
+      const res = await fetch('/api/insights', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ periodo: insPeriodo, conteudo: insConteudo })
+      })
+      if (res.ok) {
+        setInsMsg('✅ Insights salvos com sucesso!')
+      } else {
+        const err = await res.json()
+        setInsMsg(`❌ ${err.error}`)
+      }
+    } finally {
+      setInsSaving(false)
+    }
+  }
+
+  function setInsField(path: string, value: string) {
+    setInsConteudo(prev => {
+      const copy = { ...prev }
+      const parts = path.split('.')
+      if (parts.length === 1) {
+        copy[parts[0]] = value
+      } else if (parts.length === 2) {
+        copy[parts[0]] = { ...(copy[parts[0]] || {}), [parts[1]]: value }
+      } else if (parts.length === 3) {
+        copy[parts[0]] = { ...(copy[parts[0]] || {}) }
+        copy[parts[0]][parts[1]] = { ...(copy[parts[0]][parts[1]] || {}), [parts[2]]: value }
+      }
+      return copy
+    })
+  }
+
+  function getInsField(path: string): string {
+    const parts = path.split('.')
+    let v: any = insConteudo
+    for (const p of parts) {
+      if (!v) return ''
+      v = v[p]
+    }
+    return typeof v === 'string' ? v : ''
+  }
+
+  // ── User CRUD ──
+  async function loadUsers() {
+    setUsersLoading(true)
+    try {
+      const res = await fetch('/api/users')
+      if (res.ok) setUsers(await res.json())
+    } finally {
+      setUsersLoading(false)
+    }
+  }
+
+  async function createUser(e: React.FormEvent) {
+    e.preventDefault()
+    setUserMsg('')
+    const res = await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newUser)
+    })
+    if (res.ok) {
+      setNewUser({ username: '', password: '', nome_completo: '' })
+      setUserMsg('✅ Usuário criado com sucesso')
+      loadUsers()
+    } else {
+      const err = await res.json()
+      setUserMsg(`❌ ${err.error}`)
+    }
+  }
+
+  async function updateUser(id: string) {
+    setUserMsg('')
+    const body: Record<string, unknown> = { id }
+    if (editFields.password) body.password = editFields.password
+    if (editFields.nome_completo !== undefined) body.nome_completo = editFields.nome_completo
+    body.ativo = editFields.ativo
+
+    const res = await fetch('/api/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+    if (res.ok) {
+      setEditingUser(null)
+      setUserMsg('✅ Usuário atualizado')
+      loadUsers()
+    } else {
+      const err = await res.json()
+      setUserMsg(`❌ ${err.error}`)
+    }
+  }
+
+  async function deleteUser(id: string, username: string) {
+    if (!confirm(`Tem certeza que deseja excluir o usuário "${username}"?`)) return
+    setUserMsg('')
+    const res = await fetch('/api/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    if (res.ok) {
+      setUserMsg('✅ Usuário excluído')
+      loadUsers()
+    } else {
+      const err = await res.json()
+      setUserMsg(`❌ ${err.error}`)
+    }
+  }
+
   // ── Autenticação simples ──
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -29,6 +199,7 @@ export default function AdminPage() {
     if (res.ok) {
       setAuthed(true)
       loadHistory()
+      loadUsers()
     } else {
       setAuthError('Senha incorreta')
     }
@@ -131,16 +302,33 @@ export default function AdminPage() {
         <div style={styles.header}>
           <div>
             <div style={styles.headerLabel}>// ADMIN</div>
-            <h1 style={styles.headerTitle}>CBF Dashboard · Upload de Dados</h1>
+            <h1 style={styles.headerTitle}>CBF Dashboard · Administração</h1>
           </div>
           <a href="/" style={styles.viewBtn}>Ver Dashboard →</a>
         </div>
 
+        {/* Tabs */}
+        <div style={styles.tabs}>
+          <button
+            style={activeTab === 'upload' ? styles.tabActive : styles.tab}
+            onClick={() => setActiveTab('upload')}
+          >📤 Upload de Dados</button>
+          <button
+            style={activeTab === 'users' ? styles.tabActive : styles.tab}
+            onClick={() => { setActiveTab('users'); loadUsers() }}
+          >👥 Gerenciar Usuários</button>
+          <button
+            style={activeTab === 'insights' ? styles.tabActive : styles.tab}
+            onClick={() => { setActiveTab('insights'); loadInsPeriodos() }}
+          >✏️ Editar Insights</button>
+        </div>
+
+        {activeTab === 'upload' && (<>
         {/* Upload Form */}
         <div style={styles.card}>
           <h2 style={styles.cardTitle}>📤 Novo Upload Mensal</h2>
           <p style={styles.cardSub}>
-            Faça o upload do xlsx de DFS. A IA irá extrair os dados automaticamente e atualizar o dashboard.
+            Faça o upload do Balancete e das DFs do período. Ambos os arquivos se complementam para gerar os dados, insights e tabelas do dashboard. A IA irá extrair os dados automaticamente.
           </p>
 
           <form onSubmit={handleUpload} style={styles.uploadForm}>
@@ -239,7 +427,7 @@ export default function AdminPage() {
             <table style={styles.table}>
               <thead>
                 <tr>
-                  {['Período', 'Arquivo', 'Status', 'Enviado em', 'Processado em'].map(h => (
+                  {['Período', 'Tipo', 'Arquivo', 'Status', 'Enviado em', 'Processado em'].map(h => (
                     <th key={h} style={styles.th}>{h}</th>
                   ))}
                 </tr>
@@ -248,6 +436,15 @@ export default function AdminPage() {
                 {uploads.map((u: any) => (
                   <tr key={u.id}>
                     <td style={styles.td}><strong>{u.periodo}</strong></td>
+                    <td style={styles.td}>
+                      <span style={{
+                        ...styles.badge,
+                        background: u.tipo_documento === 'dfs' ? 'rgba(245,200,0,.12)' : 'rgba(139,148,158,.15)',
+                        color: u.tipo_documento === 'dfs' ? '#F5C800' : '#8B949E'
+                      }}>
+                        {u.tipo_documento === 'dfs' ? '📊 DFs' : '📋 Balancete'}
+                      </span>
+                    </td>
                     <td style={styles.td}>{u.filename}</td>
                     <td style={styles.td}>
                       <span style={{
@@ -272,11 +469,380 @@ export default function AdminPage() {
             </table>
           )}
         </div>
+        </>)}
+
+        {activeTab === 'users' && (
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>👥 Gerenciamento de Usuários</h2>
+          <p style={styles.cardSub}>
+            Crie, edite ou exclua logins de acesso ao dashboard.
+          </p>
+
+          {userMsg && (
+            <div style={{
+              padding: '10px 16px', borderRadius: 8, marginBottom: 16, fontSize: 13,
+              background: userMsg.startsWith('✅') ? 'rgba(63,185,80,.1)' : 'rgba(248,81,73,.1)',
+              color: userMsg.startsWith('✅') ? '#3FB950' : '#F85149',
+              border: `1px solid ${userMsg.startsWith('✅') ? 'rgba(63,185,80,.3)' : 'rgba(248,81,73,.3)'}`
+            }}>{userMsg}</div>
+          )}
+
+          {/* Criar novo usuário */}
+          <form onSubmit={createUser} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 }}>
+            <input
+              placeholder="Usuário"
+              value={newUser.username}
+              onChange={e => setNewUser(p => ({ ...p, username: e.target.value }))}
+              style={{ ...styles.input, flex: '1 1 140px' }}
+              required
+            />
+            <input
+              placeholder="Senha"
+              type="password"
+              value={newUser.password}
+              onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))}
+              style={{ ...styles.input, flex: '1 1 140px' }}
+              required
+            />
+            <input
+              placeholder="Nome completo"
+              value={newUser.nome_completo}
+              onChange={e => setNewUser(p => ({ ...p, nome_completo: e.target.value }))}
+              style={{ ...styles.input, flex: '2 1 200px' }}
+            />
+            <button type="submit" style={{ ...styles.btn, flex: '0 0 auto', width: 'auto', padding: '12px 20px' }}>
+              + Criar
+            </button>
+          </form>
+
+          {/* Lista de usuários */}
+          {usersLoading ? (
+            <p style={{ color: '#8B949E', fontSize: 13 }}>Carregando usuários...</p>
+          ) : users.length === 0 ? (
+            <p style={{ color: '#8B949E', fontSize: 13 }}>Nenhum usuário cadastrado.</p>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  {['Usuário', 'Nome Completo', 'Status', 'Criado em', 'Ações'].map(h => (
+                    <th key={h} style={styles.th}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  editingUser === u.id ? (
+                    <tr key={u.id}>
+                      <td style={styles.td}><strong>{u.username}</strong></td>
+                      <td style={styles.td}>
+                        <input
+                          value={editFields.nome_completo}
+                          onChange={e => setEditFields(p => ({ ...p, nome_completo: e.target.value }))}
+                          placeholder="Nome completo"
+                          style={{ ...styles.input, padding: '6px 10px', fontSize: 12 }}
+                        />
+                      </td>
+                      <td style={styles.td}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#FAFAFA', cursor: 'pointer' }}>
+                          <input
+                            type="checkbox"
+                            checked={editFields.ativo}
+                            onChange={e => setEditFields(p => ({ ...p, ativo: e.target.checked }))}
+                            style={{ accentColor: '#F5C800' }}
+                          /> Ativo
+                        </label>
+                        <input
+                          type="password"
+                          value={editFields.password}
+                          onChange={e => setEditFields(p => ({ ...p, password: e.target.value }))}
+                          placeholder="Nova senha (vazio = não alterar)"
+                          style={{ ...styles.input, padding: '6px 10px', fontSize: 12, marginTop: 6 }}
+                        />
+                      </td>
+                      <td style={styles.td}>{new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
+                      <td style={styles.td}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={() => updateUser(u.id)}
+                            style={{ ...styles.actionBtn, background: 'rgba(63,185,80,.15)', color: '#3FB950' }}
+                          >💾 Salvar</button>
+                          <button
+                            onClick={() => setEditingUser(null)}
+                            style={{ ...styles.actionBtn, background: 'rgba(255,255,255,.08)', color: '#8B949E' }}
+                          >Cancelar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={u.id}>
+                      <td style={styles.td}><strong>{u.username}</strong></td>
+                      <td style={styles.td}>{u.nome_completo || '—'}</td>
+                      <td style={styles.td}>
+                        <span style={{
+                          ...styles.badge,
+                          background: u.ativo ? 'rgba(63,185,80,.15)' : 'rgba(248,81,73,.15)',
+                          color: u.ativo ? '#3FB950' : '#F85149'
+                        }}>
+                          {u.ativo ? '✅ Ativo' : '❌ Inativo'}
+                        </span>
+                      </td>
+                      <td style={styles.td}>{new Date(u.created_at).toLocaleDateString('pt-BR')}</td>
+                      <td style={styles.td}>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={() => {
+                              setEditingUser(u.id)
+                              setEditFields({
+                                password: '',
+                                nome_completo: u.nome_completo || '',
+                                ativo: u.ativo
+                              })
+                            }}
+                            style={{ ...styles.actionBtn, background: 'rgba(245,200,0,.12)', color: '#F5C800' }}
+                          >✏️ Editar</button>
+                          <button
+                            onClick={() => deleteUser(u.id, u.username)}
+                            style={{ ...styles.actionBtn, background: 'rgba(248,81,73,.12)', color: '#F85149' }}
+                          >🗑️ Excluir</button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        )}
+
+        {activeTab === 'insights' && (
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>✏️ Editor de Insights</h2>
+          <p style={styles.cardSub}>
+            Edite os textos e análises gerados pela IA para cada período.
+          </p>
+
+          {insMsg && (
+            <div style={{
+              padding: '10px 16px', borderRadius: 8, marginBottom: 16, fontSize: 13,
+              background: insMsg.startsWith('✅') ? 'rgba(63,185,80,.1)' : 'rgba(248,81,73,.1)',
+              color: insMsg.startsWith('✅') ? '#3FB950' : '#F85149',
+              border: `1px solid ${insMsg.startsWith('✅') ? 'rgba(63,185,80,.3)' : 'rgba(248,81,73,.3)'}`
+            }}>{insMsg}</div>
+          )}
+
+          {/* Seletor de período */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 24 }}>
+            <label style={styles.label}>Período:</label>
+            <select
+              value={insPeriodo}
+              onChange={e => loadInsight(e.target.value)}
+              style={{ ...styles.input, width: 'auto', minWidth: 160 }}
+            >
+              {insPeriodos.length === 0 && <option value="">Nenhum período</option>}
+              {insPeriodos.map(p => (
+                <option key={p.periodo} value={p.periodo}>{p.periodo}</option>
+              ))}
+            </select>
+            <button
+              onClick={saveInsights}
+              disabled={insSaving || !insPeriodo}
+              style={{ ...styles.btn, width: 'auto', padding: '10px 24px', opacity: insSaving ? 0.6 : 1 }}
+            >
+              {insSaving ? '⏳ Salvando...' : '💾 Salvar Alterações'}
+            </button>
+          </div>
+
+          {insLoading ? (
+            <p style={{ color: '#8B949E', fontSize: 13 }}>Carregando insights...</p>
+          ) : !insPeriodo ? (
+            <p style={{ color: '#8B949E', fontSize: 13 }}>Selecione um período para editar.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* ── Resumo e Destaques ── */}
+              <InsSection title="📊 Resumo Geral">
+                <InsTextarea label="Resumo do Resultado (Déficit/Superávit)" path="resumo_deficit" get={getInsField} set={setInsField} />
+                <InsTextarea label="Receitas em Destaque" path="receitas_destaque" get={getInsField} set={setInsField} />
+                <InsTextarea label="Nike Banner" path="nike_banner" get={getInsField} set={setInsField} />
+              </InsSection>
+
+              {/* ── Custos por Seleção ── */}
+              <InsSection title="⚽ Custos do Futebol">
+                <InsTituloTexto label="Seleção Principal" prefixPath="custos_selecao_principal" get={getInsField} set={setInsField} />
+                <InsTituloTexto label="Seleções de Base" prefixPath="custos_selecao_base" get={getInsField} set={setInsField} />
+                <InsTituloTexto label="Seleções Femininas" prefixPath="custos_selecao_femininas" get={getInsField} set={setInsField} />
+                <InsTituloTexto label="Fomento" prefixPath="custos_fomento" get={getInsField} set={setInsField} />
+                <InsTextarea label="Alerta Despesas Administrativas" path="custos_admin_alerta" get={getInsField} set={setInsField} />
+              </InsSection>
+
+              {/* ── Balanço Patrimonial ── */}
+              <InsSection title="🏦 Balanço Patrimonial">
+                <InsTextarea label="Ativo" path="balanco_ativo" get={getInsField} set={setInsField} />
+                <InsTextarea label="Passivo" path="balanco_passivo" get={getInsField} set={setInsField} />
+                <InsTextarea label="Evolução Patrimonial" path="balanco_evolucao" get={getInsField} set={setInsField} />
+              </InsSection>
+
+              {/* ── Indicadores ── */}
+              <InsSection title="📈 Indicadores Financeiros">
+                <InsTextarea label="EBITDA" path="indicadores_ebitda" get={getInsField} set={setInsField} />
+                <InsTextarea label="Índice de Kanitz" path="indicadores_kanitz" get={getInsField} set={setInsField} />
+                <InsTextarea label="Liquidez Corrente" path="indicadores_liquidez_corrente" get={getInsField} set={setInsField} />
+                <InsTextarea label="Liquidez Geral" path="indicadores_liquidez_geral" get={getInsField} set={setInsField} />
+                <InsTextarea label="Liquidez Imediata" path="indicadores_liquidez_imediata" get={getInsField} set={setInsField} />
+                <InsTextarea label="DFC (Fluxo de Caixa)" path="indicadores_dfc" get={getInsField} set={setInsField} />
+                <InsTextarea label="Tendência" path="indicadores_tendencia" get={getInsField} set={setInsField} />
+              </InsSection>
+
+              {/* ── Histórico ── */}
+              <InsSection title="🔮 Perspectiva">
+                <InsTextarea label="Histórico e Perspectiva" path="historico_perspectiva" get={getInsField} set={setInsField} />
+              </InsSection>
+
+              {/* ── KPIs ── */}
+              <InsSection title="🎯 KPIs (Cards do Topo)">
+                {[
+                  ['receita_bruta', 'Receita Bruta'],
+                  ['resultado', 'Resultado do Exercício'],
+                  ['custos_futebol', 'Custos do Futebol'],
+                  ['caixa', 'Caixa e Equivalentes'],
+                  ['ativo_total', 'Ativo Total'],
+                  ['rec_financeiras', 'Receitas Financeiras'],
+                  ['transmissao', 'Transmissão'],
+                  ['patrocinio', 'Patrocínio'],
+                  ['bilheteria', 'Bilheteria'],
+                  ['registros', 'Registros'],
+                  ['desenvolvimento', 'Desenvolvimento'],
+                  ['fomento', 'Fomento'],
+                  ['selecao_principal', 'Seleção Principal'],
+                  ['selecao_femininas', 'Seleções Femininas'],
+                  ['selecao_base', 'Seleções de Base'],
+                  ['desp_administrativas', 'Desp. Administrativas'],
+                  ['desp_pessoal', 'Desp. Pessoal'],
+                ].map(([key, label]) => (
+                  <InsKpi key={key} label={label} kpiKey={key} get={getInsField} set={setInsField} />
+                ))}
+              </InsSection>
+
+              <button
+                onClick={saveInsights}
+                disabled={insSaving}
+                style={{ ...styles.btn, opacity: insSaving ? 0.6 : 1, marginTop: 8 }}
+              >
+                {insSaving ? '⏳ Salvando...' : '💾 Salvar Todas as Alterações'}
+              </button>
+            </div>
+          )}
+        </div>
+        )}
       </div>
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
+    </div>
+  )
+}
+
+// ── Sub-componentes do Editor de Insights ──
+function InsSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, padding: 20 }}>
+      <h3 style={{ fontSize: 14, fontWeight: 700, color: '#F5C800', marginTop: 0, marginBottom: 16 }}>{title}</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>{children}</div>
+    </div>
+  )
+}
+
+function InsTextarea({ label, path, get, set }: {
+  label: string; path: string;
+  get: (p: string) => string; set: (p: string, v: string) => void;
+}) {
+  return (
+    <div>
+      <label style={{ fontSize: 11, color: '#8B949E', fontWeight: 500, display: 'block', marginBottom: 4 }}>{label}</label>
+      <textarea
+        value={get(path)}
+        onChange={e => set(path, e.target.value)}
+        rows={3}
+        style={{
+          background: '#161B22', border: '1px solid rgba(255,255,255,.12)',
+          borderRadius: 8, padding: '10px 14px', color: '#FAFAFA',
+          fontSize: 13, width: '100%', boxSizing: 'border-box' as const,
+          resize: 'vertical' as const, outline: 'none', fontFamily: 'inherit',
+          lineHeight: 1.5
+        }}
+      />
+    </div>
+  )
+}
+
+function InsTituloTexto({ label, prefixPath, get, set }: {
+  label: string; prefixPath: string;
+  get: (p: string) => string; set: (p: string, v: string) => void;
+}) {
+  return (
+    <div style={{ background: 'rgba(255,255,255,.02)', borderRadius: 8, padding: 14 }}>
+      <label style={{ fontSize: 12, color: '#FAFAFA', fontWeight: 600, display: 'block', marginBottom: 8 }}>{label}</label>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div>
+          <label style={{ fontSize: 10, color: '#8B949E', display: 'block', marginBottom: 3 }}>Título</label>
+          <input
+            value={get(`${prefixPath}.titulo`)}
+            onChange={e => set(`${prefixPath}.titulo`, e.target.value)}
+            style={{
+              background: '#161B22', border: '1px solid rgba(255,255,255,.12)',
+              borderRadius: 6, padding: '8px 12px', color: '#FAFAFA',
+              fontSize: 13, width: '100%', boxSizing: 'border-box' as const, outline: 'none'
+            }}
+          />
+        </div>
+        <div>
+          <label style={{ fontSize: 10, color: '#8B949E', display: 'block', marginBottom: 3 }}>Texto</label>
+          <textarea
+            value={get(`${prefixPath}.texto`)}
+            onChange={e => set(`${prefixPath}.texto`, e.target.value)}
+            rows={3}
+            style={{
+              background: '#161B22', border: '1px solid rgba(255,255,255,.12)',
+              borderRadius: 6, padding: '10px 14px', color: '#FAFAFA',
+              fontSize: 13, width: '100%', boxSizing: 'border-box' as const,
+              resize: 'vertical' as const, outline: 'none', fontFamily: 'inherit',
+              lineHeight: 1.5
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function InsKpi({ label, kpiKey, get, set }: {
+  label: string; kpiKey: string;
+  get: (p: string) => string; set: (p: string, v: string) => void;
+}) {
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <span style={{ fontSize: 12, color: '#FAFAFA', fontWeight: 600, minWidth: 140, paddingTop: 10 }}>{label}</span>
+      <input
+        value={get(`kpis.${kpiKey}.delta`)}
+        onChange={e => set(`kpis.${kpiKey}.delta`, e.target.value)}
+        placeholder="Delta (ex: ▲ +12% vs 2024)"
+        style={{
+          background: '#161B22', border: '1px solid rgba(255,255,255,.12)',
+          borderRadius: 6, padding: '8px 12px', color: '#FAFAFA',
+          fontSize: 12, flex: '1 1 200px', outline: 'none', boxSizing: 'border-box' as const
+        }}
+      />
+      <input
+        value={get(`kpis.${kpiKey}.sub`)}
+        onChange={e => set(`kpis.${kpiKey}.sub`, e.target.value)}
+        placeholder="Sub-texto complementar"
+        style={{
+          background: '#161B22', border: '1px solid rgba(255,255,255,.12)',
+          borderRadius: 6, padding: '8px 12px', color: '#FAFAFA',
+          fontSize: 12, flex: '1 1 200px', outline: 'none', boxSizing: 'border-box' as const
+        }}
+      />
     </div>
   )
 }
@@ -361,5 +927,22 @@ const styles: Record<string, React.CSSProperties> = {
   badge: {
     display: 'inline-block', padding: '3px 10px', borderRadius: 100,
     fontSize: 11, fontWeight: 600
+  },
+  tabs: {
+    display: 'flex', gap: 8, marginBottom: 20
+  },
+  tab: {
+    background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.08)',
+    borderRadius: 8, padding: '10px 20px', color: '#8B949E',
+    fontSize: 13, fontWeight: 600, cursor: 'pointer'
+  },
+  tabActive: {
+    background: 'rgba(245,200,0,.12)', border: '1px solid rgba(245,200,0,.4)',
+    borderRadius: 8, padding: '10px 20px', color: '#F5C800',
+    fontSize: 13, fontWeight: 600, cursor: 'pointer'
+  },
+  actionBtn: {
+    border: 'none', borderRadius: 6, padding: '5px 12px',
+    fontSize: 11, fontWeight: 600, cursor: 'pointer'
   }
 }

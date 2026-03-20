@@ -275,6 +275,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
     </div>
     <div class="hr">
+      <select id="periodo-selector" style="display:none;background:rgba(0,30,60,.6);color:var(--yellow);border:1px solid rgba(245,201,0,.4);border-radius:8px;padding:6px 14px;font-family:var(--font-heading);font-size:15px;font-weight:600;cursor:pointer;outline:none;margin-bottom:6px;min-width:160px;text-align:center;letter-spacing:1px"></select>
       <div class="yr">2025</div>
     </div>
   </div>
@@ -319,26 +320,26 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="kcard">
       <div class="klabel">Custos com Futebol</div>
       <div class="kval" id="kv-custos">R$ 1,18 Bi</div>
-      <div class="kdelta dn">▲ +9,1% vs 2024 (R$1,08 bilhões)</div>
-      <div class="ksub"></div>
+      <div class="kdelta dn" id="kd-custos">▲ +9,1% vs 2024 (R$1,08 bilhões)</div>
+      <div class="ksub" id="ks-custos"></div>
     </div>
     <div class="kcard">
       <div class="klabel">Caixa e Equivalentes</div>
       <div class="kval" id="kv-caixa">R$ 2,0 Bi</div>
-      <div class="kdelta dn">▼ −18% vs 2024 (R$2,43 bilhões)</div>
-      <div class="ksub">Aplicações financeiras conservadoras</div>
+      <div class="kdelta dn" id="kd-caixa">▼ −18% vs 2024 (R$2,43 bilhões)</div>
+      <div class="ksub" id="ks-caixa">Aplicações financeiras conservadoras</div>
     </div>
     <div class="kcard">
       <div class="klabel">Ativo Total</div>
       <div class="kval" id="kv-ativo">R$ 3,39 Bi</div>
-      <div class="kdelta dn">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
-      <div class="ksub">PL: R$ 1,26 bilhões</div>
+      <div class="kdelta dn" id="kd-ativo">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
+      <div class="ksub" id="ks-ativo">PL: R$ 1,26 bilhões</div>
     </div>
     <div class="kcard">
       <div class="klabel">Receitas Financeiras</div>
       <div class="kval" id="kv-rec-fin">R$ 318 Mi</div>
-      <div class="kdelta up">▲ +141% vs 2024 (R$132 milhões)</div>
-      <div class="ksub"></div>
+      <div class="kdelta up" id="kd-rec-fin">▲ +141% vs 2024 (R$132 milhões)</div>
+      <div class="ksub" id="ks-rec-fin"></div>
     </div>
   </div>
 
@@ -348,7 +349,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div style="font-family:var(--font-heading);font-size:56px;color:var(--yellow);line-height:1;flex-shrink:0;">NIKE</div>
       <div style="flex:1;min-width:240px;">
         <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;">Contrato</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de <strong style="color:var(--white)">R$ 218 milhões no ano</strong>.</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;" id="insight-nike-texto">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de <strong style="color:var(--white)">R$ 218 milhões no ano</strong>.</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:1px;">NOVO CONTRATO · VIGÊNCIA</div>
@@ -372,7 +373,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="ctitle" style="margin-bottom:4px;">Resultado Anual 2021–2025 - em milhares de reais</div>
     <div class="csub" style="margin-bottom:18px;">Superávit/Déficit por exercício fiscal</div>
     <div class="cwrap" style="height:320px;"><canvas id="c3"></canvas></div>
-    <div class="insight warn">
+    <div class="insight warn" id="insight-resumo-deficit">
       <div class="ilabel">Déficit</div>
       <p>O déficit de <strong>R$ 182 milhões</strong> em 2025 decorre da compressão da margem operacional, com os custos do futebol, de R$ 1,18 bilhão, em patamar próximo à receita bruta, de R$ 1,19 bilhão, em um contexto de maior nível de investimento e retração das receitas operacionais. Ainda assim, a CBF preserva sólida posição financeira, sustentada por<strong> caixa de R$ 2 bilhões</strong> e receitas financeiras de R$ 318 milhões, impulsionadas principalmente pelo adiantamento contratual da Nike.</p>
     </div>
@@ -421,7 +422,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="ctitle" style="margin-bottom:4px;">Receitas 2025 vs 2024 por Categoria</div>
       <div class="csub" style="margin-bottom:18px;">Comparativo em milhares de reais</div>
       <div class="cwrap" style="height:300px;"><canvas id="c4"></canvas></div>
-      <div class="insight" style="margin-top:12px;">
+      <div class="insight" style="margin-top:12px;" id="insight-receitas-destaque">
         <div class="ilabel">💡 Destaque</div>
         <p>Queda concentrada em transmissão (−R$86 milhões) e bilheteria (−R$12 milhões). <strong>Registros e Transferências crescem +32,9%</strong>, com crescimento significativo em 2025. Patrocínios recuam levemente (−3%).</p>
       </div>
@@ -630,19 +631,19 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
         <tr class="dre-row-total"><td>Total Custos com Futebol</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">1.176,7</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">1.078,7</td><td class="num dd" style="font-family:var(--font-mono);font-size:13px;">▲ +9,1%</td></tr>
       </tbody>
     </table>
-    <div class="insight" style="margin-top:12px;">
+    <div class="insight" style="margin-top:12px;" id="insight-custos-sp">
       <div class="ilabel">SELEÇÃO PRINCIPAL +R$ 79,9Mi</div>
       <p>Serviços Contratados +R$ 92,7Mi, Pessoal +R$ 5,9Mi, Gerais -R$ 13,9Mi, Util. e Serviços -R$ 4,7Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
-    <div class="insight" style="margin-top:12px;">
+    <div class="insight" style="margin-top:12px;" id="insight-custos-base">
       <div class="ilabel">SELEÇÕES DE BASE +R$ 17,7Mi</div>
       <p>Serviços Contratados +R$ 11,3Mi, Pessoal +R$ 4,2Mi, Gerais +R$ 1,7Mi, Util. e Serviços +R$ 0,5Mi.</p>
     </div>
-    <div class="insight" style="margin-top:12px;">
+    <div class="insight" style="margin-top:12px;" id="insight-custos-fem">
       <div class="ilabel">SELEÇÕES FEMININAS -R$ 22,2Mi</div>
       <p>Gerais -R$ 15,0Mi, Serviços Contratados -R$ 11,9Mi, Pessoal +R$ 4,5Mi, Util. e Serviços +R$ 0,3Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
-    <div class="insight" style="margin-top:12px;">
+    <div class="insight" style="margin-top:12px;" id="insight-custos-fomento">
       <div class="ilabel">CONTRIBUIÇÃO AO FOMENTO DO FUTEBOL +R$ 22,6Mi</div>
       <p>Gerais +R$ 29,8Mi, Serviços Contratados +R$ 4,4Mi, Pessoal +R$ 2,5Mi, Util. e Serviços +R$ 3,0Mi, Competições -R$ 10,4Mi, Ocupação -R$ 6,5Mi, PAF -R$ 0,2Mi.</p>
     </div>
@@ -794,7 +795,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
     </div>
 
-    <div class="insight warn" style="margin-top:14px;">
+    <div class="insight warn" style="margin-top:14px;" id="insight-custos-admin">
       <div class="ilabel">⚠️ Desvio Principal</div>
       <p>O aumento de <strong>+153%</strong> nas despesas administrativas foi impulsionado principalmente por eventos não recorrentes, com destaque para gastos jurídicos, constituição de PCLD em 2025, serviços especializados com honorários de êxito e despesas com viagens institucionais. Esses fatores concentraram <strong>R$ 188 milhões</strong> do total de <strong>R$ 223 milhões</strong> de acréscimo no período.</p>
     </div>
@@ -950,7 +951,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="ctitle" style="margin-bottom:4px;">Composição do Ativo</div>
       <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp1"></canvas></div>
-      <div class="insight" style="margin-top:12px;">
+      <div class="insight" style="margin-top:12px;" id="insight-bp-ativo">
         <div class="ilabel">📋 Composição</div>
         <p>Ativo predominantemente composto por <strong>Caixa e Equivalentes (2 Bi)</strong>. Depósitos Judiciais somam R$607 milhões (18% do ativo). Imobilizado representa R$309 milhões na estrutura.</p>
       </div>
@@ -959,7 +960,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="ctitle" style="margin-bottom:4px;">Composição do Passivo + PL</div>
       <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp2"></canvas></div>
-      <div class="insight" style="margin-top:12px;">
+      <div class="insight" style="margin-top:12px;" id="insight-bp-passivo">
         <div class="ilabel">⚖️ Nota</div>
         <p>Fornecedores e Contas a Pagar incluem obrigações contratuais e operacionais em curso. Provisão para Contingências cresceu 14% no ano (R$672 milhões), refletindo processos judiciais tributários, cíveis e trabalhistas ativos.</p>
       </div>
@@ -969,7 +970,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   <div class="ccard">
     <div class="ctitle" style="margin-bottom:16px;">Evolução do Ativo Total · 2016–2025 - em milhares de reais</div>
     <div class="cwrap" style="height:220px;"><canvas id="cbp3"></canvas></div>
-    <div class="insight" style="margin-top:12px;">
+    <div class="insight" style="margin-top:12px;" id="insight-bp-evolucao">
       <div class="ilabel">📈 10 anos de crescimento</div>
       <p>O Ativo Total cresceu de <strong>R$ 800 Mi (2016) para R$ 3,39 Bi (2025)</strong>, multiplicação de 4,2× em uma década. As disponibilidades saíram de R$ 245 Mi para R$ 1,99 Bi (<strong>+R$ 1,75 Bi</strong>). O salto de 2023→2024 foi impulsionado pelo adiantamento Nike de R$ 1,3 Bi. Em 2025, leve recuo pelo consumo operacional, estrutura patrimonial robusta.</p>
     </div>
@@ -1038,7 +1039,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="ctitle" style="margin-bottom:4px;">Evolução das Disponibilidades · 10 Anos</div>
       <div class="csub" style="margin-bottom:16px;">Caixa + Aplicações Financeiras</div>
       <div class="cwrap" style="height:260px;"><canvas id="cind1"></canvas></div>
-      <div class="insight" style="margin-top:12px;">
+      <div class="insight" style="margin-top:12px;" id="insight-ind-tendencia">
         <div class="ilabel">💡 Tendência</div>
         <p>Crescimento consistente de R$244 milhões (2015) para R$1.997 milhões (2025). O salto de 2023→2024 (+134%) foi o maior da série histórica, puxado pelo adiantamento Nike. Em 2025, leve recuo de <strong>−18%</strong> pelo consumo operacional e pagamentos como Icasa (R$81 milhões).</p>
       </div>
@@ -1069,7 +1070,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
           </tbody>
         </table>
       </div>
-      <div class="insight" style="margin-top:12px;">
+      <div class="insight" style="margin-top:12px;" id="insight-ind-dfc">
         <div class="ilabel">📋 Leitura da DFC</div>
         <p>A redução de <strong>R$ 436 milhões</strong> no caixa é majoritariamente operacional (R$ 330 milhões), impulsionada pelo déficit do exercício (R$ 183 milhões) e pelo aumento de depósitos judiciais (R$ 87 milhões) e impostos a recuperar (R$ 59 milhões). O fluxo de investimento (R$ 45 milhões) reflete aquisição de imobilizado. Não houve atividade de financiamento relevante no período.</p>
       </div>
@@ -1078,27 +1079,27 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="ccard">
     <div class="ctitle" style="margin-bottom:16px;">Análise de Indicadores · Contexto Narrativo</div>
-    <div class="two" style="gap:16px;margin-bottom:0;">
+    <div class="two" style="gap:16px;margin-bottom:0;" id="insight-indicadores-narrativa">
       <div>
-        <div style="margin-bottom:16px;">
+        <div style="margin-bottom:16px;" id="insight-ind-ebitda">
           <div style="font-size:12px;font-weight:600;color:var(--yellow);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">EBITDA · −R$ 494 Mi (Margem −40,4%)</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;">O EBITDA de <strong style="color:var(--neg);">−R$ 494 milhões</strong> revela que a operação central da CBF, excluindo efeitos financeiros, fiscais, depreciação e amortização. O resultado financeiro de <strong style="color:var(--white);">R$ 318 milhões</strong> é justamente o que sustenta o caixa, mas por definição é excluído do EBITDA. Déficit do Exercício (−R$182Mi) − Receita Financeira (+R$318Mi) + Depreciação e Amortização (R$6,7Mi) = −R$494Mi.</div>
         </div>
-        <div>
+        <div id="insight-ind-kanitz">
           <div style="font-size:12px;font-weight:600;color:var(--yellow);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">KANITZ · Índice de Solvência: 17,33</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;">O Índice de Kanitz indica uma <strong style="color:var(--white);">posição sólida, com baixo risco e boa liquidez</strong>. Como reflexo de uma gestão eficiente, esse desempenho fortalece a confiança do mercado e consolida a imagem da CBF como referência no setor esportivo.</div>
         </div>
       </div>
       <div>
-        <div style="margin-bottom:16px;">
+        <div style="margin-bottom:16px;" id="insight-ind-lc">
           <div style="font-size:12px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Liquidez Corrente - 3,95</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;">Redução em relação a 2024 (5,21), mas ainda em posição confortável: para cada R$ 1,00 de obrigação de curto prazo, a CBF dispõe de R$ 3,95 em ativos circulantes.</div>
         </div>
-        <div style="margin-bottom:16px;">
+        <div style="margin-bottom:16px;" id="insight-ind-lg">
           <div style="font-size:12px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Liquidez Geral - 1,59</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;">Leve queda frente a 2024 (1,66), reflexo do crescimento do passivo não circulante. A entidade mantém folga para cobrir a totalidade de suas obrigações.</div>
         </div>
-        <div>
+        <div id="insight-ind-li">
           <div style="font-size:12px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Liquidez Imediata - 3,27</div>
           <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.7;">Recuo em relação a 2024 (4,58), porém com cobertura imediata robusta: o caixa disponível de R$ 2,0Bi representa 3,27 vezes o passivo circulante de R$ 611Mi.</div>
         </div>
@@ -1121,8 +1122,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="ctitle" style="margin-bottom:4px;">Receita Bruta Anual · Série Histórica em milhares de reais</div>
     <div class="csub" style="margin-bottom:18px;">2021–2025</div>
     <div class="cwrap" style="height:260px;"><canvas id="c11"></canvas></div>
-    <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">📈 Perspectiva 2026–2027</div>
+    <div class="insight" style="margin-top:12px;" id="insight-hist-perspectiva">
+      <div class="ilabel">📈 Perspectiva</div>
       <p>A queda de receita em 2025 (−8,4%) é pontual, ciclo de jogos mais fraco. <strong>2026</strong> projetado como ano excepcional com a Copa do Mundo FIFA. Em <strong>2027</strong>, entrada em vigor do <strong>novo contrato Nike</strong> representa salto estrutural de receita de patrocínio. A CBF possui R$2 bilhões em caixa para suportar este ciclo transitório.</p>
     </div>
   </div>
@@ -1375,6 +1376,129 @@ function _atualizarKPIs() {
 
 // Executar atualização de KPIs imediatamente
 _atualizarKPIs();
+
+// ── Aplicar insights dinâmicos vindos do Supabase ──
+function _aplicarInsights(ins) {
+  if (!ins) return;
+
+  // Helper: atualiza innerHTML de um elemento <p> dentro de um insight container
+  function _setInsight(id, texto) {
+    const el = document.getElementById(id);
+    if (!el || !texto) return;
+    const p = el.querySelector('p');
+    if (p) p.innerHTML = texto;
+  }
+
+  // Helper: atualiza título (.ilabel) e texto (<p>) de um insight com {titulo, texto}
+  function _setInsightObj(id, obj) {
+    if (!obj) return;
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (obj.titulo) {
+      const lbl = el.querySelector('.ilabel');
+      if (lbl) lbl.textContent = obj.titulo;
+    }
+    if (obj.texto) {
+      const p = el.querySelector('p');
+      if (p) p.innerHTML = obj.texto;
+    }
+  }
+
+  // Helper: atualiza texto de indicador narrativo (divs com título e texto)
+  function _setIndicador(id, tituloHtml, textoHtml) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const divs = el.querySelectorAll('div');
+    if (divs.length >= 2) {
+      if (tituloHtml) divs[0].innerHTML = tituloHtml;
+      if (textoHtml) divs[1].innerHTML = textoHtml;
+    }
+  }
+
+  // ── Resumo Executivo ──
+  _setInsight('insight-resumo-deficit', ins.resumo_deficit);
+
+  // Nike banner
+  if (ins.nike_banner) {
+    const nike = document.getElementById('insight-nike-texto');
+    if (nike) nike.innerHTML = ins.nike_banner;
+  }
+
+  // ── Receitas ──
+  _setInsight('insight-receitas-destaque', ins.receitas_destaque);
+
+  // ── Custos ──
+  _setInsightObj('insight-custos-sp', ins.custos_selecao_principal);
+  _setInsightObj('insight-custos-base', ins.custos_selecao_base);
+  _setInsightObj('insight-custos-fem', ins.custos_selecao_femininas);
+  _setInsightObj('insight-custos-fomento', ins.custos_fomento);
+  _setInsight('insight-custos-admin', ins.custos_admin_alerta);
+
+  // ── Balanço Patrimonial ──
+  _setInsight('insight-bp-ativo', ins.balanco_ativo);
+  _setInsight('insight-bp-passivo', ins.balanco_passivo);
+  _setInsight('insight-bp-evolucao', ins.balanco_evolucao);
+
+  // ── Indicadores ──
+  if (ins.indicadores_ebitda) {
+    _setIndicador('insight-ind-ebitda',
+      null, // mantém título EBITDA do HTML
+      ins.indicadores_ebitda
+    );
+  }
+  if (ins.indicadores_kanitz) {
+    _setIndicador('insight-ind-kanitz', null, ins.indicadores_kanitz);
+  }
+  if (ins.indicadores_liquidez_corrente) {
+    _setIndicador('insight-ind-lc', null, ins.indicadores_liquidez_corrente);
+  }
+  if (ins.indicadores_liquidez_geral) {
+    _setIndicador('insight-ind-lg', null, ins.indicadores_liquidez_geral);
+  }
+  if (ins.indicadores_liquidez_imediata) {
+    _setIndicador('insight-ind-li', null, ins.indicadores_liquidez_imediata);
+  }
+  if (ins.indicadores_dfc) {
+    _setInsight('insight-ind-dfc', ins.indicadores_dfc);
+  }
+  if (ins.indicadores_tendencia) {
+    _setInsight('insight-ind-tendencia', ins.indicadores_tendencia);
+  }
+
+  // ── Série Histórica ──
+  _setInsight('insight-hist-perspectiva', ins.historico_perspectiva);
+
+  // ── KPI deltas (textos comparativos nos cards) ──
+  if (ins.kpis) {
+    const k = ins.kpis;
+    const _kpi = (id, data) => {
+      if (!data) return;
+      const deltaEl = document.getElementById('kd-' + id);
+      const subEl = document.getElementById('ks-' + id);
+      if (deltaEl && data.delta) {
+        deltaEl.textContent = data.delta;
+        // Atualizar classe de cor baseado na seta
+        if (data.delta.includes('▲')) {
+          deltaEl.className = deltaEl.className.replace(/\b(up|dn)\b/, '').trim();
+          deltaEl.classList.add('up');
+        } else if (data.delta.includes('▼')) {
+          deltaEl.className = deltaEl.className.replace(/\b(up|dn)\b/, '').trim();
+          deltaEl.classList.add('dn');
+        }
+      }
+      if (subEl && data.sub) subEl.textContent = data.sub;
+    };
+
+    _kpi('receita-bruta', k.receita_bruta);
+    _kpi('resultado', k.resultado);
+    _kpi('custos', k.custos_futebol);
+    _kpi('caixa', k.caixa);
+    _kpi('ativo', k.ativo_total);
+    _kpi('rec-fin', k.rec_financeiras);
+  }
+
+  console.log('[CBF] ✅ Insights aplicados ao dashboard');
+}
 
 // ── Helpers para doughnut interativo ──
 function _doughnutLabels(showVal) {
@@ -1730,207 +1854,227 @@ initCharts();
 </script>
 <script>
 // ══════════════════════════════════════════════════════════
-// AUTO-FETCH: busca dados do Supabase e faz merge com histórico
-// Dados anteriores a 2025 mantidos do hardcode; Supabase completa
+// AUTO-FETCH: busca dados do Supabase com suporte multi-período
+// Seletor de período no header; cada troca recarrega KPIs,
+// gráficos, insights e barra de info.
 // ══════════════════════════════════════════════════════════
-(async function() {
-  const SUPA_URL  = 'https://uqthbzqpsgfflljxepen.supabase.co';
-  const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdGhienFwc2dmZmxsanhlcGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkyMTYsImV4cCI6MjA4OTA4NTIxNn0.bdZUNrd9TlErrs4uhCzzas9cKnUhzSKGOpkVQXIK1yA';
+const SUPA_URL  = 'https://uqthbzqpsgfflljxepen.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdGhienFwc2dmZmxsanhlcGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkyMTYsImV4cCI6MjA4OTA4NTIxNn0.bdZUNrd9TlErrs4uhCzzas9cKnUhzSKGOpkVQXIK1yA';
+const _supaHeaders = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json'
+};
 
-  const headers = {
-    'apikey': SUPA_KEY,
-    'Authorization': 'Bearer ' + SUPA_KEY,
-    'Content-Type': 'application/json'
+// Dados históricos hardcoded (2021-2024) — fonte: DFS auditadas
+const HIST = {
+  '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040 },
+  '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040 },
+  '2023': { label:'2023', receita:1172, resultado:238, custos:701,  caixa:1041 },
+  '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433 },
+};
+
+// Cache de todos os registros de dados_financeiros
+let _allDados = [];
+
+function fmtPeriodo(p) {
+  if (!p) return p;
+  const [ano, mes] = p.split('-');
+  if (!mes) return p;
+  const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return m[parseInt(mes)-1] + '/' + ano;
+}
+
+// ── Carregar dados de um período específico ──
+async function loadPeriodo(periodo) {
+  const d = _allDados.find(x => x.periodo === periodo);
+  if (!d) { console.warn('[CBF] Período não encontrado:', periodo); return; }
+
+  console.log('[CBF] Carregando período:', periodo);
+
+  // Montar mapa de anos do Supabase para série histórica
+  const supaMap = {};
+  _allDados.forEach(row => {
+    const ano = row.periodo.split('-')[0];
+    supaMap[ano] = {
+      label: ano,
+      receita:   Math.round(+row.receita_bruta / 1000),
+      resultado: Math.round(+row.resultado_exercicio / 1000),
+      custos:    Math.round(Math.abs(+row.custos_futebol) / 1000),
+      caixa:     Math.round(+row.caixa_equivalentes / 1000),
+    };
+  });
+
+  const merged = { ...HIST, ...supaMap };
+  const anos = Object.keys(merged).sort();
+  const labels      = anos.map(a => merged[a].label);
+  const rec_serie   = anos.map(a => merged[a].receita);
+  const res_serie   = anos.map(a => merged[a].resultado);
+  const cus_serie   = anos.map(a => merged[a].custos);
+  const caixa_serie = anos.map(a => merged[a].caixa);
+
+  // Montar __CBF_DADOS__
+  window.__CBF_DADOS__ = {
+    periodo,
+    periodoFormatado: fmtPeriodo(periodo),
+    source_file: d.source_file,
+    geradoEm: d.updated_at,
+
+    receita_bruta:       +d.receita_bruta,
+    receita_liquida:     +d.receita_liquida,
+    resultado_exercicio: +(d.resultado_exercicio ?? d.resultado_periodo ?? 0),
+    custos_futebol:      Math.abs(+d.custos_futebol),
+    caixa_equivalentes:  +d.caixa_equivalentes,
+    ativo_total:         +d.ativo_total,
+    rec_financeiras:     +d.rec_financeiras,
+    patrimonio_liquido:  +d.patrimonio_liquido,
+    liquidez_corrente:   +d.liquidez_corrente,
+    liquidez_imediata:   +d.liquidez_imediata,
+    fluxo_operacional:   +d.fluxo_operacional,
+    fluxo_investimento:  +d.fluxo_investimento,
+
+    labels,
+    receita_serie:   rec_serie,
+    resultado_serie: res_serie,
+    custos_serie:    cus_serie,
+    caixa_serie,
+
+    receitas_composicao: [
+      Math.round(Math.abs(+d.rec_transmissao) / 1000),
+      Math.round(Math.abs(+d.rec_patrocinio) / 1000),
+      Math.round(Math.abs(+d.rec_bilheteria) / 1000),
+      Math.round(Math.abs(+d.rec_registros) / 1000),
+      Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000),
+    ],
+    custos_composicao: [
+      Math.round(Math.abs(+d.custo_fomento) / 1000),
+      Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
+      Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
+      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
+    ],
+
+    custo_selecao_principal: Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
+    custo_selecao_base:      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
+    custo_selecao_femininas: Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
+    custo_fomento:           Math.round(Math.abs(+d.custo_fomento) / 1000),
+    desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) / 1000),
+    desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) / 1000),
+    desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) / 1000),
+
+    ativo_circulante:      +d.ativo_circulante,
+    passivo_circulante:    +d.passivo_circulante,
+    contas_receber:        +d.contas_receber,
+    tributos_recuperar:    +d.tributos_recuperar,
+    depositos_judiciais:   +d.depositos_judiciais,
+    imobilizado:           +d.imobilizado,
+    receitas_diferidas_cp: +d.receitas_diferidas_cp,
+    receitas_diferidas_lp: +d.receitas_diferidas_lp,
+    prov_contingencias:    +d.prov_contingencias,
+    patrimonio_social:     +d.patrimonio_social,
   };
 
-  // Dados históricos hardcoded (2021-2024) — fonte: DFS auditadas
-  const HIST = {
-    '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040 },
-    '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040 },
-    '2023': { label:'2023', receita:1172, resultado:238, custos:701,  caixa:1041 },
-    '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433 },
-  };
-
-  function fmtPeriodo(p) {
-    if (!p) return p;
-    const [ano, mes] = p.split('-');
-    if (!mes) return p; // já é só ano
-    const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    return m[parseInt(mes)-1] + '/' + ano;
+  // Atualizar GD
+  if (typeof GD !== 'undefined') {
+    GD.hist_labels    = labels;
+    GD.hist_resultado = res_serie;
+    GD.hist_receita   = rec_serie;
+    GD.hist_custos    = cus_serie;
+    GD.hist_caixa     = caixa_serie;
+    GD.rec_composicao = window.__CBF_DADOS__.receitas_composicao;
+    GD.cus_composicao = window.__CBF_DADOS__.custos_composicao;
+    GD.sel_2025 = [
+      window.__CBF_DADOS__.custo_selecao_principal,
+      window.__CBF_DADOS__.custo_selecao_base,
+      window.__CBF_DADOS__.custo_selecao_femininas
+    ];
+    GD.cus_barras = [
+      window.__CBF_DADOS__.custo_fomento,
+      window.__CBF_DADOS__.custo_selecao_principal,
+      window.__CBF_DADOS__.desp_administrativas,
+      window.__CBF_DADOS__.custo_selecao_femininas,
+      window.__CBF_DADOS__.desp_pessoal,
+      window.__CBF_DADOS__.custo_selecao_base,
+    ];
   }
 
-  try {
-    // Buscar configurações
-    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?select=chave,valor', { headers });
-    const cfgList = await cfgRes.json();
-    const cfgMap = Object.fromEntries((cfgList || []).map((c) => [c.chave, c.valor]));
-    const periodo = cfgMap['periodo_atual'] || '2025-12';
-    const ultimoBalancete = cfgMap['ultimo_balancete'] || null;
+  // Atualizar KPIs
+  if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
 
-    // Buscar DFs anuais
-    const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.asc', { headers });
-    const supa = await dadosRes.json();
-
-    // Buscar balancetes (se existirem)
-    const balRes = await fetch(SUPA_URL + '/rest/v1/balancetes?select=*&order=periodo.asc', { headers });
-    const balancetes = await balRes.json();
-    const temBalancete = Array.isArray(balancetes) && balancetes.length > 0;
-
-    // Decidir fonte de dados principal:
-    // - Se há balancete mais recente que as DFs → usar balancete como dado atual
-    // - Caso contrário → usar DFs anuais
-    let d, fonteAtual;
-    if (temBalancete && ultimoBalancete) {
-      const bal = balancetes.find(x => x.periodo === ultimoBalancete) || balancetes[balancetes.length - 1];
-      const dfAnual = (supa || []).find(x => x.periodo === periodo) || (supa || [])[supa.length - 1];
-      // Balancete prevalece se for de um período mais recente
-      if (!dfAnual || bal.periodo > dfAnual.periodo) {
-        d = bal; fonteAtual = 'balancete';
-      } else {
-        d = dfAnual; fonteAtual = 'dfs';
-      }
-    } else {
-      if (!supa || supa.length === 0) { console.warn('[CBF] Sem dados no Supabase'); return; }
-      d = supa.find(x => x.periodo === periodo) || supa[supa.length - 1];
-      fonteAtual = 'dfs';
-    }
-
-    console.log('[CBF] Fonte:', fonteAtual, '| Período:', d?.periodo);
-
-    // ── Merge histórico: hardcode (anos anteriores) + Supabase (2025+) ──
-    // Montar mapa de anos do Supabase
-    const supaMap = {};
-    supa.forEach(row => {
-      const ano = row.periodo.split('-')[0];
-      supaMap[ano] = {
-        label: ano,
-        receita:   Math.round(+row.receita_bruta / 1000),
-        resultado: Math.round(+row.resultado_exercicio / 1000),
-        custos:    Math.round(Math.abs(+row.custos_futebol) / 1000),
-        caixa:     Math.round(+row.caixa_equivalentes / 1000),
-      };
+  // Recriar gráficos
+  if (typeof done !== 'undefined') done.clear();
+  if (typeof chartInstances !== 'undefined') {
+    Object.keys(chartInstances).forEach(id => {
+      try { chartInstances[id].destroy(); } catch(e) {}
+      delete chartInstances[id];
     });
+  }
+  if (typeof initCharts === 'function') initCharts();
 
-    // Combinar hardcode + Supabase (Supabase prevalece quando existe)
-    const merged = { ...HIST, ...supaMap };
-    const anos = Object.keys(merged).sort();
-
-    const labels      = anos.map(a => merged[a].label);
-    const rec_serie   = anos.map(a => merged[a].receita);
-    const res_serie   = anos.map(a => merged[a].resultado);
-    const cus_serie   = anos.map(a => merged[a].custos);
-    const caixa_serie = anos.map(a => merged[a].caixa);
-
-    // Montar __CBF_DADOS__ com dados do período atual + série completa
-    window.__CBF_DADOS__ = {
-      periodo,
-      periodoFormatado: fmtPeriodo(periodo),
-      source_file: d.source_file,
-      geradoEm: d.updated_at,
-
-      // KPIs do período atual
-      receita_bruta:       +d.receita_bruta,
-      receita_liquida:     +d.receita_liquida,
-      resultado_exercicio: +(d.resultado_exercicio ?? d.resultado_periodo ?? 0),
-      custos_futebol:      Math.abs(+d.custos_futebol),
-      caixa_equivalentes:  +d.caixa_equivalentes,
-      ativo_total:         +d.ativo_total,
-      rec_financeiras:     +d.rec_financeiras,
-      patrimonio_liquido:  +d.patrimonio_liquido,
-      liquidez_corrente:   +d.liquidez_corrente,
-      liquidez_imediata:   +d.liquidez_imediata,
-      fluxo_operacional:   +d.fluxo_operacional,
-      fluxo_investimento:  +d.fluxo_investimento,
-
-      // Série histórica completa (hardcode + Supabase merged)
-      labels,
-      receita_serie:   rec_serie,
-      resultado_serie: res_serie,
-      custos_serie:    cus_serie,
-      caixa_serie,
-
-      // Doughnuts período atual
-      receitas_composicao: [
-        Math.round(Math.abs(+d.rec_transmissao) / 1000),
-        Math.round(Math.abs(+d.rec_patrocinio) / 1000),
-        Math.round(Math.abs(+d.rec_bilheteria) / 1000),
-        Math.round(Math.abs(+d.rec_registros) / 1000),
-        Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000),
-      ],
-      custos_composicao: [
-        Math.round(Math.abs(+d.custo_fomento) / 1000),
-        Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
-        Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
-        Math.round(Math.abs(+d.custo_selecao_base) / 1000),
-      ],
-
-      custo_selecao_principal: Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
-      custo_selecao_base:      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
-      custo_selecao_femininas: Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
-      custo_fomento:           Math.round(Math.abs(+d.custo_fomento) / 1000),
-      desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) / 1000),
-      desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) / 1000),
-      desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) / 1000),
-
-      ativo_circulante:      +d.ativo_circulante,
-      passivo_circulante:    +d.passivo_circulante,
-      contas_receber:        +d.contas_receber,
-      tributos_recuperar:    +d.tributos_recuperar,
-      depositos_judiciais:   +d.depositos_judiciais,
-      imobilizado:           +d.imobilizado,
-      receitas_diferidas_cp: +d.receitas_diferidas_cp,
-      receitas_diferidas_lp: +d.receitas_diferidas_lp,
-      prov_contingencias:    +d.prov_contingencias,
-      patrimonio_social:     +d.patrimonio_social,
-    };
-
-    // Atualizar GD com série completa (merged)
-    if (typeof GD !== 'undefined') {
-      GD.hist_labels      = labels;
-      GD.hist_resultado   = res_serie;
-      GD.hist_receita     = rec_serie;
-      GD.hist_custos      = cus_serie;
-      GD.hist_caixa       = caixa_serie;
-      GD.hist_despesas    = desp_serie || GD.hist_despesas;
-      GD.rec_composicao   = window.__CBF_DADOS__.receitas_composicao;
-      GD.cus_composicao   = window.__CBF_DADOS__.custos_composicao;
-      GD.sel_2025 = [
-        window.__CBF_DADOS__.custo_selecao_principal,
-        window.__CBF_DADOS__.custo_selecao_base,
-        window.__CBF_DADOS__.custo_selecao_femininas
-      ];
-      GD.cus_barras = [
-        window.__CBF_DADOS__.custo_fomento,
-        window.__CBF_DADOS__.custo_selecao_principal,
-        window.__CBF_DADOS__.desp_administrativas,
-        window.__CBF_DADOS__.custo_selecao_femininas,
-        window.__CBF_DADOS__.desp_pessoal,
-        window.__CBF_DADOS__.custo_selecao_base,
-      ];
+  // Buscar insights do período
+  try {
+    const insRes = await fetch(SUPA_URL + '/rest/v1/insights_gerados?periodo=eq.' + periodo + '&select=conteudo', { headers: _supaHeaders });
+    const insArr = await insRes.json();
+    if (Array.isArray(insArr) && insArr.length > 0) {
+      _aplicarInsights(insArr[0].conteudo);
+      console.log('[CBF] Insights carregados para período:', periodo);
+    } else {
+      console.log('[CBF] Sem insights para este período');
     }
+  } catch(e) {
+    console.warn('[CBF] Erro ao buscar insights:', e.message);
+  }
 
-    // Atualizar KPIs no DOM
-    if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
-
-    // Recriar gráficos com dados completos
-    if (typeof done !== 'undefined') done.clear();
-    if (typeof chartInstances !== 'undefined') {
-      Object.keys(chartInstances).forEach(id => {
-        try { chartInstances[id].destroy(); } catch(e) {}
-        delete chartInstances[id];
-      });
-    }
-    if (typeof initCharts === 'function') initCharts();
-
-    // Barra de info no rodapé
-    const bar = document.createElement('div');
+  // Atualizar barra de info
+  let bar = document.getElementById('cbf-info-bar');
+  if (!bar) {
+    bar = document.createElement('div');
     bar.id = 'cbf-info-bar';
     bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,156,59,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
-    const tipoLabel = fonteAtual === 'balancete' ? '📋 Balancete' : '📊 DFS';
-    bar.innerHTML = '<span>' + tipoLabel + ' <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">⚙️ Admin</a>';
     document.body.appendChild(bar);
+  }
+  bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">⚙️ Admin</a>';
 
-    console.log('[CBF] ✅ Dados carregados. Período:', periodo, '| Série:', anos.join(','));
+  // Atualizar seletor
+  const sel = document.getElementById('periodo-selector');
+  if (sel) sel.value = periodo;
+
+  console.log('[CBF] ✅ Período carregado:', periodo, '| Série:', anos.join(','));
+}
+
+// ── Inicialização: buscar todos os períodos e popular seletor ──
+(async function() {
+  try {
+    // Buscar todos os registros de dados_financeiros
+    const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.desc', { headers: _supaHeaders });
+    const dados = await dadosRes.json();
+    if (!Array.isArray(dados) || dados.length === 0) {
+      console.warn('[CBF] Sem dados no Supabase');
+      return;
+    }
+    _allDados = dados;
+
+    // Buscar periodo_atual da configuração
+    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?select=chave,valor', { headers: _supaHeaders });
+    const cfgList = await cfgRes.json();
+    const cfgMap = Object.fromEntries((cfgList || []).map(c => [c.chave, c.valor]));
+    const periodoAtual = cfgMap['periodo_atual'] || dados[0].periodo;
+
+    // Popular seletor de período
+    const sel = document.getElementById('periodo-selector');
+    if (sel) {
+      dados.forEach(row => {
+        const opt = document.createElement('option');
+        opt.value = row.periodo;
+        opt.textContent = fmtPeriodo(row.periodo);
+        sel.appendChild(opt);
+      });
+      sel.value = periodoAtual;
+      sel.style.display = dados.length > 1 ? 'block' : 'none';
+      sel.addEventListener('change', () => loadPeriodo(sel.value));
+    }
+
+    // Carregar período atual
+    await loadPeriodo(periodoAtual);
 
   } catch(err) {
     console.warn('[CBF] ⚠️ Erro ao buscar dados do Supabase:', err.message);
@@ -1958,13 +2102,6 @@ initCharts();
 <script>
 // ═ LOGIN SYSTEM ═
 (function(){
-  const CREDENTIALS = {
-    'cbf': 'cbf2025',
-    'admin': 'dashboard2025',
-    'valdecir.souza': 'cbf@123',
-    'antonio.junior': 'cbf@123',
-    'luiz.gomes': 'cbf@123'
-  };
   const SESSION_KEY = 'cbf_dashboard_auth';
 
   function isAuthenticated() {
@@ -1983,17 +2120,29 @@ initCharts();
     showDashboard();
   }
 
-  document.getElementById('login-form').addEventListener('submit', function(e) {
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     var user = document.getElementById('login-user').value.trim().toLowerCase();
     var pass = document.getElementById('login-pass').value.trim();
-    console.log('[LOGIN] user:', JSON.stringify(user), 'pass:', JSON.stringify(pass));
-    if (CREDENTIALS.hasOwnProperty(user) && CREDENTIALS[user] === pass) {
-      showDashboard();
-    } else {
-      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos (user: "' + user + '")';
-      document.getElementById('login-pass').value = '';
-      document.getElementById('login-pass').focus();
+    var errEl = document.getElementById('login-error');
+    errEl.textContent = 'Verificando...';
+
+    try {
+      var res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+      });
+      if (res.ok) {
+        showDashboard();
+      } else {
+        var data = await res.json();
+        errEl.textContent = data.error || 'Usuário ou senha incorretos';
+        document.getElementById('login-pass').value = '';
+        document.getElementById('login-pass').focus();
+      }
+    } catch (err) {
+      errEl.textContent = 'Erro de conexão. Tente novamente.';
     }
   });
 })();

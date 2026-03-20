@@ -70,8 +70,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Disparar Edge Function de processamento (assíncrono)
-    const funcName = tipoDocumento === 'balancete' ? 'process-balancete' : 'process-upload'
-    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/${funcName}`
+    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/process-upload`
     
     fetch(edgeFunctionUrl, {
       method: 'POST',
@@ -83,7 +82,8 @@ export async function POST(req: NextRequest) {
         upload_id: uploadRecord.id,
         storage_path: storagePath,
         periodo,
-        filename: file.name
+        filename: file.name,
+        tipo_documento: tipoDocumento
       })
     }).catch(err => console.error('Erro ao disparar Edge Function:', err))
     // Não await — processamento é assíncrono

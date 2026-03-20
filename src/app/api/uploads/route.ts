@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function GET() {
   const { data, error } = await supabase
     .from('uploads')
-    .select('id, filename, file_type, periodo, status, error_msg, uploaded_at, processed_at')
+    .select('id, filename, file_type, periodo, tipo_documento, status, error_msg, uploaded_at, processed_at')
     .order('uploaded_at', { ascending: false })
     .limit(20)
 

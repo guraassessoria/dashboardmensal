@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   periodo     TEXT,          -- ex: "2025-12", "2026-01"
   status      TEXT DEFAULT 'pending' CHECK (status IN ('pending','processing','done','error')),
   error_msg   TEXT,
+  tipo_documento TEXT DEFAULT 'dfs' CHECK (tipo_documento IN ('dfs', 'balancete')),
   uploaded_at TIMESTAMPTZ DEFAULT now(),
   processed_at TIMESTAMPTZ
 );
@@ -115,6 +116,46 @@ INSERT INTO configuracao (chave, valor) VALUES
   ('titulo', 'CBF — Demonstrações Financeiras')
 ON CONFLICT (chave) DO NOTHING;
 
+-- Tabela de insights gerados por IA (uma linha por período)
+CREATE TABLE IF NOT EXISTS insights_gerados (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  periodo     TEXT NOT NULL UNIQUE,
+  upload_id   UUID REFERENCES uploads(id),
+  conteudo    JSONB NOT NULL DEFAULT '{}',
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  updated_at  TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_insights_periodo ON insights_gerados(periodo DESC);
+
+-- Tabela de usuários do dashboard
+CREATE TABLE IF NOT EXISTS dashboard_users (
+  id             UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  username       TEXT NOT NULL UNIQUE,
+  password_hash  TEXT NOT NULL,
+  nome_completo  TEXT,
+  ativo          BOOLEAN DEFAULT true,
+  created_at     TIMESTAMPTZ DEFAULT now(),
+  updated_at     TIMESTAMPTZ DEFAULT now()
+);
+
+-- Seed: usuários iniciais (senhas em bcrypt — precisam ser geradas na aplicação)
+-- Os usuários abaixo são criados via API /api/users
+
+ALTER TABLE dashboard_users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Leitura pública dashboard_users"
+  ON dashboard_users FOR SELECT USING (true);
+
+CREATE POLICY "Apenas service_role insere dashboard_users"
+  ON dashboard_users FOR INSERT WITH CHECK (auth.role() = 'service_role');
+
+CREATE POLICY "Apenas service_role atualiza dashboard_users"
+  ON dashboard_users FOR UPDATE USING (auth.role() = 'service_role');
+
+CREATE POLICY "Apenas service_role deleta dashboard_users"
+  ON dashboard_users FOR DELETE USING (auth.role() = 'service_role');
+
 -- Storage bucket para os arquivos
 -- (Execute via Supabase Dashboard > Storage > New Bucket)
 -- Nome: "uploads-cbf"
@@ -143,3 +184,15 @@ CREATE POLICY "Apenas service_role insere uploads"
 
 CREATE POLICY "Apenas service_role atualiza uploads"
   ON uploads FOR UPDATE USING (auth.role() = 'service_role');
+
+-- RLS para insights_gerados
+ALTER TABLE insights_gerados ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Leitura pública insights"
+  ON insights_gerados FOR SELECT USING (true);
+
+CREATE POLICY "Apenas service_role insere insights"
+  ON insights_gerados FOR INSERT WITH CHECK (auth.role() = 'service_role');
+
+CREATE POLICY "Apenas service_role atualiza insights"
+  ON insights_gerados FOR UPDATE USING (auth.role() = 'service_role');
