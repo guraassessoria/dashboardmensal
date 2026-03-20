@@ -1044,7 +1044,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="ccard">
       <div class="ctitle" style="margin-bottom:4px;">Demonstração do Fluxo de Caixa - em milhares de reais</div>
       <div class="csub" style="margin-bottom:16px;">Composição da variação de −R$ 436 milhões nas disponibilidades</div>
-      <div class="cwrap" style="height:260px;"><canvas id="cind2"></canvas></div>
+      <div class="cwrap" style="height:380px;"><canvas id="cind2"></canvas></div>
       <div style="margin-top:16px;">
         <table>
           <thead><tr><th></th><th style="text-align:right;">R$ Mi</th><th style="text-align:right;">Efeito</th></tr></thead>
@@ -1539,10 +1539,11 @@ function initCharts() {
     datasets:[{label:'R$ Mi', data:GD.dfc_data,
       backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':'#009C3B', borderRadius:4}]
   }, options:{maintainAspectRatio:false,
+    layout:{padding:{top:30,bottom:10}},
     plugins:{legend:{display:false},
       tooltip:{callbacks:{label:function(ctx){return ' R$ '+ctx.parsed.y.toFixed(1)+' Mi';}}}
     },
-    scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
+    scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{suggestedMin:-220, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
 
   // ── LIQUIDEZ ──
   safeChart('cliq', {type:'bar', data:{
