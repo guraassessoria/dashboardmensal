@@ -36,9 +36,11 @@ export async function GET(req: NextRequest) {
 }
 
 // PUT /api/insights — atualiza conteúdo de insights
+const ADMIN_PWD = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'cbf2025'
+
 export async function PUT(req: NextRequest) {
   const authCookie = req.cookies.get('admin_auth')
-  if (!authCookie || authCookie.value !== process.env.ADMIN_PASSWORD) {
+  if (!authCookie || authCookie.value !== ADMIN_PWD) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 

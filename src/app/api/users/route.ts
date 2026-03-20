@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
 
+const ADMIN_PWD = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'cbf2025'
+
 function isAdmin(req: NextRequest) {
-  return req.cookies.get('admin_auth')?.value === process.env.ADMIN_PASSWORD
+  return req.cookies.get('admin_auth')?.value === ADMIN_PWD
 }
 
 // GET /api/users  — lista todos os usuários (sem expor password_hash)
