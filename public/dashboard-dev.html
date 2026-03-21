@@ -1278,15 +1278,15 @@ const GD = {
   hist_despesas:  _D?.despesas_serie  || [170, 199, 162, 208, 438],
   
   // Labels dinâmicos para ano atual/anterior
-  anoAtual: '2025',
-  anoAnterior: '2024',
+  anoAtual: '2026',
+  anoAnterior: '2025',
 
   // Comparativo receitas (c4) — período atual vs anterior
   comp_2025: _D?.receitas_composicao
     ? [_D.receitas_composicao[0], _D.receitas_composicao[1],
        _D.receitas_composicao[2], _D.receitas_composicao[3]]
     : [638, 438, 55, 51],
-  comp_2024: [724, 451, 67, 38],
+  comp_2024: [],
   
   // Seleções (c8)
   sel_2025: _D ? [
@@ -1294,7 +1294,7 @@ const GD = {
     Math.round((_D.custo_selecao_base||0)),
     Math.round((_D.custo_selecao_femininas||0))
   ] : [281, 45, 94],
-  sel_2024: [201, 27, 116],
+  sel_2024: [],
   
   // Estrutura custos (c7)
   cus_barras: _D ? [
@@ -1344,7 +1344,7 @@ const GD = {
     1.59,
     _D.liquidez_imediata || 3.27
   ] : [3.95, 1.59, 3.27],
-  liq_2024: [5.21, 1.66, 4.58],
+  liq_2024: [],
 };
 
 // ── Atualizar KPI cards no DOM com dados dinâmicos ──
