@@ -1931,56 +1931,108 @@ function _rebuildDRE(d, dPrev) {
     return '<tr' + cls + '><td>' + label + '</td><td class="num">' + fv + '</td>' + prevTd + pct + '</tr>';
   };
 
+  // Renderizar linha somente se valor não for null/zero
+  const maybeRow = (label, val, prevVal, isTotal, isCost) => {
+    if (val == null || (+val === 0 && !isTotal)) return '';
+    return row(label, val, prevVal, isTotal, isCost);
+  };
+
   const hdr = label => '<tr class="dre-header"><td colspan="' + cols + '">' + label + '</td></tr>';
   const p = dPrev || {};
-  const deducoes = (d.receita_bruta && d.receita_liquida) ? d.receita_liquida - d.receita_bruta : null;
-  const deducoesPrev = (p.receita_bruta && p.receita_liquida) ? p.receita_liquida - p.receita_bruta : null;
+
+  // Sub-objetos detalhados de dados_raw
+  const rRec = d.dados_raw?.receitas || {};
+  const pRec = p.dados_raw?.receitas || {};
+  const rCus = d.dados_raw?.custos_futebol || {};
+  const pCus = p.dados_raw?.custos_futebol || {};
+  const rDesp = d.dados_raw?.despesas || {};
+  const pDesp = p.dados_raw?.despesas || {};
+  const rFin = d.dados_raw?.resultado_financeiro || {};
+  const pFin = p.dados_raw?.resultado_financeiro || {};
+  const dr = d.dados_raw?.dre || {};
+  const drP = p.dados_raw?.dre || {};
+
+  // Labels amigáveis por seção — campos novos aparecem automaticamente
+  const _receitaLabels = {
+    patrocinio: 'Patrocínios', transmissao: 'Direito de Transmissão e Comerciais',
+    bilheteria: 'Bilheteria e Premiações', registros: 'Registros e Transferências',
+    desenvolvimento: 'Programa de Desenvolvimento', academy: 'CBF Academy', legado: 'Legado'
+  };
+  const _custoLabels = {
+    selecao_principal: 'Seleção Principal', selecoes_base: 'Seleções de Base',
+    selecoes_femininas: 'Seleções Femininas', fomento: 'Contribuição ao Fomento'
+  };
+  const _despLabels = {
+    pessoal: 'Despesas com Pessoal', administrativas: 'Despesas Administrativas',
+    impostos_taxas: 'Impostos e Taxas'
+  };
+  const _finLabels = {
+    receitas_financeiras: 'Receitas Financeiras', despesas_financeiras: 'Despesas Financeiras',
+    variacao_cambial: 'Variação Cambial', total: null
+  };
+
+  // Função genérica: renderizar seção dinamicamente
+  const renderSection = (rawObj, rawPrev, labelMap, isCost) => {
+    let s = '';
+    // Renderizar campos conhecidos na ordem do mapa
+    const rendered = new Set();
+    Object.keys(labelMap).forEach(k => {
+      if (labelMap[k] === null) return; // skip totais
+      rendered.add(k);
+      const v = rawObj[k]; const pv = rawPrev[k];
+      s += maybeRow(labelMap[k], v, pv, false, isCost);
+    });
+    // Detectar campos extras não mapeados
+    Object.keys(rawObj).forEach(k => {
+      if (rendered.has(k) || labelMap[k] === null) return;
+      const v = rawObj[k];
+      if (v == null || +v === 0) return;
+      const label = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      s += maybeRow(label, v, rawPrev[k], false, isCost);
+    });
+    return s;
+  };
+
+  const deducoes = (d.receita_bruta && d.receita_liquida) ? d.receita_liquida - d.receita_bruta : (dr.deducoes || null);
+  const deducoesPrev = (p.receita_bruta && p.receita_liquida) ? p.receita_liquida - p.receita_bruta : (drP.deducoes || null);
 
   let h = '';
+
+  // Receitas
   h += hdr('Receita Bruta');
-  h += row('Patrocínios', d.rec_patrocinio, p.rec_patrocinio);
-  h += row('Direito de Transmissão e Comerciais', d.rec_transmissao, p.rec_transmissao);
-  h += row('Bilheteria e Premiações', d.rec_bilheteria, p.rec_bilheteria);
-  h += row('Registros e Transferências', d.rec_registros, p.rec_registros);
-  h += row('Programa de Desenvolvimento', d.rec_desenvolvimento, p.rec_desenvolvimento);
-  h += row('CBF Academy', d.rec_academy, p.rec_academy);
+  h += renderSection(rRec, pRec, _receitaLabels, false);
   h += row('Total das Receitas', d.receita_bruta, p.receita_bruta, true);
-  h += row('Deduções da Receita (COFINS/ISS)', deducoes, deducoesPrev);
+  h += maybeRow('Deduções da Receita (COFINS/ISS)', deducoes, deducoesPrev);
   h += row('Receita Líquida', d.receita_liquida, p.receita_liquida, true);
 
+  // Custos com Futebol
   h += hdr('Custos com Futebol');
-  h += row('Seleção Principal', d.custo_selecao_principal, p.custo_selecao_principal, false, true);
-  h += row('Seleções de Base', d.custo_selecao_base, p.custo_selecao_base, false, true);
-  h += row('Seleções Femininas', d.custo_selecao_femininas, p.custo_selecao_femininas, false, true);
-  h += row('Contribuição ao Fomento', d.custo_fomento, p.custo_fomento, false, true);
+  h += renderSection(rCus, pCus, _custoLabels, true);
   h += row('Total dos Custos com Futebol', d.custos_futebol, p.custos_futebol, true, true);
   h += row('Superávit / (Déficit) Bruto', d.superavit_bruto, p.superavit_bruto, true);
 
+  // Despesas Operacionais
   h += hdr('Despesas Operacionais');
-  h += row('Despesas com Pessoal', d.desp_pessoal, p.desp_pessoal, false, true);
-  h += row('Despesas Administrativas', d.desp_administrativas, p.desp_administrativas, false, true);
-  h += row('Impostos e Taxas', d.desp_impostos_taxas, p.desp_impostos_taxas, false, true);
+  h += renderSection(rDesp, pDesp, _despLabels, true);
   h += row('Total das Despesas Operacionais', d.despesas_operacionais, p.despesas_operacionais, true, true);
 
+  // Resultado Financeiro
   h += hdr('Resultado Financeiro');
-  h += row('Receitas Financeiras', d.res_fin_receitas, p.res_fin_receitas);
-  h += row('Despesas Financeiras', d.res_fin_despesas, p.res_fin_despesas, false, true);
-  h += row('Variação Cambial', d.res_fin_cambial, p.res_fin_cambial);
+  h += renderSection(rFin, pFin, _finLabels, false);
   h += row('Total do Resultado Financeiro', d.resultado_financeiro, p.resultado_financeiro, true);
 
-  // Outros Resultados Operacionais (from dados_raw)
-  const dr = d.dados_raw?.dre || {};
-  const drP = p.dados_raw?.dre || {};
+  // Outros Resultados Operacionais
   h += hdr('Outros Resultados Operacionais');
-  h += row('Outras Receitas Operacionais', dr.outras_receitas, drP.outras_receitas);
-  h += row('Outras Despesas Operacionais', dr.outras_despesas, drP.outras_despesas, false, true);
+  h += maybeRow('Outras Receitas Operacionais', dr.outras_receitas, drP.outras_receitas);
+  h += maybeRow('Outras Despesas Operacionais', dr.outras_despesas, drP.outras_despesas, false, true);
   const totalOutros = (+(dr.outras_receitas || 0)) + (+(dr.outras_despesas || 0));
   const totalOutrosP = (+(drP.outras_receitas || 0)) + (+(drP.outras_despesas || 0));
-  h += row('Total de Outros Resultados Operacionais', totalOutros, dPrev ? totalOutrosP : null, true);
+  if (totalOutros !== 0 || dr.outras_receitas || dr.outras_despesas)
+    h += row('Total de Outros Resultados Operacionais', totalOutros, dPrev ? totalOutrosP : null, true);
 
   // Resultado antes do IR
-  h += row('Resultado antes do IR/CSLL', dr.resultado_antes_ir, drP.resultado_antes_ir, true);
-  h += row('IR e Contribuição Social', dr.ir_csll, drP.ir_csll, false, true);
+  h += maybeRow('Resultado antes do IR/CSLL', dr.resultado_antes_ir, drP.resultado_antes_ir, true);
+  h += maybeRow('IR e Contribuição Social', dr.ir_csll, drP.ir_csll, false, true);
 
   // Resultado final
   const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);font-size:14px;' : 'color:var(--pos);font-size:14px;';
