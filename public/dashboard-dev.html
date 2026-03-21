@@ -1921,7 +1921,9 @@ function _rebuildDRE(d, dPrev) {
     const fp = dPrev ? (isCost && prevVal != null ? _fmtNum(-Math.abs(prevVal)) : _fmtNum(prevVal)) : '';
     const cls = isTotal ? ' class="dre-row-total"' : '';
     const prevTd = dPrev ? '<td class="num">' + fp + '</td>' : '';
-    const pct = dPrev ? pctCell(val, prevVal) : '';
+    const pctA = isCost && val != null ? Math.abs(val) : val;
+    const pctB = isCost && prevVal != null ? Math.abs(prevVal) : prevVal;
+    const pct = dPrev ? pctCell(pctA, pctB) : '';
     return '<tr' + cls + '><td>' + label + '</td><td class="num">' + fv + '</td>' + prevTd + pct + '</tr>';
   };
 

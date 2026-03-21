@@ -112,17 +112,29 @@ serve(async (req) => {
     const existingRaw = existingRow?.dados_raw || {}
 
     // Merge: dados_raw combina ambas as fontes com deep merge inteligente
-    const mergedRaw = deepMerge(existingRaw, dadosExtraidos)
+    // DFS tem prioridade sobre balancete para dados consolidados
+    const mergePriority = tipo_documento === 'dfs' ? 'incoming' as const : 'existing' as const
+    const mergedRaw = deepMerge(existingRaw, dadosExtraidos, mergePriority)
     mergedRaw._sources = {
       ...(existingRaw._sources || {}),
       [tipo_documento]: { filename, processed_at: new Date().toISOString() }
     }
 
-    // Helper: preferir valor real (não-nulo e não-zero) ao mesclar fontes
-    const pick = (a: any, b: any) => {
-      if (a !== null && a !== undefined && a !== 0) return a
-      if (b !== null && b !== undefined && b !== 0) return b
-      return a ?? b
+    // Helper: merge com prioridade baseada na fonte.
+    // DFS é a fonte autoritativa para DRE/BP/DFC. Balancete só preenche nulls.
+    // Se o documento atual é DFS, seus valores têm prioridade (a=DFS, b=existing).
+    // Se o documento atual é balancete, os valores existentes (vindos do DFS) têm prioridade (a=balancete, b=existing/DFS).
+    const isDfs = tipo_documento === 'dfs'
+    const pick = (incoming: any, existing: any) => {
+      // Se DFS está sendo processado agora, preferir DFS (incoming)
+      if (isDfs) {
+        if (incoming !== null && incoming !== undefined) return incoming
+        return existing
+      }
+      // Se balancete está sendo processado, preferir existing (provavelmente DFS)
+      if (existing !== null && existing !== undefined && existing !== 0) return existing
+      if (incoming !== null && incoming !== undefined && incoming !== 0) return incoming
+      return existing ?? incoming
     }
 
     // Construir objeto de dados: novos valores preenchem os que estavam null
@@ -356,20 +368,27 @@ serve(async (req) => {
   }
 })
 
-// ── Deep merge: preserva valores não-nulos/não-zero de ambas as fontes ──
-function deepMerge(existing: any, incoming: any): any {
+// ── Deep merge: preserva valores de ambas as fontes. DFS tem prioridade sobre balancete. ──
+// O parâmetro sourcePriority controla qual fonte é preferida:
+// 'incoming' = novo documento tem prioridade (DFS processado agora)
+// 'existing' = dados existentes têm prioridade (DFS já processado antes, balancete chegando)
+function deepMerge(existing: any, incoming: any, sourcePriority: 'incoming' | 'existing' = 'incoming'): any {
   if (incoming === null || incoming === undefined) return existing
   if (existing === null || existing === undefined) return incoming
   if (typeof incoming !== 'object' || Array.isArray(incoming)) {
-    // Para valores escalares: preferir não-zero/não-null
-    if (incoming !== 0 && incoming !== null) return incoming
-    if (existing !== 0 && existing !== null) return existing
-    return incoming ?? existing
+    if (sourcePriority === 'incoming') {
+      // Preferir incoming (DFS), exceto se null/undefined
+      return (incoming !== null && incoming !== undefined) ? incoming : existing
+    } else {
+      // Preferir existing (DFS já no banco), usar incoming só se existing é null/0
+      if (existing !== null && existing !== undefined && existing !== 0) return existing
+      return (incoming !== null && incoming !== undefined && incoming !== 0) ? incoming : existing
+    }
   }
   const result: any = { ...existing }
   for (const [key, val] of Object.entries(incoming)) {
-    if (key === '_sources') continue // tratado separadamente
-    result[key] = deepMerge(existing[key], val)
+    if (key === '_sources') continue
+    result[key] = deepMerge(existing[key], val, sourcePriority)
   }
   return result
 }
