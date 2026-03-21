@@ -2014,43 +2014,89 @@ function _rebuildBP(d, dPrev) {
 
   const f = _fmtNum;
   const p = dPrev || {};
-  const prevTd = v => dPrev ? '<td class="num">' + f(v) + '</td>' : '';
   const hdr = label => '<tr class="dre-header"><td colspan="' + (dPrev ? 3 : 2) + '">' + label + '</td></tr>';
   const row = (label, val, pv, isTotal, style) => '<tr' + (isTotal ? ' class="dre-row-total"' : '') + '><td>' + label + '</td><td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(val) + '</td>' + (dPrev ? '<td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(pv) + '</td>' : '') + '</tr>';
 
-  const circulanteTotal = d.ativo_circulante;
-  const naoCirculante = d.ativo_total && d.ativo_circulante ? d.ativo_total - d.ativo_circulante : null;
   // Helper: ler campo do direct col ou fallback para dados_raw.balanco
   const bv = (obj, key) => obj[key] != null ? +obj[key] : (obj.dados_raw?.balanco?.[key] != null ? +obj.dados_raw.balanco[key] : null);
 
+  // Mapa de labels para campos conhecidos — novos campos extraídos pela IA aparecem automaticamente
+  const _labelMap = {
+    caixa_equivalentes: 'Caixa e Equivalentes',
+    contas_receber: 'Contas a Receber',
+    tributos_recuperar: 'Tributos a Recuperar',
+    adiantamentos: 'Adiantamentos',
+    ativo_circulante: null, // mostrado como total
+    depositos_judiciais: 'Depósitos Judiciais',
+    imobilizado: 'Imobilizado',
+    intangivel: 'Intangível',
+    ativo_total: null,
+    fornecedores: 'Fornecedores',
+    obrig_trabalhistas: 'Obrigações Trabalhistas',
+    receitas_diferidas_cp: 'Receitas Diferidas CP',
+    passivo_circulante: null,
+    receitas_diferidas_lp: 'Receitas Diferidas LP',
+    prov_contingencias: 'Provisão Contingências',
+    patrimonio_social: 'Patrimônio Social',
+    patrimonio_liquido: null,
+    resultado_acumulado: 'Resultado do Exercício',
+  };
+
+  // Detectar campos extras em dados_raw.balanco que não estão no mapa
+  const bal = d.dados_raw?.balanco || {};
+  const _knownKeys = new Set(Object.keys(_labelMap));
+  const _totalsSet = new Set(['ativo_circulante','ativo_total','passivo_circulante','patrimonio_liquido']);
+  Object.keys(bal).forEach(k => {
+    if (!_knownKeys.has(k) && !_totalsSet.has(k) && bal[k] != null && +bal[k] !== 0) {
+      _labelMap[k] = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+  });
+
+  // Função auxiliar: renderizar linha se valor não-nulo e não-zero
+  const maybeRow = (key, isTotal) => {
+    const v = bv(d, key);
+    if (v == null || (v === 0 && !isTotal)) return '';
+    const label = _labelMap[key] || key;
+    const pv = bv(p, key);
+    const stl = key === 'resultado_acumulado' && v < 0 ? 'color:var(--neg);' : '';
+    return row(label, v, pv, !!isTotal, stl);
+  };
+
+  // === ATIVO ===
+  const ativoCircFields = ['caixa_equivalentes','contas_receber','tributos_recuperar','adiantamentos'];
+  const ativoNCircFields = ['depositos_judiciais','imobilizado','intangivel'];
+  // Adicionar campos extras do balanco que parecem ativo (heurística: valor positivo, não está em passivo/PL)
+  const _passivoKeys = new Set(['fornecedores','obrig_trabalhistas','receitas_diferidas_cp','passivo_circulante','receitas_diferidas_lp','prov_contingencias','patrimonio_social','patrimonio_liquido','resultado_acumulado']);
+  Object.keys(_labelMap).forEach(k => {
+    if (!_totalsSet.has(k) && !_passivoKeys.has(k) && !ativoCircFields.includes(k) && !ativoNCircFields.includes(k) && _labelMap[k]) {
+      const v = bv(d, k);
+      if (v != null && v > 0) ativoNCircFields.push(k);
+    }
+  });
+
   let ha = '';
   ha += hdr('Circulante');
-  ha += row('Caixa e Equivalentes', d.caixa_equivalentes, p.caixa_equivalentes);
-  ha += row('Contas a Receber', d.contas_receber, p.contas_receber);
-  ha += row('Tributos a Recuperar', d.tributos_recuperar, p.tributos_recuperar);
-  if (bv(d,'adiantamentos')) ha += row('Adiantamentos', bv(d,'adiantamentos'), bv(p,'adiantamentos'));
-  ha += row('Total Circulante', d.ativo_circulante, p.ativo_circulante, true);
+  ativoCircFields.forEach(k => { ha += maybeRow(k); });
+  ha += row('Total Circulante', bv(d,'ativo_circulante'), bv(p,'ativo_circulante'), true);
   ha += hdr('Não Circulante');
-  ha += row('Depósitos Judiciais', d.depositos_judiciais, p.depositos_judiciais);
-  ha += row('Imobilizado', d.imobilizado, p.imobilizado);
-  if (bv(d,'intangivel')) ha += row('Intangível', bv(d,'intangivel'), bv(p,'intangivel'));
-  ha += row('Total do Ativo', d.ativo_total, p.ativo_total, true);
+  ativoNCircFields.forEach(k => { ha += maybeRow(k); });
+  ha += row('Total do Ativo', bv(d,'ativo_total'), bv(p,'ativo_total'), true);
   ativoTbody.innerHTML = ha;
+
+  // === PASSIVO + PL ===
+  const passCircFields = ['fornecedores','obrig_trabalhistas','receitas_diferidas_cp'];
+  const passNCircFields = ['receitas_diferidas_lp','prov_contingencias'];
+  const plFields = ['patrimonio_social','resultado_acumulado'];
 
   let hp = '';
   hp += hdr('Circulante');
-  if (bv(d,'fornecedores')) hp += row('Fornecedores', bv(d,'fornecedores'), bv(p,'fornecedores'));
-  if (bv(d,'obrig_trabalhistas')) hp += row('Obrigações Trabalhistas', bv(d,'obrig_trabalhistas'), bv(p,'obrig_trabalhistas'));
-  if (d.receitas_diferidas_cp) hp += row('Receitas Diferidas CP', d.receitas_diferidas_cp, p.receitas_diferidas_cp);
-  hp += row('Total Circulante', d.passivo_circulante, p.passivo_circulante, true);
+  passCircFields.forEach(k => { hp += maybeRow(k); });
+  hp += row('Total Circulante', bv(d,'passivo_circulante'), bv(p,'passivo_circulante'), true);
   hp += hdr('Não Circulante');
-  hp += row('Receitas Diferidas LP', d.receitas_diferidas_lp, p.receitas_diferidas_lp);
-  hp += row('Provisão Contingências', d.prov_contingencias, p.prov_contingencias);
+  passNCircFields.forEach(k => { hp += maybeRow(k); });
   hp += hdr('Patrimônio Líquido');
-  hp += row('Patrimônio Social', d.patrimonio_social, p.patrimonio_social);
-  const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);' : 'color:var(--pos);';
-  hp += row('Resultado do Exercício', d.resultado_exercicio, p.resultado_exercicio, false, stl);
-  hp += row('Total Passivo + PL', d.ativo_total, p.ativo_total, true);
+  plFields.forEach(k => { hp += maybeRow(k); });
+  hp += row('Total Passivo + PL', bv(d,'ativo_total'), bv(p,'ativo_total'), true);
   passivoTbody.innerHTML = hp;
 }
 
