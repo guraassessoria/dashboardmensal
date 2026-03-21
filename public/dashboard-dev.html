@@ -2078,16 +2078,22 @@ function _rebuildBP(d, dPrev) {
     contas_receber: 'Contas a Receber',
     tributos_recuperar: 'Tributos a Recuperar',
     adiantamentos: 'Adiantamentos',
+    despesas_antecipadas: 'Despesas Antecipadas',
     ativo_circulante: null, // mostrado como total
+    contas_receber_lp: 'Contas a Receber LP',
     depositos_judiciais: 'Depósitos Judiciais',
+    investimentos: 'Investimentos',
     imobilizado: 'Imobilizado',
     intangivel: 'Intangível',
     ativo_total: null,
     fornecedores: 'Fornecedores',
+    programas_desenvolvimento: 'Programas de Desenvolvimento',
     obrig_trabalhistas: 'Obrigações Trabalhistas',
+    provisao_ferias: 'Provisão Férias e Encargos',
     receitas_diferidas_cp: 'Receitas Diferidas CP',
     passivo_circulante: null,
     receitas_diferidas_lp: 'Receitas Diferidas LP',
+    fornecedores_lp: 'Fornecedores LP',
     prov_contingencias: 'Provisão Contingências',
     patrimonio_social: 'Patrimônio Social',
     patrimonio_liquido: null,
@@ -2115,10 +2121,10 @@ function _rebuildBP(d, dPrev) {
   };
 
   // === ATIVO ===
-  const ativoCircFields = ['caixa_equivalentes','contas_receber','tributos_recuperar','adiantamentos'];
-  const ativoNCircFields = ['depositos_judiciais','imobilizado','intangivel'];
+  const ativoCircFields = ['caixa_equivalentes','contas_receber','tributos_recuperar','adiantamentos','despesas_antecipadas'];
+  const ativoNCircFields = ['contas_receber_lp','depositos_judiciais','investimentos','imobilizado','intangivel'];
   // Adicionar campos extras do balanco que parecem ativo (heurística: valor positivo, não está em passivo/PL)
-  const _passivoKeys = new Set(['fornecedores','obrig_trabalhistas','receitas_diferidas_cp','passivo_circulante','receitas_diferidas_lp','prov_contingencias','patrimonio_social','patrimonio_liquido','resultado_acumulado']);
+  const _passivoKeys = new Set(['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','passivo_circulante','receitas_diferidas_lp','fornecedores_lp','prov_contingencias','patrimonio_social','patrimonio_liquido','resultado_acumulado']);
   Object.keys(_labelMap).forEach(k => {
     if (!_totalsSet.has(k) && !_passivoKeys.has(k) && !ativoCircFields.includes(k) && !ativoNCircFields.includes(k) && _labelMap[k]) {
       const v = bv(d, k);
@@ -2136,8 +2142,8 @@ function _rebuildBP(d, dPrev) {
   ativoTbody.innerHTML = ha;
 
   // === PASSIVO + PL ===
-  const passCircFields = ['fornecedores','obrig_trabalhistas','receitas_diferidas_cp'];
-  const passNCircFields = ['receitas_diferidas_lp','prov_contingencias'];
+  const passCircFields = ['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp'];
+  const passNCircFields = ['receitas_diferidas_lp','fornecedores_lp','prov_contingencias'];
   const plFields = ['patrimonio_social','resultado_acumulado'];
 
   let hp = '';

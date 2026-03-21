@@ -97,9 +97,73 @@ serve(async (req) => {
     const dadosExtraidosRaw = JSON.parse(jsonMatch[1] || jsonMatch[0])
 
     // Balancete vem em R$ (reais). Converter para R$ milhares para padronizar com DFS.
-    const dadosExtraidos = tipo_documento === 'balancete'
+    let dadosExtraidos = tipo_documento === 'balancete'
       ? convertToThousands(dadosExtraidosRaw)
       : dadosExtraidosRaw
+
+    // ── 4.5. Validação pós-extração + correção automática ──
+    const validacao1 = validateExtraction(dadosExtraidos, tipo_documento)
+
+    if (validacao1.missing.length > 0) {
+      console.log(`⚠️ Validação: ${validacao1.missing.length} campos faltando: ${validacao1.missing.join(', ')}`)
+
+      // Re-prompt Claude para extrair campos faltantes
+      const correctionPrompt = buildCorrectionPrompt(validacao1.missing, periodo, tipo_documento)
+
+      try {
+        const correctionResponse = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": ANTHROPIC_API_KEY,
+            "anthropic-version": "2023-06-01"
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 2048,
+            messages: [{
+              role: "user",
+              content: [
+                { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX\n\n${sheetText}\n\n---\n\n${correctionPrompt}` }
+              ]
+            }]
+          })
+        })
+
+        if (correctionResponse.ok) {
+          const corrData = await correctionResponse.json()
+          const corrText = corrData.content?.[0]?.text || ""
+          const corrMatch = corrText.match(/```json\n?([\s\S]*?)\n?```/) || corrText.match(/\{[\s\S]*\}/)
+
+          if (corrMatch) {
+            const corrections = JSON.parse(corrMatch[1] || corrMatch[0])
+            const convertedCorrections = tipo_documento === 'balancete' ? convertToThousands(corrections) : corrections
+
+            // Mesclar correções no dadosExtraidos
+            dadosExtraidos = deepMerge(dadosExtraidos, convertedCorrections, 'incoming')
+            console.log(`✅ Correção aplicada. Re-validando...`)
+
+            // Re-validar após correção
+            const validacao2 = validateExtraction(dadosExtraidos, tipo_documento)
+            if (validacao2.missing.length > 0) {
+              console.warn(`⚠️ Ainda faltam ${validacao2.missing.length} campos após correção: ${validacao2.missing.join(', ')}`)
+            } else {
+              console.log(`✅ Re-validação OK: todos os campos críticos extraídos`)
+            }
+            if (validacao2.warnings.length > 0) {
+              console.warn(`ℹ️ Avisos: ${validacao2.warnings.join(', ')}`)
+            }
+          }
+        }
+      } catch (corrErr: any) {
+        console.warn(`Erro na correção (não bloqueante): ${corrErr.message}`)
+      }
+    } else {
+      console.log(`✅ Validação OK: todos os campos críticos extraídos`)
+      if (validacao1.warnings.length > 0) {
+        console.warn(`ℹ️ Avisos: ${validacao1.warnings.join(', ')}`)
+      }
+    }
 
     // ── 5. Salvar no banco (merge com dados existentes) ──
     // Buscar dados já existentes para este período (do outro arquivo)
@@ -196,6 +260,12 @@ serve(async (req) => {
       adiantamentos:          pick(dadosExtraidos.balanco?.adiantamentos, existingRow?.adiantamentos),
       intangivel:             pick(dadosExtraidos.balanco?.intangivel, existingRow?.intangivel),
       resultado_acumulado:    pick(dadosExtraidos.balanco?.resultado_acumulado, existingRow?.resultado_acumulado),
+      despesas_antecipadas:   pick(dadosExtraidos.balanco?.despesas_antecipadas, existingRow?.despesas_antecipadas),
+      contas_receber_lp:      pick(dadosExtraidos.balanco?.contas_receber_lp, existingRow?.contas_receber_lp),
+      investimentos:          pick(dadosExtraidos.balanco?.investimentos, existingRow?.investimentos),
+      programas_desenvolvimento: pick(dadosExtraidos.balanco?.programas_desenvolvimento, existingRow?.programas_desenvolvimento),
+      provisao_ferias:        pick(dadosExtraidos.balanco?.provisao_ferias, existingRow?.provisao_ferias),
+      fornecedores_lp:        pick(dadosExtraidos.balanco?.fornecedores_lp, existingRow?.fornecedores_lp),
 
       // DRE complementar
       outras_receitas_op:     pick(dadosExtraidos.dre?.outras_receitas, existingRow?.outras_receitas_op),
@@ -548,14 +618,20 @@ Retorne APENAS um JSON válido no seguinte formato (sem texto antes ou depois, s
     "contas_receber": 0,
     "tributos_recuperar": 0,
     "adiantamentos": 0,
+    "despesas_antecipadas": 0,
+    "contas_receber_lp": 0,
     "depositos_judiciais": 0,
+    "investimentos": 0,
     "imobilizado": 0,
     "intangivel": 0,
     "passivo_circulante": 0,
     "fornecedores": 0,
-    "receitas_diferidas_cp": 0,
+    "programas_desenvolvimento": 0,
     "obrig_trabalhistas": 0,
+    "provisao_ferias": 0,
+    "receitas_diferidas_cp": 0,
     "receitas_diferidas_lp": 0,
+    "fornecedores_lp": 0,
     "prov_contingencias": 0,
     "patrimonio_social": 0,
     "resultado_acumulado": 0,
@@ -655,14 +731,20 @@ Retorne APENAS um JSON válido no seguinte formato:
     "contas_receber": 0,
     "tributos_recuperar": 0,
     "adiantamentos": 0,
+    "despesas_antecipadas": 0,
+    "contas_receber_lp": 0,
     "depositos_judiciais": 0,
+    "investimentos": 0,
     "imobilizado": 0,
     "intangivel": 0,
     "passivo_circulante": 0,
     "fornecedores": 0,
-    "receitas_diferidas_cp": 0,
+    "programas_desenvolvimento": 0,
     "obrig_trabalhistas": 0,
+    "provisao_ferias": 0,
+    "receitas_diferidas_cp": 0,
     "receitas_diferidas_lp": 0,
+    "fornecedores_lp": 0,
     "prov_contingencias": 0,
     "patrimonio_social": 0,
     "resultado_acumulado": 0,
@@ -806,4 +888,160 @@ IMPORTANTE:
 - Todos os valores no xlsx estão em R$ milhares. Converta para milhões (divida por 1000) na apresentação.
 - Se não houver dados do período anterior, faça análise apenas do período atual.
 - Retorne APENAS o JSON, sem texto antes ou depois.`
+}
+
+// ── Validação pós-extração: verifica se todos os campos esperados foram extraídos ──
+function validateExtraction(dados: any, tipo: string): { missing: string[]; warnings: string[] } {
+  const missing: string[] = []
+  const warnings: string[] = []
+
+  // Campos críticos que DEVEM existir e ser numéricos (não null)
+  const requiredFields: Record<string, string[]> = {
+    dre: ['receita_bruta', 'deducoes', 'receita_liquida', 'custos_futebol', 'superavit_bruto',
+          'despesas_operacionais', 'resultado_financeiro', 'outras_receitas', 'outras_despesas',
+          'resultado_antes_ir', 'ir_csll', 'resultado_exercicio'],
+    receitas: ['patrocinio', 'transmissao', 'bilheteria', 'registros', 'desenvolvimento'],
+    custos_futebol: ['selecao_principal', 'selecoes_base', 'selecoes_femininas', 'fomento'],
+    despesas: ['pessoal', 'administrativas', 'impostos_taxas'],
+    resultado_financeiro: ['receitas_financeiras', 'despesas_financeiras', 'total'],
+    balanco: [
+      'ativo_total', 'ativo_circulante', 'caixa_equivalentes', 'contas_receber',
+      'tributos_recuperar', 'adiantamentos', 'despesas_antecipadas',
+      'contas_receber_lp', 'depositos_judiciais', 'investimentos', 'imobilizado', 'intangivel',
+      'passivo_circulante', 'fornecedores', 'programas_desenvolvimento',
+      'obrig_trabalhistas', 'provisao_ferias', 'receitas_diferidas_cp',
+      'receitas_diferidas_lp', 'fornecedores_lp', 'prov_contingencias',
+      'patrimonio_social', 'resultado_acumulado', 'patrimonio_liquido'
+    ]
+  }
+
+  // DFC só é obrigatório para DFS (balancete geralmente não tem)
+  if (tipo === 'dfs') {
+    requiredFields.dfc = ['fluxo_operacional', 'fluxo_investimento', 'variacao_total']
+  }
+
+  for (const [section, fields] of Object.entries(requiredFields)) {
+    if (!dados[section]) {
+      missing.push(`${section} (seção inteira ausente)`)
+      continue
+    }
+    for (const field of fields) {
+      const val = dados[section][field]
+      if (val === null || val === undefined) {
+        missing.push(`${section}.${field}`)
+      }
+    }
+  }
+
+  // Verificações de consistência contábil
+  if (dados.balanco) {
+    const b = dados.balanco
+    // Ativo total deve ser > 0
+    if (b.ativo_total !== null && b.ativo_total !== undefined && b.ativo_total <= 0) {
+      warnings.push(`balanco.ativo_total = ${b.ativo_total} (esperado > 0)`)
+    }
+    // Ativo circulante <= Ativo total
+    if (b.ativo_total && b.ativo_circulante && b.ativo_circulante > b.ativo_total) {
+      warnings.push(`ativo_circulante (${b.ativo_circulante}) > ativo_total (${b.ativo_total})`)
+    }
+    // Passivo circulante <= Ativo total (sanity check)
+    if (b.ativo_total && b.passivo_circulante && b.passivo_circulante > b.ativo_total * 2) {
+      warnings.push(`passivo_circulante (${b.passivo_circulante}) muito alto vs ativo_total (${b.ativo_total})`)
+    }
+  }
+
+  // DRE: receita_bruta deve ser >= receita_liquida
+  if (dados.dre?.receita_bruta && dados.dre?.receita_liquida) {
+    if (dados.dre.receita_liquida > dados.dre.receita_bruta * 1.05) {
+      warnings.push(`receita_liquida (${dados.dre.receita_liquida}) > receita_bruta (${dados.dre.receita_bruta})`)
+    }
+  }
+
+  // DRE: verificar se soma das receitas detalhadas ≈ receita_bruta
+  if (dados.receitas && dados.dre?.receita_bruta) {
+    const r = dados.receitas
+    const somaReceitas = (r.patrocinio || 0) + (r.transmissao || 0) + (r.bilheteria || 0) +
+      (r.registros || 0) + (r.desenvolvimento || 0) + (r.academy || 0) + (r.legado || 0)
+    if (somaReceitas > 0 && Math.abs(somaReceitas - dados.dre.receita_bruta) > dados.dre.receita_bruta * 0.15) {
+      warnings.push(`soma receitas detalhadas (${somaReceitas}) difere muito da receita_bruta (${dados.dre.receita_bruta})`)
+    }
+  }
+
+  // DRE: verificar se soma dos custos detalhados ≈ custos_futebol
+  if (dados.custos_futebol && dados.dre?.custos_futebol) {
+    const c = dados.custos_futebol
+    const somaCustos = (c.selecao_principal || 0) + (c.selecoes_base || 0) +
+      (c.selecoes_femininas || 0) + (c.fomento || 0)
+    if (somaCustos > 0 && Math.abs(somaCustos - Math.abs(dados.dre.custos_futebol)) > Math.abs(dados.dre.custos_futebol) * 0.15) {
+      warnings.push(`soma custos detalhados (${somaCustos}) difere muito dos custos_futebol DRE (${dados.dre.custos_futebol})`)
+    }
+  }
+
+  // DRE: verificar se soma das despesas detalhadas ≈ despesas_operacionais
+  if (dados.despesas && dados.dre?.despesas_operacionais) {
+    const d = dados.despesas
+    const somaDespesas = (d.pessoal || 0) + (d.administrativas || 0) + (d.impostos_taxas || 0)
+    if (somaDespesas > 0 && Math.abs(somaDespesas - Math.abs(dados.dre.despesas_operacionais)) > Math.abs(dados.dre.despesas_operacionais) * 0.15) {
+      warnings.push(`soma despesas detalhadas (${somaDespesas}) difere muito das despesas_operacionais DRE (${dados.dre.despesas_operacionais})`)
+    }
+  }
+
+  // DRE: superavit_bruto ≈ receita_liquida - custos_futebol
+  if (dados.dre?.receita_liquida && dados.dre?.custos_futebol && dados.dre?.superavit_bruto) {
+    const esperado = dados.dre.receita_liquida + dados.dre.custos_futebol // custos é negativo
+    if (Math.abs(esperado - dados.dre.superavit_bruto) > Math.abs(dados.dre.superavit_bruto) * 0.10) {
+      warnings.push(`superavit_bruto (${dados.dre.superavit_bruto}) ≠ receita_liquida + custos (${esperado})`)
+    }
+  }
+
+  // DRE: resultado_financeiro ≈ receitas_fin - despesas_fin + cambial
+  if (dados.resultado_financeiro?.total && dados.resultado_financeiro?.receitas_financeiras) {
+    const rf = dados.resultado_financeiro
+    const calcRF = (rf.receitas_financeiras || 0) + (rf.despesas_financeiras || 0) + (rf.variacao_cambial || 0)
+    if (Math.abs(calcRF - rf.total) > Math.abs(rf.total) * 0.15) {
+      warnings.push(`resultado_financeiro.total (${rf.total}) ≠ soma componentes (${calcRF})`)
+    }
+  }
+
+  return { missing, warnings }
+}
+
+// ── Prompt de correção: pede ao Claude para extrair apenas campos faltantes ──
+function buildCorrectionPrompt(missingFields: string[], periodo: string, tipo: string): string {
+  const fieldsList = missingFields.map(f => `- ${f}`).join('\n')
+
+  // Agrupar campos por seção para facilitar a resposta
+  const sections = new Set(missingFields.map(f => f.split('.')[0].replace(/ \(.*\)/, '')))
+  const sectionsList = [...sections].join(', ')
+
+  return `Na extração anterior dos dados financeiros (${tipo}, período ${periodo}), os seguintes campos ficaram com valor null ou ausentes:
+
+${fieldsList}
+
+Revise CUIDADOSAMENTE o conteúdo do arquivo xlsx acima e extraia ESPECIFICAMENTE estes campos faltantes.
+Procure nas abas relevantes: ${tipo === 'dfs' ? 'BP, DRE, DFC, e Notas 12-15' : 'todas as abas do balancete'}.
+
+REGRAS:
+- Use SEMPRE a PRIMEIRA coluna numérica (período corrente)
+- Se o campo existe no arquivo mas com outro nome/posição, identifique-o pelo contexto contábil
+- Se o campo realmente não existir no arquivo, retorne 0 (zero), NUNCA null
+- Valores devem ser numéricos (em R$ milhares para DFS, R$ reais para balancete)
+
+Retorne APENAS um JSON válido com as seções afetadas (${sectionsList}):
+
+\`\`\`json
+{
+  "secao": {
+    "campo": valor
+  }
+}
+\`\`\`
+
+Exemplo: se faltam balanco.fornecedores e dre.receita_bruta, retorne:
+\`\`\`json
+{
+  "balanco": { "fornecedores": 1234 },
+  "dre": { "receita_bruta": 5678 }
+}
+\`\`\``
 }
