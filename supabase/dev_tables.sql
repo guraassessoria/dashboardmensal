@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS dev_dados_financeiros (
   custo_selecao_femininas numeric, custo_fomento numeric,
   desp_pessoal numeric, desp_administrativas numeric, desp_impostos_taxas numeric,
   res_fin_receitas numeric, res_fin_despesas numeric, res_fin_cambial numeric,
+  outras_receitas_op numeric, outras_despesas_op numeric,
+  resultado_antes_ir numeric, ir_csll numeric,
   ativo_total numeric, ativo_circulante numeric, caixa_equivalentes numeric,
   contas_receber numeric, tributos_recuperar numeric, depositos_judiciais numeric,
   imobilizado numeric, passivo_circulante numeric,

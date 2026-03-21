@@ -499,6 +499,7 @@ Retorne APENAS um JSON válido no seguinte formato (sem texto antes ou depois, s
     "despesas_operacionais": 0,
     "resultado_financeiro": 0,
     "outras_receitas": 0,
+    "outras_despesas": 0,
     "resultado_antes_ir": 0,
     "ir_csll": 0,
     "resultado_exercicio": 0
@@ -605,6 +606,7 @@ Retorne APENAS um JSON válido no seguinte formato:
     "despesas_operacionais": 0,
     "resultado_financeiro": 0,
     "outras_receitas": 0,
+    "outras_despesas": 0,
     "resultado_antes_ir": 0,
     "ir_csll": 0,
     "resultado_exercicio": 0

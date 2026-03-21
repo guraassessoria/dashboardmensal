@@ -1964,6 +1964,20 @@ function _rebuildDRE(d, dPrev) {
   h += row('Variação Cambial', d.res_fin_cambial, p.res_fin_cambial);
   h += row('Total do Resultado Financeiro', d.resultado_financeiro, p.resultado_financeiro, true);
 
+  // Outros Resultados Operacionais (from dados_raw)
+  const dr = d.dados_raw?.dre || {};
+  const drP = p.dados_raw?.dre || {};
+  h += hdr('Outros Resultados Operacionais');
+  h += row('Outras Receitas Operacionais', dr.outras_receitas, drP.outras_receitas);
+  h += row('Outras Despesas Operacionais', dr.outras_despesas, drP.outras_despesas, false, true);
+  const totalOutros = (+(dr.outras_receitas || 0)) + (+(dr.outras_despesas || 0));
+  const totalOutrosP = (+(drP.outras_receitas || 0)) + (+(drP.outras_despesas || 0));
+  h += row('Total de Outros Resultados Operacionais', totalOutros, dPrev ? totalOutrosP : null, true);
+
+  // Resultado antes do IR
+  h += row('Resultado antes do IR/CSLL', dr.resultado_antes_ir, drP.resultado_antes_ir, true);
+  h += row('IR e Contribuição Social', dr.ir_csll, drP.ir_csll, false, true);
+
   // Resultado final
   const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);font-size:14px;' : 'color:var(--pos);font-size:14px;';
   h += '<tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>RESULTADO DO EXERCÍCIO</strong></td><td class="num" style="' + stl + '"><strong>' + _fmtNum(d.resultado_exercicio) + '</strong></td>';
