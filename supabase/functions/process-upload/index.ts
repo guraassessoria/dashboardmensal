@@ -1,9 +1,10 @@
 // supabase/functions/process-upload/index.ts
 // Edge Function: ativada via webhook quando arquivo chega no Storage
-// Lê o xlsx → envia para Claude API → salva JSON no banco
+// Lê o xlsx → parseia localmente → envia texto para Claude API → salva JSON no banco
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import * as XLSX from "https://esm.sh/xlsx@0.18.5"
 
 const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
@@ -40,10 +41,10 @@ serve(async (req) => {
       throw new Error(`Erro ao baixar arquivo: ${downloadError?.message}`)
     }
 
-    // Converter para base64 para enviar ao Claude
+    // Parsear xlsx localmente com SheetJS
     const arrayBuffer = await fileData.arrayBuffer()
-    const bytes = new Uint8Array(arrayBuffer)
-    const base64 = btoa(String.fromCharCode(...bytes))
+    const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" })
+    const sheetText = xlsxToText(workbook)
 
     // ── 3. Enviar para Claude API com prompt adequado ao tipo ──
     const prompt = tipo_documento === 'balancete'
@@ -58,20 +59,12 @@ serve(async (req) => {
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-opus-4-6",
+        model: "claude-sonnet-4-20250514",
         max_tokens: 4096,
         messages: [{
           role: "user",
           content: [
-            {
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                data: base64
-              }
-            },
-            { type: "text", text: prompt }
+            { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX: ${filename}\n\n${sheetText}\n\n---\n\n${prompt}` }
           ]
         }]
       })
@@ -204,17 +197,8 @@ serve(async (req) => {
       .order("periodo", { ascending: false })
       .limit(1)
 
-    // Preparar documentos para Claude: incluir o outro arquivo se existir
-    const insightDocuments: any[] = [
-      {
-        type: "document",
-        source: {
-          type: "base64",
-          media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          data: base64
-        }
-      }
-    ]
+    // Preparar texto dos arquivos para Claude insights
+    let insightFilesText = `## ARQUIVO ATUAL: ${filename}\n\n${sheetText}`
 
     // Se o outro arquivo existe, baixar e incluir
     let otherFileLabel = ''
@@ -237,16 +221,9 @@ serve(async (req) => {
             .download(otherUpload.storage_path)
           if (otherFile) {
             const otherBuffer = await otherFile.arrayBuffer()
-            const otherBytes = new Uint8Array(otherBuffer)
-            const otherBase64 = btoa(String.fromCharCode(...otherBytes))
-            insightDocuments.push({
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                data: otherBase64
-              }
-            })
+            const otherWb = XLSX.read(new Uint8Array(otherBuffer), { type: "array" })
+            const otherText = xlsxToText(otherWb)
+            insightFilesText += `\n\n## ARQUIVO COMPLEMENTAR: ${otherUpload.filename} (${otherTipo})\n\n${otherText}`
             otherFileLabel = ` + ${otherUpload.filename} (${otherTipo})`
             console.log(`Incluindo segundo arquivo para insights: ${otherUpload.filename}`)
           }
@@ -270,13 +247,12 @@ serve(async (req) => {
           "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
-          model: "claude-opus-4-6",
+          model: "claude-sonnet-4-20250514",
           max_tokens: 12000,
           messages: [{
             role: "user",
             content: [
-              ...insightDocuments,
-              { type: "text", text: insightsPrompt }
+              { type: "text", text: `${insightFilesText}\n\n---\n\n${insightsPrompt}` }
             ]
           }]
         })
@@ -360,10 +336,23 @@ serve(async (req) => {
   }
 })
 
+// ── Converter workbook xlsx para texto legível ──
+function xlsxToText(workbook: XLSX.WorkBook): string {
+  const parts: string[] = []
+  for (const name of workbook.SheetNames) {
+    const sheet = workbook.Sheets[name]
+    if (!sheet) continue
+    const csv = XLSX.utils.sheet_to_csv(sheet, { FS: "\t", blankrows: false })
+    if (csv.trim().length === 0) continue
+    parts.push(`### Aba: ${name}\n${csv}`)
+  }
+  return parts.join("\n\n")
+}
+
 // ── Prompt para o Claude extrair os dados ──
 function buildPrompt(periodo: string, filename: string): string {
   return `Você é um especialista em demonstrações financeiras brasileiras.
-Analise este arquivo xlsx das Demonstrações Financeiras da CBF (arquivo: ${filename}, período: ${periodo}).
+Analise os dados acima extraídos do arquivo xlsx das Demonstrações Financeiras da CBF (arquivo: ${filename}, período: ${periodo}).
 
 Extraia TODOS os dados numéricos das seguintes abas: BP, DRE, DFC, e Notas 12, 13, 14 e 15.
 Os valores estão em R$ milhares.
@@ -463,7 +452,7 @@ Para o campo "competicoes", liste todas as competições da Nota 13 com seus val
 // ── Prompt para o Claude extrair dados do BALANCETE ──
 function buildBalancetePrompt(periodo: string, filename: string): string {
   return `Você é um especialista em contabilidade e demonstrações financeiras brasileiras.
-Analise este arquivo xlsx de Balancete da CBF (arquivo: ${filename}, período: ${periodo}).
+Analise os dados acima extraídos do arquivo xlsx de Balancete da CBF (arquivo: ${filename}, período: ${periodo}).
 
 O Balancete contém contas contábeis com saldos acumulados do ano até o mês. Os valores estão em R$ milhares.
 Extraia os dados e mapeie para o formato padrão abaixo, agregando as contas conforme necessário:
@@ -581,7 +570,7 @@ function buildInsightsPrompt(dadosExtraidos: any, dadosAnteriores: any, periodo:
     : `\n## FONTE DISPONÍVEL\nApenas um documento disponível (${filename}). Análise baseada nos dados disponíveis.\n`
 
   return `Você é um analista financeiro sênior especializado em demonstrações financeiras de entidades esportivas brasileiras.
-Analise o(s) arquivo(s) xlsx anexado(s) das Demonstrações Financeiras da CBF (período: ${periodo}) e os dados extraídos abaixo para gerar insights analíticos detalhados.
+Analise os dados das planilhas xlsx fornecidos acima, das Demonstrações Financeiras da CBF (período: ${periodo}), e os dados extraídos abaixo para gerar insights analíticos detalhados.
 ${filesNote}
 
 ## DADOS EXTRAÍDOS DO PERÍODO ATUAL (${periodo})
