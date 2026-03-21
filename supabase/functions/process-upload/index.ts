@@ -292,6 +292,10 @@ serve(async (req) => {
     }
 
     // ── 5.5. Gerar insights analíticos com IA ──
+    // Aguardar 65s para reset do rate limit (30k tokens/min compartilhado com extração)
+    console.log("Aguardando reset do rate limit antes de gerar insights...")
+    await new Promise(r => setTimeout(r, 65000))
+
     // Verificar se o OUTRO arquivo também já foi processado para este período
     const sources = mergedRaw._sources || {}
     const hasDfs = !!sources.dfs
@@ -308,46 +312,19 @@ serve(async (req) => {
       .order("periodo", { ascending: false })
       .limit(1)
 
-    // Preparar texto dos arquivos para Claude insights
-    let insightFilesText = `## ARQUIVO ATUAL: ${filename}\n\n${sheetText}`
-
-    // Se o outro arquivo existe, baixar e incluir
-    let otherFileLabel = ''
-    if (bothFilesAvailable) {
-      const otherTipo = tipo_documento === 'dfs' ? 'balancete' : 'dfs'
-      const { data: otherUpload } = await supabase
-        .from(t("uploads"))
-        .select("storage_path, filename")
-        .eq("periodo", periodo)
-        .eq("tipo_documento", otherTipo)
-        .eq("status", "done")
-        .order("uploaded_at", { ascending: false })
-        .limit(1)
-        .single()
-
-      if (otherUpload) {
-        try {
-          const { data: otherFile } = await supabase.storage
-            .from("uploads-cbf")
-            .download(otherUpload.storage_path)
-          if (otherFile) {
-            const otherBuffer = await otherFile.arrayBuffer()
-            const otherWb = XLSX.read(new Uint8Array(otherBuffer), { type: "array" })
-            const otherText = xlsxToText(otherWb)
-            insightFilesText += `\n\n## ARQUIVO COMPLEMENTAR: ${otherUpload.filename} (${otherTipo})\n\n${otherText}`
-            otherFileLabel = ` + ${otherUpload.filename} (${otherTipo})`
-            console.log(`Incluindo segundo arquivo para insights: ${otherUpload.filename}`)
-          }
-        } catch (e: any) {
-          console.warn("Não foi possível incluir o outro arquivo:", e.message)
-        }
-      }
-    }
+    // Usar dados extraídos estruturados (JSON) em vez do xlsx raw para economizar tokens
+    // Remover campos volumosos que não são necessários para insights narrativos
+    const insightData = { ...mergedRaw }
+    delete insightData.contas_detalhadas
+    delete insightData.competicoes
+    const insightDataText = `## DADOS FINANCEIROS EXTRAÍDOS: ${filename}\nPeríodo: ${periodo}\n\n\`\`\`json\n${JSON.stringify(insightData, null, 2)}\n\`\`\``
 
     const insightsPrompt = buildInsightsPrompt(
       mergedRaw, dadosAnteriores?.[0] || null, periodo,
-      filename + otherFileLabel, bothFilesAvailable
+      filename, bothFilesAvailable
     )
+
+    let insightErrorMsg: string | null = null
 
     try {
       const insightsResponse = await fetch("https://api.anthropic.com/v1/messages", {
@@ -359,11 +336,11 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 12000,
+          max_tokens: 8000,
           messages: [{
             role: "user",
             content: [
-              { type: "text", text: `${insightFilesText}\n\n---\n\n${insightsPrompt}` }
+              { type: "text", text: `${insightDataText}\n\n---\n\n${insightsPrompt}` }
             ]
           }]
         })
@@ -389,17 +366,22 @@ serve(async (req) => {
             }, { onConflict: "periodo" })
 
           if (insightError) {
+            insightErrorMsg = `Insights save error: ${insightError.message}`
             console.error("Erro ao salvar insights:", insightError.message)
           } else {
             console.log("✅ Insights gerados e salvos com sucesso")
           }
         } else {
-          console.warn("Claude não retornou JSON válido para insights")
+          insightErrorMsg = "Claude não retornou JSON válido para insights"
+          console.warn(insightErrorMsg)
         }
       } else {
-        console.error("Erro na API Claude (insights):", await insightsResponse.text())
+        const errBody = await insightsResponse.text()
+        insightErrorMsg = `Insights API error: ${errBody.substring(0, 400)}`
+        console.error("Erro na API Claude (insights):", errBody)
       }
     } catch (insightErr: any) {
+      insightErrorMsg = `Insights exception: ${insightErr.message?.substring(0, 400)}`
       console.error("Erro ao gerar insights (não bloqueante):", insightErr.message)
     }
 
@@ -411,7 +393,7 @@ serve(async (req) => {
     // ── 7. Marcar upload como concluído ──
     await supabase
       .from(t("uploads"))
-      .update({ status: "done", processed_at: new Date().toISOString() })
+      .update({ status: "done", processed_at: new Date().toISOString(), error_msg: insightErrorMsg })
       .eq("id", upload_id)
 
     // ── 8. Disparar rebuild no Vercel ──
