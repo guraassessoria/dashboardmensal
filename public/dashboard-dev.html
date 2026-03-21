@@ -2170,12 +2170,20 @@ function _rebuildDFC(d) {
   const fi  = +d.fluxo_investimento || 0;
   const vc  = +d.variacao_caixa || 0;
   const cx  = +d.caixa_equivalentes || 0;
-  const adj = fo - re; // ajustes operacionais
+
+  // Detalhe do DFC vem de dados_raw.dfc
+  const dfc = d.dados_raw?.dfc || {};
+  const ajOp = (typeof dfc.ajustes_operacionais === 'object' && dfc.ajustes_operacionais) ? dfc.ajustes_operacionais : {};
+  const vAtivos = (typeof dfc.variacao_ativos === 'object' && dfc.variacao_ativos) ? dfc.variacao_ativos : {};
+  const vPassivos = (typeof dfc.variacao_passivos === 'object' && dfc.variacao_passivos) ? dfc.variacao_passivos : {};
+  const invest = (typeof dfc.investimento === 'object' && dfc.investimento) ? dfc.investimento : {};
+  const saldoInicial = +dfc.saldo_inicial || 0;
+  const supBruto = +dfc.superavit_bruto_antes_capital_giro || 0;
 
   const f = v => {
     const mi = v / 1000;
     if (v === 0) return '—';
-    return v < 0 ? '(' + Math.abs(mi).toFixed(1).replace('.', ',') + ')' : '+' + mi.toFixed(1).replace('.', ',');
+    return v < 0 ? '(' + Math.abs(mi).toFixed(1).replace('.', ',') + ')' : mi.toFixed(1).replace('.', ',');
   };
   const cls = v => v >= 0 ? 'du' : 'dd';
   const eff = v => v >= 0 ? '+' : '−';
@@ -2187,22 +2195,91 @@ function _rebuildDFC(d) {
       : 'Composição da variação nas disponibilidades';
   }
 
+  // Helper para linhas de detalhe (indentadas, fonte menor)
+  const detailRow = (label, val) => {
+    const v = +val || 0;
+    if (v === 0) return '';
+    return '<tr><td style="padding-left:20px;color:#8B949E;font-size:12px;">' + label + '</td><td class="num ' + cls(v) + '" style="font-size:12px;">' + f(v) + '</td><td class="num ' + cls(v) + '" style="font-size:12px;">' + eff(v) + '</td></tr>';
+  };
+  // Helper para linhas de subtotal
+  const subtotalRow = (label, val) => {
+    const v = +val || 0;
+    return '<tr style="border-top:1px solid rgba(255,255,255,.08);"><td style="padding-left:10px;font-weight:600;font-size:12px;">' + label + '</td><td class="num ' + cls(v) + '" style="font-size:12px;font-weight:600;">' + f(v) + '</td><td class="num ' + cls(v) + '" style="font-size:12px;">' + eff(v) + '</td></tr>';
+  };
+
   let h = '';
-  h += '<tr class="dre-header"><td colspan="3">Atividades Operacionais — (' + f(fo) + ' Mi)</td></tr>';
+  // ── ATIVIDADES OPERACIONAIS ──
+  h += '<tr class="dre-header"><td colspan="3">ATIVIDADES OPERACIONAIS — (' + f(fo) + ' Mi)</td></tr>';
   h += '<tr><td>Resultado do Exercício</td><td class="num ' + cls(re) + '">' + f(re) + '</td><td class="num ' + cls(re) + '">' + eff(re) + '</td></tr>';
-  if (adj !== 0) {
-    h += '<tr><td>Ajustes Operacionais (provisões, depreciação, capital de giro)</td><td class="num ' + cls(adj) + '">' + f(adj) + '</td><td class="num ' + cls(adj) + '">' + eff(adj) + '</td></tr>';
+
+  // Ajustes operacionais (detalhe)
+  const hasAjDetail = ajOp.provisoes_contingentes || ajOp.variacao_cambial || ajOp.demais_provisoes_ajustes || ajOp.depreciacao_amortizacao;
+  if (hasAjDetail) {
+    h += '<tr class="dre-header" style="font-size:11px;color:#8B949E;"><td colspan="3" style="padding-top:4px;">Ajustes para conciliar o resultado</td></tr>';
+    h += detailRow('Provisões contingentes', ajOp.provisoes_contingentes);
+    h += detailRow('Variação Cambial', ajOp.variacao_cambial);
+    h += detailRow('Demais Provisões e ajustes', ajOp.demais_provisoes_ajustes);
+    h += detailRow('Depreciação e amortização', ajOp.depreciacao_amortizacao);
+    if (supBruto) h += subtotalRow('Superávit Op. Bruto antes Capital de Giro', supBruto);
+  } else {
+    // Fallback: formato legado (flat) — mostra ajuste calculado
+    const adj = fo - re;
+    if (adj !== 0) {
+      h += '<tr><td>Ajustes Operacionais (provisões, depreciação, capital de giro)</td><td class="num ' + cls(adj) + '">' + f(adj) + '</td><td class="num ' + cls(adj) + '">' + eff(adj) + '</td></tr>';
+    }
   }
-  h += '<tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num ' + cls(fo) + '">' + f(fo) + '</td><td class="num ' + cls(fo) + '">' + eff(fo) + '</td></tr>';
-  h += '<tr class="dre-header"><td colspan="3">Atividades de Investimento — (' + f(fi) + ' Mi)</td></tr>';
-  h += '<tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num ' + cls(fi) + '">' + f(fi) + '</td><td class="num ' + cls(fi) + '">' + eff(fi) + '</td></tr>';
+
+  // Variação nos ativos (detalhe)
+  const hasAtivosDetail = vAtivos.contas_receber || vAtivos.adto_fornecedores || vAtivos.despesas_antecipadas || vAtivos.impostos_recuperar || vAtivos.depositos_judiciais;
+  if (hasAtivosDetail) {
+    h += '<tr class="dre-header" style="font-size:11px;color:#8B949E;"><td colspan="3" style="padding-top:4px;">Mudanças nos ativos</td></tr>';
+    h += detailRow('Contas a receber', vAtivos.contas_receber);
+    h += detailRow('Adto de Fornecedores', vAtivos.adto_fornecedores);
+    h += detailRow('Despesas antecipadas', vAtivos.despesas_antecipadas);
+    h += detailRow('Impostos a recuperar', vAtivos.impostos_recuperar);
+    h += detailRow('Depósitos Judiciais', vAtivos.depositos_judiciais);
+    if (vAtivos.total) h += subtotalRow('Total variação nos ativos', vAtivos.total);
+  }
+
+  // Variação nos passivos (detalhe)
+  const hasPassivosDetail = vPassivos.fornecedores_contas_pagar || vPassivos.tributos_encargos || vPassivos.adto_transmissao_patrocinio || vPassivos.receita_diferida || vPassivos.ir_csll;
+  if (hasPassivosDetail) {
+    h += '<tr class="dre-header" style="font-size:11px;color:#8B949E;"><td colspan="3" style="padding-top:4px;">Mudanças nos passivos</td></tr>';
+    h += detailRow('Fornecedores e contas a pagar', vPassivos.fornecedores_contas_pagar);
+    h += detailRow('Tributos e encargos sociais', vPassivos.tributos_encargos);
+    h += detailRow('Adto transmissão e patrocínio', vPassivos.adto_transmissao_patrocinio);
+    h += detailRow('Receita diferida', vPassivos.receita_diferida);
+    h += detailRow('IR e Contribuição Social', vPassivos.ir_csll);
+    if (vPassivos.total) h += subtotalRow('Total variação nos passivos', vPassivos.total);
+  }
+
+  h += '<tr class="dre-row-total"><td><strong>Fluxo Operacional</strong></td><td class="num ' + cls(fo) + '"><strong>' + f(fo) + '</strong></td><td class="num ' + cls(fo) + '"><strong>' + eff(fo) + '</strong></td></tr>';
+
+  // ── ATIVIDADES DE INVESTIMENTO ──
+  h += '<tr class="dre-header"><td colspan="3">ATIVIDADES DE INVESTIMENTO — (' + f(fi) + ' Mi)</td></tr>';
+  const hasInvestDetail = invest.compra_imobilizado || invest.baixa_imobilizado;
+  if (hasInvestDetail) {
+    h += detailRow('Compra de Imobilizado', invest.compra_imobilizado);
+    h += detailRow('Baixa Imobilizado', invest.baixa_imobilizado);
+  }
+  h += '<tr class="dre-row-total"><td><strong>Fluxo de Investimento</strong></td><td class="num ' + cls(fi) + '"><strong>' + f(fi) + '</strong></td><td class="num ' + cls(fi) + '"><strong>' + eff(fi) + '</strong></td></tr>';
+
+  // ── VARIAÇÃO TOTAL ──
   h += '<tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>Variação Total no Caixa</strong></td><td class="num ' + cls(vc) + '"><strong>' + f(vc) + '</strong></td><td class="num ' + cls(vc) + '"><strong>' + eff(vc) + '</strong></td></tr>';
-  h += '<tr class="dre-header"><td colspan="3">Saldos de Caixa</td></tr>';
-  h += '<tr><td>Saldo Final</td><td class="num">' + (cx / 1000).toFixed(1).replace('.', ',') + '</td><td></td></tr>';
+
+  // ── SALDOS DE CAIXA ──
+  h += '<tr class="dre-header"><td colspan="3">SALDOS DE CAIXA</td></tr>';
+  if (saldoInicial) h += '<tr><td>Caixa no início do período</td><td class="num">' + (saldoInicial / 1000).toFixed(1).replace('.', ',') + '</td><td></td></tr>';
+  h += '<tr><td>Caixa no final do período</td><td class="num">' + (cx / 1000).toFixed(1).replace('.', ',') + '</td><td></td></tr>';
+  if (saldoInicial && cx) {
+    const varDisp = cx - saldoInicial;
+    h += '<tr style="border-top:1px solid rgba(255,255,255,.08);"><td style="font-weight:600;">Aumento / redução disponibilidades</td><td class="num ' + cls(varDisp) + '" style="font-weight:600;">' + f(varDisp) + '</td><td class="num ' + cls(varDisp) + '">' + eff(varDisp) + '</td></tr>';
+  }
   tbody.innerHTML = h;
 
-  // Update waterfall chart data in GD
+  // Update waterfall chart data in GD — mais detalhado
   if (typeof GD !== 'undefined') {
+    const adj = fo - re;
     GD.dfc_labels = ['Resultado', 'Ajustes Oper.', 'Fluxo Invest.'];
     GD.dfc_data = [re / 1000, adj / 1000, fi / 1000];
   }

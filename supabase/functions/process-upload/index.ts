@@ -621,12 +621,34 @@ Retorne APENAS um JSON válido no seguinte formato (sem texto antes ou depois, s
   },
   "dfc": {
     "resultado_exercicio": 0,
-    "ajustes_provisoes": 0,
-    "depreciacao": 0,
-    "variacao_ativos": 0,
-    "variacao_passivos": 0,
+    "ajustes_operacionais": {
+      "provisoes_contingentes": 0,
+      "variacao_cambial": 0,
+      "demais_provisoes_ajustes": 0,
+      "depreciacao_amortizacao": 0
+    },
+    "superavit_bruto_antes_capital_giro": 0,
+    "variacao_ativos": {
+      "contas_receber": 0,
+      "adto_fornecedores": 0,
+      "despesas_antecipadas": 0,
+      "impostos_recuperar": 0,
+      "depositos_judiciais": 0,
+      "total": 0
+    },
+    "variacao_passivos": {
+      "fornecedores_contas_pagar": 0,
+      "tributos_encargos": 0,
+      "adto_transmissao_patrocinio": 0,
+      "receita_diferida": 0,
+      "ir_csll": 0,
+      "total": 0
+    },
     "fluxo_operacional": 0,
-    "compra_imobilizado": 0,
+    "investimento": {
+      "compra_imobilizado": 0,
+      "baixa_imobilizado": 0
+    },
     "fluxo_investimento": 0,
     "variacao_total": 0,
     "saldo_inicial": 0,
@@ -734,12 +756,34 @@ Retorne APENAS um JSON válido no seguinte formato:
   },
   "dfc": {
     "resultado_exercicio": 0,
-    "ajustes_provisoes": 0,
-    "depreciacao": 0,
-    "variacao_ativos": 0,
-    "variacao_passivos": 0,
+    "ajustes_operacionais": {
+      "provisoes_contingentes": 0,
+      "variacao_cambial": 0,
+      "demais_provisoes_ajustes": 0,
+      "depreciacao_amortizacao": 0
+    },
+    "superavit_bruto_antes_capital_giro": 0,
+    "variacao_ativos": {
+      "contas_receber": 0,
+      "adto_fornecedores": 0,
+      "despesas_antecipadas": 0,
+      "impostos_recuperar": 0,
+      "depositos_judiciais": 0,
+      "total": 0
+    },
+    "variacao_passivos": {
+      "fornecedores_contas_pagar": 0,
+      "tributos_encargos": 0,
+      "adto_transmissao_patrocinio": 0,
+      "receita_diferida": 0,
+      "ir_csll": 0,
+      "total": 0
+    },
     "fluxo_operacional": 0,
-    "compra_imobilizado": 0,
+    "investimento": {
+      "compra_imobilizado": 0,
+      "baixa_imobilizado": 0
+    },
     "fluxo_investimento": 0,
     "variacao_total": 0,
     "saldo_inicial": 0,
