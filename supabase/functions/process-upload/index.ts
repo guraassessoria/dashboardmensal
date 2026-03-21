@@ -50,7 +50,10 @@ serve(async (req) => {
     // Parsear xlsx localmente com SheetJS
     const arrayBuffer = await fileData.arrayBuffer()
     const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" })
-    const sheetText = xlsxToText(workbook)
+    // DFS: priorizar abas relevantes (BP, DRE, DFC, notas) para não estourar o limite de chars
+    const sheetText = tipo_documento === 'balancete'
+      ? xlsxToText(workbook)
+      : xlsxToText(workbook, ABAS_ALVO)
 
     // ── 3. Enviar para Claude API com prompt adequado ao tipo ──
     const prompt = tipo_documento === 'balancete'
@@ -108,14 +111,18 @@ serve(async (req) => {
 
     const existingRaw = existingRow?.dados_raw || {}
 
-    // Merge: dados_raw combina ambas as fontes
-    const mergedRaw = {
-      ...existingRaw,
-      ...dadosExtraidos,
-      _sources: {
-        ...(existingRaw._sources || {}),
-        [tipo_documento]: { filename, processed_at: new Date().toISOString() }
-      }
+    // Merge: dados_raw combina ambas as fontes com deep merge inteligente
+    const mergedRaw = deepMerge(existingRaw, dadosExtraidos)
+    mergedRaw._sources = {
+      ...(existingRaw._sources || {}),
+      [tipo_documento]: { filename, processed_at: new Date().toISOString() }
+    }
+
+    // Helper: preferir valor real (não-nulo e não-zero) ao mesclar fontes
+    const pick = (a: any, b: any) => {
+      if (a !== null && a !== undefined && a !== 0) return a
+      if (b !== null && b !== undefined && b !== 0) return b
+      return a ?? b
     }
 
     // Construir objeto de dados: novos valores preenchem os que estavam null
@@ -125,58 +132,58 @@ serve(async (req) => {
       source_file: filename,
 
       // DRE
-      receita_bruta:          dadosExtraidos.dre?.receita_bruta ?? existingRow?.receita_bruta,
-      receita_liquida:        dadosExtraidos.dre?.receita_liquida ?? existingRow?.receita_liquida,
-      custos_futebol:         dadosExtraidos.dre?.custos_futebol ?? existingRow?.custos_futebol,
-      superavit_bruto:        dadosExtraidos.dre?.superavit_bruto ?? existingRow?.superavit_bruto,
-      despesas_operacionais:  dadosExtraidos.dre?.despesas_operacionais ?? existingRow?.despesas_operacionais,
-      resultado_financeiro:   dadosExtraidos.dre?.resultado_financeiro ?? existingRow?.resultado_financeiro,
-      resultado_exercicio:    dadosExtraidos.dre?.resultado_exercicio ?? existingRow?.resultado_exercicio,
+      receita_bruta:          pick(dadosExtraidos.dre?.receita_bruta, existingRow?.receita_bruta),
+      receita_liquida:        pick(dadosExtraidos.dre?.receita_liquida, existingRow?.receita_liquida),
+      custos_futebol:         pick(dadosExtraidos.dre?.custos_futebol, existingRow?.custos_futebol),
+      superavit_bruto:        pick(dadosExtraidos.dre?.superavit_bruto, existingRow?.superavit_bruto),
+      despesas_operacionais:  pick(dadosExtraidos.dre?.despesas_operacionais, existingRow?.despesas_operacionais),
+      resultado_financeiro:   pick(dadosExtraidos.dre?.resultado_financeiro, existingRow?.resultado_financeiro),
+      resultado_exercicio:    pick(dadosExtraidos.dre?.resultado_exercicio, existingRow?.resultado_exercicio),
 
       // Receitas detalhadas
-      rec_patrocinio:         dadosExtraidos.receitas?.patrocinio ?? existingRow?.rec_patrocinio,
-      rec_transmissao:        dadosExtraidos.receitas?.transmissao ?? existingRow?.rec_transmissao,
-      rec_bilheteria:         dadosExtraidos.receitas?.bilheteria ?? existingRow?.rec_bilheteria,
-      rec_registros:          dadosExtraidos.receitas?.registros ?? existingRow?.rec_registros,
-      rec_desenvolvimento:    dadosExtraidos.receitas?.desenvolvimento ?? existingRow?.rec_desenvolvimento,
-      rec_academy:            dadosExtraidos.receitas?.academy ?? existingRow?.rec_academy,
-      rec_financeiras:        dadosExtraidos.resultado_financeiro?.receitas_financeiras ?? existingRow?.rec_financeiras,
+      rec_patrocinio:         pick(dadosExtraidos.receitas?.patrocinio, existingRow?.rec_patrocinio),
+      rec_transmissao:        pick(dadosExtraidos.receitas?.transmissao, existingRow?.rec_transmissao),
+      rec_bilheteria:         pick(dadosExtraidos.receitas?.bilheteria, existingRow?.rec_bilheteria),
+      rec_registros:          pick(dadosExtraidos.receitas?.registros, existingRow?.rec_registros),
+      rec_desenvolvimento:    pick(dadosExtraidos.receitas?.desenvolvimento, existingRow?.rec_desenvolvimento),
+      rec_academy:            pick(dadosExtraidos.receitas?.academy, existingRow?.rec_academy),
+      rec_financeiras:        pick(dadosExtraidos.resultado_financeiro?.receitas_financeiras, existingRow?.rec_financeiras),
 
       // Custos futebol
-      custo_selecao_principal: dadosExtraidos.custos_futebol?.selecao_principal ?? existingRow?.custo_selecao_principal,
-      custo_selecao_base:      dadosExtraidos.custos_futebol?.selecoes_base ?? existingRow?.custo_selecao_base,
-      custo_selecao_femininas: dadosExtraidos.custos_futebol?.selecoes_femininas ?? existingRow?.custo_selecao_femininas,
-      custo_fomento:           dadosExtraidos.custos_futebol?.fomento ?? existingRow?.custo_fomento,
+      custo_selecao_principal: pick(dadosExtraidos.custos_futebol?.selecao_principal, existingRow?.custo_selecao_principal),
+      custo_selecao_base:      pick(dadosExtraidos.custos_futebol?.selecoes_base, existingRow?.custo_selecao_base),
+      custo_selecao_femininas: pick(dadosExtraidos.custos_futebol?.selecoes_femininas, existingRow?.custo_selecao_femininas),
+      custo_fomento:           pick(dadosExtraidos.custos_futebol?.fomento, existingRow?.custo_fomento),
 
       // Despesas operacionais
-      desp_pessoal:           dadosExtraidos.despesas?.pessoal ?? existingRow?.desp_pessoal,
-      desp_administrativas:   dadosExtraidos.despesas?.administrativas ?? existingRow?.desp_administrativas,
-      desp_impostos_taxas:    dadosExtraidos.despesas?.impostos_taxas ?? existingRow?.desp_impostos_taxas,
+      desp_pessoal:           pick(dadosExtraidos.despesas?.pessoal, existingRow?.desp_pessoal),
+      desp_administrativas:   pick(dadosExtraidos.despesas?.administrativas, existingRow?.desp_administrativas),
+      desp_impostos_taxas:    pick(dadosExtraidos.despesas?.impostos_taxas, existingRow?.desp_impostos_taxas),
 
       // Resultado financeiro
-      res_fin_receitas:       dadosExtraidos.resultado_financeiro?.receitas_financeiras ?? existingRow?.res_fin_receitas,
-      res_fin_despesas:       dadosExtraidos.resultado_financeiro?.despesas_financeiras ?? existingRow?.res_fin_despesas,
-      res_fin_cambial:        dadosExtraidos.resultado_financeiro?.variacao_cambial ?? existingRow?.res_fin_cambial,
+      res_fin_receitas:       pick(dadosExtraidos.resultado_financeiro?.receitas_financeiras, existingRow?.res_fin_receitas),
+      res_fin_despesas:       pick(dadosExtraidos.resultado_financeiro?.despesas_financeiras, existingRow?.res_fin_despesas),
+      res_fin_cambial:        pick(dadosExtraidos.resultado_financeiro?.variacao_cambial, existingRow?.res_fin_cambial),
 
       // Balanço
-      ativo_total:            dadosExtraidos.balanco?.ativo_total ?? existingRow?.ativo_total,
-      ativo_circulante:       dadosExtraidos.balanco?.ativo_circulante ?? existingRow?.ativo_circulante,
-      caixa_equivalentes:     dadosExtraidos.balanco?.caixa_equivalentes ?? existingRow?.caixa_equivalentes,
-      contas_receber:         dadosExtraidos.balanco?.contas_receber ?? existingRow?.contas_receber,
-      tributos_recuperar:     dadosExtraidos.balanco?.tributos_recuperar ?? existingRow?.tributos_recuperar,
-      depositos_judiciais:    dadosExtraidos.balanco?.depositos_judiciais ?? existingRow?.depositos_judiciais,
-      imobilizado:            dadosExtraidos.balanco?.imobilizado ?? existingRow?.imobilizado,
-      passivo_circulante:     dadosExtraidos.balanco?.passivo_circulante ?? existingRow?.passivo_circulante,
-      receitas_diferidas_cp:  dadosExtraidos.balanco?.receitas_diferidas_cp ?? existingRow?.receitas_diferidas_cp,
-      receitas_diferidas_lp:  dadosExtraidos.balanco?.receitas_diferidas_lp ?? existingRow?.receitas_diferidas_lp,
-      prov_contingencias:     dadosExtraidos.balanco?.prov_contingencias ?? existingRow?.prov_contingencias,
-      patrimonio_liquido:     dadosExtraidos.balanco?.patrimonio_liquido ?? existingRow?.patrimonio_liquido,
-      patrimonio_social:      dadosExtraidos.balanco?.patrimonio_social ?? existingRow?.patrimonio_social,
+      ativo_total:            pick(dadosExtraidos.balanco?.ativo_total, existingRow?.ativo_total),
+      ativo_circulante:       pick(dadosExtraidos.balanco?.ativo_circulante, existingRow?.ativo_circulante),
+      caixa_equivalentes:     pick(dadosExtraidos.balanco?.caixa_equivalentes, existingRow?.caixa_equivalentes),
+      contas_receber:         pick(dadosExtraidos.balanco?.contas_receber, existingRow?.contas_receber),
+      tributos_recuperar:     pick(dadosExtraidos.balanco?.tributos_recuperar, existingRow?.tributos_recuperar),
+      depositos_judiciais:    pick(dadosExtraidos.balanco?.depositos_judiciais, existingRow?.depositos_judiciais),
+      imobilizado:            pick(dadosExtraidos.balanco?.imobilizado, existingRow?.imobilizado),
+      passivo_circulante:     pick(dadosExtraidos.balanco?.passivo_circulante, existingRow?.passivo_circulante),
+      receitas_diferidas_cp:  pick(dadosExtraidos.balanco?.receitas_diferidas_cp, existingRow?.receitas_diferidas_cp),
+      receitas_diferidas_lp:  pick(dadosExtraidos.balanco?.receitas_diferidas_lp, existingRow?.receitas_diferidas_lp),
+      prov_contingencias:     pick(dadosExtraidos.balanco?.prov_contingencias, existingRow?.prov_contingencias),
+      patrimonio_liquido:     pick(dadosExtraidos.balanco?.patrimonio_liquido, existingRow?.patrimonio_liquido),
+      patrimonio_social:      pick(dadosExtraidos.balanco?.patrimonio_social, existingRow?.patrimonio_social),
 
       // DFC
-      fluxo_operacional:      dadosExtraidos.dfc?.fluxo_operacional ?? existingRow?.fluxo_operacional,
-      fluxo_investimento:     dadosExtraidos.dfc?.fluxo_investimento ?? existingRow?.fluxo_investimento,
-      variacao_caixa:         dadosExtraidos.dfc?.variacao_total ?? existingRow?.variacao_caixa,
+      fluxo_operacional:      pick(dadosExtraidos.dfc?.fluxo_operacional, existingRow?.fluxo_operacional),
+      fluxo_investimento:     pick(dadosExtraidos.dfc?.fluxo_investimento, existingRow?.fluxo_investimento),
+      variacao_caixa:         pick(dadosExtraidos.dfc?.variacao_total, existingRow?.variacao_caixa),
 
       // JSON completo mesclado
       dados_raw: mergedRaw,
@@ -349,12 +356,48 @@ serve(async (req) => {
   }
 })
 
+// ── Deep merge: preserva valores não-nulos/não-zero de ambas as fontes ──
+function deepMerge(existing: any, incoming: any): any {
+  if (incoming === null || incoming === undefined) return existing
+  if (existing === null || existing === undefined) return incoming
+  if (typeof incoming !== 'object' || Array.isArray(incoming)) {
+    // Para valores escalares: preferir não-zero/não-null
+    if (incoming !== 0 && incoming !== null) return incoming
+    if (existing !== 0 && existing !== null) return existing
+    return incoming ?? existing
+  }
+  const result: any = { ...existing }
+  for (const [key, val] of Object.entries(incoming)) {
+    if (key === '_sources') continue // tratado separadamente
+    result[key] = deepMerge(existing[key], val)
+  }
+  return result
+}
+
 // ── Converter workbook xlsx para texto legível (otimizado para limites de token) ──
 const MAX_CHARS = 80000 // ~20k tokens
-function xlsxToText(workbook: XLSX.WorkBook): string {
+function xlsxToText(workbook: XLSX.WorkBook, prioritySheets?: string[]): string {
   const parts: string[] = []
   let totalChars = 0
+
+  // Ordenar abas: priorizar as relevantes (BP, DRE, DFC, notas) para não desperdiçar budget
+  const ordered: string[] = []
+  if (prioritySheets && prioritySheets.length > 0) {
+    for (const prio of prioritySheets) {
+      const lower = prio.toLowerCase()
+      for (const name of workbook.SheetNames) {
+        if (!ordered.includes(name) && (name === prio || name.toLowerCase() === lower)) {
+          ordered.push(name)
+        }
+      }
+    }
+  }
+  // Adicionar abas restantes depois das prioritárias
   for (const name of workbook.SheetNames) {
+    if (!ordered.includes(name)) ordered.push(name)
+  }
+
+  for (const name of ordered) {
     const sheet = workbook.Sheets[name]
     if (!sheet) continue
     const csv = XLSX.utils.sheet_to_csv(sheet, { FS: "\t", blankrows: false })
@@ -364,7 +407,7 @@ function xlsxToText(workbook: XLSX.WorkBook): string {
     const truncated = lines.length > 500 ? lines.slice(0, 500).join("\n") + "\n[... truncado]" : csv
     if (totalChars + truncated.length > MAX_CHARS) {
       parts.push(`### Aba: ${name}\n[Aba omitida - limite de caracteres atingido]`)
-      break
+      continue  // continuar tentando abas menores em vez de parar
     }
     parts.push(`### Aba: ${name}\n${truncated}`)
     totalChars += truncated.length
@@ -396,11 +439,31 @@ function convertToThousands(obj: any): any {
 
 // ── Prompt para o Claude extrair os dados ──
 function buildPrompt(periodo: string, filename: string): string {
+  const [ano, mes] = periodo.split('-')
+  const dataRef = `${mes}/${ano}` // ex: 01/2026
+
   return `Você é um especialista em demonstrações financeiras brasileiras.
 Analise os dados acima extraídos do arquivo xlsx das Demonstrações Financeiras da CBF (arquivo: ${filename}, período: ${periodo}).
 
 Extraia TODOS os dados numéricos das seguintes abas: BP, DRE, DFC, e Notas 12, 13, 14 e 15.
 Os valores estão em R$ milhares.
+
+## IMPORTANTE — COLUNAS
+O arquivo tem MÚLTIPLAS colunas de datas. Use SEMPRE a PRIMEIRA coluna numérica após "Nota" (que corresponde ao período ${dataRef}).
+- Na aba DRE: use a coluna "1/31/26" ou a primeira coluna de dados (período corrente)
+- Na aba BP: use a coluna "1/31/26" ou a primeira coluna de dados (período corrente)
+- Na aba DFC: a primeira coluna (pode estar rotulada "${ano}" ou "${+ano - 1}") corresponde ao período corrente
+
+## RESULTADO FINANCEIRO
+Na DRE, a seção "Resultado Financeiro" fica ENTRE "Total das despesas operacionais" e "Outros Resultados Operacionais". Contém:
+- Receitas Financeiras (linha ~27)
+- Despesas Financeiras (linha ~28)
+- Variação Cambial (linha ~29)
+- Total do Resultado Financeiro (linha ~30)
+NÃO retorne null para estes campos — eles EXISTEM na DRE.
+
+## PATRIMÔNIO
+Na aba BP, o lado direito tem o Passivo e PL. "Patrimônio Social" está na seção "Patrimônio Líquido".
 
 Retorne APENAS um JSON válido no seguinte formato (sem texto antes ou depois, sem markdown exceto o bloco json):
 

@@ -1046,27 +1046,20 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     </div>
     <div class="ccard">
       <div class="ctitle" style="margin-bottom:4px;">Demonstração do Fluxo de Caixa - em milhares de reais</div>
-      <div class="csub" style="margin-bottom:16px;">Composição da variação de −R$ 436 milhões nas disponibilidades</div>
+      <div class="csub" style="margin-bottom:16px;" id="dfc-subtitle">Composição da variação nas disponibilidades</div>
       <div class="cwrap" style="height:380px;"><canvas id="cind2"></canvas></div>
-      <div style="margin-top:16px;">
+      <div style="margin-top:16px;" id="dfc-table-wrap">
         <table>
           <thead><tr><th></th><th style="text-align:right;">R$ Mi</th><th style="text-align:right;">Efeito</th></tr></thead>
-          <tbody>
-            <tr class="dre-header"><td colspan="3">Atividades Operacionais — (R$ 330 milhões)</td></tr>
-            <tr><td>Déficit do Exercício</td><td class="num">(182,5)</td><td class="num dd">−</td></tr>
-            <tr><td>Provisões para Contingências</td><td class="num du">+116,6</td><td class="num du">+</td></tr>
-            <tr><td>Depreciação e Amortização</td><td class="num du">+6,3</td><td class="num du">+</td></tr>
-            <tr><td>Demais Provisões</td><td class="num dd">(1,6)</td><td class="num dd">−</td></tr>
-            <tr><td>Aumento em Ativos (Dep.Judiciais, C.Receber, Impost.)</td><td class="num dd">(191,5)</td><td class="num dd">−</td></tr>
-            <tr><td>Variação em Passivos (Rec.Diferida, Fornec., Tributos)</td><td class="num dd">(138,3)</td><td class="num dd">−</td></tr>
-            <tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num dd">(329,8)</td><td class="num dd">−</td></tr>
-            <tr class="dre-header"><td colspan="3">Atividades de Investimento — (R$ 45 milhões)</td></tr>
-            <tr><td>Compra de Imobilizado</td><td class="num dd">(45,1)</td><td class="num dd">−</td></tr>
-            <tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num dd">(45,1)</td><td class="num dd">−</td></tr>
-            <tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>Redução Total no Caixa</strong></td><td class="num dd"><strong>(436,2)</strong></td><td class="num dd"><strong>−</strong></td></tr>
+          <tbody id="dfc-tbody">
+            <tr class="dre-header"><td colspan="3">Atividades Operacionais</td></tr>
+            <tr><td>Resultado do Exercício</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr class="dre-header"><td colspan="3">Atividades de Investimento</td></tr>
+            <tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>Variação Total no Caixa</strong></td><td class="num">—</td><td class="num">—</td></tr>
             <tr class="dre-header"><td colspan="3">Saldos de Caixa</td></tr>
-            <tr><td>Saldo Inicial (01/01/2025)</td><td class="num">2.433,3</td><td></td></tr>
-            <tr><td>Saldo Final (31/12/2025)</td><td class="num">1.997,1</td><td></td></tr>
+            <tr><td>Saldo Final</td><td class="num">—</td><td></td></tr>
           </tbody>
         </table>
       </div>
@@ -1337,9 +1330,9 @@ const GD = {
   disp_labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
   disp_data:   [245,361,517,697,873,724,888,1041,2433,1997],
   
-  // DFC (cind2) — dados conforme DFC 31/12/2025
-  dfc_labels: ['Déficit','Ajustes s/ caixa','Contas a Receber','Impostos a Recup.','Dep. Judiciais','Outros Ativos','Fornecedores','Tributos/Encargos','Rec. Diferida','Investimentos'],
-  dfc_data: [-182.5, 121.2, -49.5, -58.8, -86.9, 3.6, 6.3, 16.1, -161.0, -45.1],
+  // DFC (cind2) — dados dinâmicos (atualizados por _rebuildDFC)
+  dfc_labels: ['Resultado','Ajustes Oper.','Fluxo Invest.'],
+  dfc_data: [0, 0, 0],
   
   // Liquidez (cliq)
   liq_2025: _D ? [
@@ -1570,9 +1563,9 @@ function initCharts() {
       legend:{position:'bottom',labels:{color:'#ffffff',boxWidth:10}},
       tooltip:{callbacks:{
         label:function(ctx){
-          const v2025=[638,438,55,51]; const v2024=[724,451,67,38];
-          const i=ctx.dataIndex; const pct=((v2025[i]-v2024[i])/v2024[i]*100).toFixed(1);
-          return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===0?' ('+pct+'% vs 2024)':'');
+          const cur=GD.comp_2025||[]; const prev=GD.comp_2024||[];
+          const i=ctx.dataIndex; const pct=prev[i]?((cur[i]-prev[i])/prev[i]*100).toFixed(1):'—';
+          return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===0?' ('+pct+'% vs anterior)':'');
         }
       }}
     },
@@ -1587,7 +1580,7 @@ function initCharts() {
       legend:{display:false},
       tooltip:{callbacks:{
         label:function(ctx){
-          const total=1177; const pct=((ctx.parsed.x/total)*100).toFixed(1);
+          const total=GD.cus_barras.reduce((a,b)=>a+b,0)||1; const pct=((ctx.parsed.x/total)*100).toFixed(1);
           return ' R$ '+ctx.parsed.x+' Mi ('+pct+'% do total)';
         }
       }}
@@ -1606,9 +1599,9 @@ function initCharts() {
       legend:{position:'bottom',labels:{color:'#ffffff',boxWidth:10}},
       tooltip:{callbacks:{
         label:function(ctx){
-          const v2025=[281,45,94]; const v2024=[201,27,116];
-          const i=ctx.dataIndex; const pct=((v2025[i]-v2024[i])/v2024[i]*100).toFixed(1);
-          return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===0?' ('+pct+'% vs 2024)':'');
+          const cur=GD.sel_2025||[]; const prev=GD.sel_2024||[];
+          const i=ctx.dataIndex; const pct=prev[i]?((cur[i]-prev[i])/prev[i]*100).toFixed(1):'—';
+          return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===0?' ('+pct+'% vs anterior)':'');
         }
       }}
     },
@@ -1674,7 +1667,7 @@ function initCharts() {
     plugins:{legend:{display:false},
       tooltip:{callbacks:{label:function(ctx){return ' R$ '+ctx.parsed.y.toFixed(1)+' Mi';}}}
     },
-    scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{suggestedMin:-220, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
+    scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
 
   // ── LIQUIDEZ ──
   safeChart('cliq', {type:'bar', data:{
@@ -2262,6 +2255,55 @@ function _updateIndicadoresKPIs(d, dPrev) {
   });
 }
 
+// ── Rebuild DFC table and waterfall chart data ──
+function _rebuildDFC(d) {
+  const tbody = document.getElementById('dfc-tbody');
+  const subtitle = document.getElementById('dfc-subtitle');
+  if (!tbody || !d) return;
+
+  const re  = +d.resultado_exercicio || 0;
+  const fo  = +d.fluxo_operacional || 0;
+  const fi  = +d.fluxo_investimento || 0;
+  const vc  = +d.variacao_caixa || 0;
+  const cx  = +d.caixa_equivalentes || 0;
+  const adj = fo - re; // ajustes operacionais
+
+  const f = v => {
+    const mi = v / 1000;
+    if (v === 0) return '—';
+    return v < 0 ? '(' + Math.abs(mi).toFixed(1).replace('.', ',') + ')' : '+' + mi.toFixed(1).replace('.', ',');
+  };
+  const cls = v => v >= 0 ? 'du' : 'dd';
+  const eff = v => v >= 0 ? '+' : '−';
+
+  if (subtitle) {
+    const vcMi = Math.abs(vc / 1000).toFixed(0);
+    subtitle.textContent = vc !== 0
+      ? 'Composição da variação de ' + (vc < 0 ? '−' : '+') + 'R$ ' + vcMi + ' milhões nas disponibilidades'
+      : 'Composição da variação nas disponibilidades';
+  }
+
+  let h = '';
+  h += '<tr class="dre-header"><td colspan="3">Atividades Operacionais — (' + f(fo) + ' Mi)</td></tr>';
+  h += '<tr><td>Resultado do Exercício</td><td class="num ' + cls(re) + '">' + f(re) + '</td><td class="num ' + cls(re) + '">' + eff(re) + '</td></tr>';
+  if (adj !== 0) {
+    h += '<tr><td>Ajustes Operacionais (provisões, depreciação, capital de giro)</td><td class="num ' + cls(adj) + '">' + f(adj) + '</td><td class="num ' + cls(adj) + '">' + eff(adj) + '</td></tr>';
+  }
+  h += '<tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num ' + cls(fo) + '">' + f(fo) + '</td><td class="num ' + cls(fo) + '">' + eff(fo) + '</td></tr>';
+  h += '<tr class="dre-header"><td colspan="3">Atividades de Investimento — (' + f(fi) + ' Mi)</td></tr>';
+  h += '<tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num ' + cls(fi) + '">' + f(fi) + '</td><td class="num ' + cls(fi) + '">' + eff(fi) + '</td></tr>';
+  h += '<tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>Variação Total no Caixa</strong></td><td class="num ' + cls(vc) + '"><strong>' + f(vc) + '</strong></td><td class="num ' + cls(vc) + '"><strong>' + eff(vc) + '</strong></td></tr>';
+  h += '<tr class="dre-header"><td colspan="3">Saldos de Caixa</td></tr>';
+  h += '<tr><td>Saldo Final</td><td class="num">' + (cx / 1000).toFixed(1).replace('.', ',') + '</td><td></td></tr>';
+  tbody.innerHTML = h;
+
+  // Update waterfall chart data in GD
+  if (typeof GD !== 'undefined') {
+    GD.dfc_labels = ['Resultado', 'Ajustes Oper.', 'Fluxo Invest.'];
+    GD.dfc_data = [re / 1000, adj / 1000, fi / 1000];
+  }
+}
+
 // ── Rebuild Despesas Investment Table ──
 function _rebuildDespesasInvestTable(d, dPrev) {
   const tbody = document.getElementById('despesas-invest-tbody');
@@ -2372,6 +2414,7 @@ async function loadPeriodo(periodo) {
     liquidez_imediata:   +d.liquidez_imediata || 0,
     fluxo_operacional:   +d.fluxo_operacional || 0,
     fluxo_investimento:  +d.fluxo_investimento || 0,
+    variacao_caixa:      +d.variacao_caixa || 0,
     contas_receber:      +d.contas_receber || 0,
     tributos_recuperar:  +d.tributos_recuperar || 0,
     depositos_judiciais: +d.depositos_judiciais || 0,
@@ -2426,6 +2469,27 @@ async function loadPeriodo(periodo) {
       window.__CBF_DADOS__.custo_selecao_base,
       window.__CBF_DADOS__.custo_selecao_femininas
     ];
+    // Comparison data from previous period
+    const dP = _allDados.find(x => x.periodo !== periodo);
+    if (dP) {
+      GD.sel_2024 = [
+        Math.round(Math.abs(+dP.custo_selecao_principal) / 1000),
+        Math.round(Math.abs(+dP.custo_selecao_base) / 1000),
+        Math.round(Math.abs(+dP.custo_selecao_femininas) / 1000)
+      ];
+      GD.comp_2024 = [
+        Math.round(Math.abs(+dP.rec_transmissao) / 1000),
+        Math.round(Math.abs(+dP.rec_patrocinio) / 1000),
+        Math.round(Math.abs(+dP.rec_bilheteria) / 1000),
+        Math.round(Math.abs(+dP.rec_registros) / 1000)
+      ];
+      GD.comp_2025 = [
+        Math.round(Math.abs(+d.rec_transmissao) / 1000),
+        Math.round(Math.abs(+d.rec_patrocinio) / 1000),
+        Math.round(Math.abs(+d.rec_bilheteria) / 1000),
+        Math.round(Math.abs(+d.rec_registros) / 1000)
+      ];
+    }
     GD.cus_barras = [
       window.__CBF_DADOS__.custo_fomento,
       window.__CBF_DADOS__.custo_selecao_principal,
@@ -2473,6 +2537,7 @@ async function loadPeriodo(periodo) {
   _updateDespesasKPIs(d, dPrev || null);
   _updateIndicadoresKPIs(d, dPrev || null);
   _rebuildDespesasInvestTable(d, dPrev || null);
+  _rebuildDFC(d);
 
   // Recriar gráficos
   if (typeof done !== 'undefined') done.clear();
