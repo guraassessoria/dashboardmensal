@@ -2020,21 +2020,28 @@ function _rebuildBP(d, dPrev) {
 
   const circulanteTotal = d.ativo_circulante;
   const naoCirculante = d.ativo_total && d.ativo_circulante ? d.ativo_total - d.ativo_circulante : null;
+  // Helper: ler campo do direct col ou fallback para dados_raw.balanco
+  const bv = (obj, key) => obj[key] != null ? +obj[key] : (obj.dados_raw?.balanco?.[key] != null ? +obj.dados_raw.balanco[key] : null);
 
   let ha = '';
   ha += hdr('Circulante');
   ha += row('Caixa e Equivalentes', d.caixa_equivalentes, p.caixa_equivalentes);
   ha += row('Contas a Receber', d.contas_receber, p.contas_receber);
   ha += row('Tributos a Recuperar', d.tributos_recuperar, p.tributos_recuperar);
+  if (bv(d,'adiantamentos')) ha += row('Adiantamentos', bv(d,'adiantamentos'), bv(p,'adiantamentos'));
   ha += row('Total Circulante', d.ativo_circulante, p.ativo_circulante, true);
   ha += hdr('Não Circulante');
   ha += row('Depósitos Judiciais', d.depositos_judiciais, p.depositos_judiciais);
   ha += row('Imobilizado', d.imobilizado, p.imobilizado);
+  if (bv(d,'intangivel')) ha += row('Intangível', bv(d,'intangivel'), bv(p,'intangivel'));
   ha += row('Total do Ativo', d.ativo_total, p.ativo_total, true);
   ativoTbody.innerHTML = ha;
 
   let hp = '';
   hp += hdr('Circulante');
+  if (bv(d,'fornecedores')) hp += row('Fornecedores', bv(d,'fornecedores'), bv(p,'fornecedores'));
+  if (bv(d,'obrig_trabalhistas')) hp += row('Obrigações Trabalhistas', bv(d,'obrig_trabalhistas'), bv(p,'obrig_trabalhistas'));
+  if (d.receitas_diferidas_cp) hp += row('Receitas Diferidas CP', d.receitas_diferidas_cp, p.receitas_diferidas_cp);
   hp += row('Total Circulante', d.passivo_circulante, p.passivo_circulante, true);
   hp += hdr('Não Circulante');
   hp += row('Receitas Diferidas LP', d.receitas_diferidas_lp, p.receitas_diferidas_lp);

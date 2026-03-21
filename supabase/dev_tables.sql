@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS dev_dados_financeiros (
   imobilizado numeric, passivo_circulante numeric,
   receitas_diferidas_cp numeric, receitas_diferidas_lp numeric,
   prov_contingencias numeric, patrimonio_liquido numeric, patrimonio_social numeric,
+  fornecedores numeric, obrig_trabalhistas numeric, adiantamentos numeric,
+  intangivel numeric, resultado_acumulado numeric,
   fluxo_operacional numeric, fluxo_investimento numeric, variacao_caixa numeric,
   dados_raw jsonb DEFAULT '{}'::jsonb,
   updated_at timestamptz DEFAULT now()

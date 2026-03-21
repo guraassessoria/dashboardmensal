@@ -191,6 +191,17 @@ serve(async (req) => {
       prov_contingencias:     pick(dadosExtraidos.balanco?.prov_contingencias, existingRow?.prov_contingencias),
       patrimonio_liquido:     pick(dadosExtraidos.balanco?.patrimonio_liquido, existingRow?.patrimonio_liquido),
       patrimonio_social:      pick(dadosExtraidos.balanco?.patrimonio_social, existingRow?.patrimonio_social),
+      fornecedores:           pick(dadosExtraidos.balanco?.fornecedores, existingRow?.fornecedores),
+      obrig_trabalhistas:     pick(dadosExtraidos.balanco?.obrig_trabalhistas, existingRow?.obrig_trabalhistas),
+      adiantamentos:          pick(dadosExtraidos.balanco?.adiantamentos, existingRow?.adiantamentos),
+      intangivel:             pick(dadosExtraidos.balanco?.intangivel, existingRow?.intangivel),
+      resultado_acumulado:    pick(dadosExtraidos.balanco?.resultado_acumulado, existingRow?.resultado_acumulado),
+
+      // DRE complementar
+      outras_receitas_op:     pick(dadosExtraidos.dre?.outras_receitas, existingRow?.outras_receitas_op),
+      outras_despesas_op:     pick(dadosExtraidos.dre?.outras_despesas, existingRow?.outras_despesas_op),
+      resultado_antes_ir:     pick(dadosExtraidos.dre?.resultado_antes_ir, existingRow?.resultado_antes_ir),
+      ir_csll:                pick(dadosExtraidos.dre?.ir_csll, existingRow?.ir_csll),
 
       // DFC
       fluxo_operacional:      pick(dadosExtraidos.dfc?.fluxo_operacional, existingRow?.fluxo_operacional),
