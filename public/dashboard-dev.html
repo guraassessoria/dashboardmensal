@@ -419,7 +419,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="c32" style="grid-template-columns:1fr;gap:20px;">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Receitas 2025 vs 2024 por Categoria</div>
+      <div class="ctitle" style="margin-bottom:4px;" id="ctitle-receitas-comp">Receitas 2025 vs 2024 por Categoria</div>
       <div class="csub" style="margin-bottom:18px;">Comparativo em milhares de reais</div>
       <div class="cwrap" style="height:300px;"><canvas id="c4"></canvas></div>
       <div class="insight" style="margin-top:12px;" id="insight-receitas-destaque">
@@ -611,7 +611,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="cwrap" style="height:270px;"><canvas id="c7"></canvas></div>
     </div>
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Custos das Seleções 2025 vs 2024</div>
+      <div class="ctitle" style="margin-bottom:4px;" id="ctitle-selecoes-comp">Custos das Seleções 2025 vs 2024</div>
       <div class="csub" style="margin-bottom:18px;">Crescimento por categoria - em milhares de reais</div>
       <div class="cwrap" style="height:270px;"><canvas id="c8"></canvas></div>
     </div>
@@ -1277,12 +1277,16 @@ const GD = {
   hist_caixa:     _D?.caixa_serie     || [1040, 1040, 1041, 2433, 1997],
   hist_despesas:  _D?.despesas_serie  || [170, 199, 162, 208, 438],
   
+  // Labels dinâmicos para ano atual/anterior
+  anoAtual: '2025',
+  anoAnterior: '2024',
+
   // Comparativo receitas (c4) — período atual vs anterior
   comp_2025: _D?.receitas_composicao
     ? [_D.receitas_composicao[0], _D.receitas_composicao[1],
        _D.receitas_composicao[2], _D.receitas_composicao[3]]
     : [638, 438, 55, 51],
-  comp_2024: [724, 451, 67, 38],  // TODO: puxar do período anterior no Supabase
+  comp_2024: [724, 451, 67, 38],
   
   // Seleções (c8)
   sel_2025: _D ? [
@@ -1555,8 +1559,8 @@ function initCharts() {
   safeChart('c4', {type:'bar', data:{
     labels:['Transmissão e Comerciais','Patrocínios','Bilheteria','Registros'],
     datasets:[  
-      {label:'2025 (R$Mi)', data:GD.comp_2025, backgroundColor:C.y, borderRadius:4},
-      {label:'2024 (R$Mi)', data:GD.comp_2024, backgroundColor:'#009C3B', borderRadius:4}
+      {label:GD.anoAtual+' (R$Mi)', data:GD.comp_2025, backgroundColor:C.y, borderRadius:4},
+      {label:GD.anoAnterior+' (R$Mi)', data:GD.comp_2024, backgroundColor:'#009C3B', borderRadius:4}
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
@@ -1591,8 +1595,8 @@ function initCharts() {
   safeChart('c8', {type:'bar', data:{
     labels:['Sel. Principal','Sel. Base','Sel. Femininas'],
     datasets:[
-      {label:'2025 (R$Mi)', data:GD.sel_2025, backgroundColor:C.y, borderRadius:4},
-      {label:'2024 (R$Mi)', data:GD.sel_2024, backgroundColor:'#009C3B', borderRadius:4}
+      {label:GD.anoAtual+' (R$Mi)', data:GD.sel_2025, backgroundColor:C.y, borderRadius:4},
+      {label:GD.anoAnterior+' (R$Mi)', data:GD.sel_2024, backgroundColor:'#009C3B', borderRadius:4}
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
@@ -1673,8 +1677,8 @@ function initCharts() {
   safeChart('cliq', {type:'bar', data:{
     labels:['Liquidez Corrente','Liquidez Geral','Liquidez Imediata'],
     datasets:[
-      {label:'2025 (R$Mi)', data:GD.liq_2025, backgroundColor:C.y, borderRadius:4},
-      {label:'2024 (R$Mi)', data:GD.liq_2024, backgroundColor:'#009C3B', borderRadius:4}
+      {label:GD.anoAtual+' (R$Mi)', data:GD.liq_2025, backgroundColor:C.y, borderRadius:4},
+      {label:GD.anoAnterior+' (R$Mi)', data:GD.liq_2024, backgroundColor:'#009C3B', borderRadius:4}
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
@@ -2485,8 +2489,17 @@ async function loadPeriodo(periodo) {
       window.__CBF_DADOS__.custo_selecao_base,
       window.__CBF_DADOS__.custo_selecao_femininas
     ];
-    // Comparison data from previous period
-    const dP = _allDados.find(x => x.periodo !== periodo);
+    // Comparison data: same month, previous year
+    const [yy, mm] = periodo.split('-');
+    const periodoAnterior = (parseInt(yy) - 1) + '-' + mm;
+    const dP = _allDados.find(x => x.periodo === periodoAnterior);
+    GD.anoAtual = yy;
+    GD.anoAnterior = String(parseInt(yy) - 1);
+    // Update chart titles
+    const elRec = document.getElementById('ctitle-receitas-comp');
+    if (elRec) elRec.textContent = 'Receitas ' + yy + ' vs ' + GD.anoAnterior + ' por Categoria';
+    const elSel = document.getElementById('ctitle-selecoes-comp');
+    if (elSel) elSel.textContent = 'Custos das Seleções ' + yy + ' vs ' + GD.anoAnterior;
     GD.comp_2025 = [
       Math.round(Math.abs(+d.rec_transmissao) / 1000),
       Math.round(Math.abs(+d.rec_patrocinio) / 1000),
@@ -2544,7 +2557,8 @@ async function loadPeriodo(periodo) {
   if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
 
   // Reconstruir tabelas DRE e BP
-  const dPrev = _allDados.find(x => x.periodo !== periodo);
+  const [yyP, mmP] = periodo.split('-');
+  const dPrev = _allDados.find(x => x.periodo === (parseInt(yyP) - 1) + '-' + mmP);
   _rebuildDRE(d, dPrev || null);
   _rebuildBP(d, dPrev || null);
   _updateBPKPIs(d, dPrev || null);
