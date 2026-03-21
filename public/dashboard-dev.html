@@ -384,7 +384,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <div id="receitas" class="page landscape">
   <div class="stitle">Receitas</div>
 
-  <div class="kgrid" style="grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
+  <div class="kgrid" id="receitas-kgrid" style="grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel">Direitos de Transmissão e Comerciais</div>
       <div class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
@@ -569,7 +569,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <div id="despesas" class="page landscape">
   <div class="stitle">Custos com Futebol e Despesas de Operação e Estrutura</div>
 
-  <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
+  <div class="kgrid" id="despesas-kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Fomento Estados e Competições</div>
       <div class="kval">R$ 756,7 Mi</div>
@@ -618,10 +618,10 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro · 2025 vs 2024</div>
-    <table>
-      <thead><tr><th>Linha de Custo</th><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
-      <tbody>
+    <div class="ctitle" id="despesas-invest-title" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro</div>
+    <table id="despesas-invest-table">
+      <thead id="despesas-invest-thead"><tr><th>Linha de Custo</th><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
+      <tbody id="despesas-invest-tbody">
         <tr class="dre-header"><td colspan="4">Custos com Seleções</td></tr>
         <tr><td>Seleção Principal</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">281,1</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">201,1</td><td class="num dd" style="font-family:var(--font-mono);font-size:13px;">▲ +39,7%</td></tr>
         <tr><td>Seleções de Base</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">44,7</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">27,0</td><td class="num dd" style="font-family:var(--font-mono);font-size:13px;">▲ +65,6%</td></tr>
@@ -983,7 +983,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <div id="indicadores" class="page landscape">
   <div class="stitle">Indicadores Financeiros</div>
 
-  <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
+  <div class="kgrid" id="indicadores-kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel">Índice Kanitz (Solvência)</div>
       <div class="kval">17,33</div>
@@ -1361,7 +1361,6 @@ function _atualizarKPIs() {
   
   if (el('lbl-periodo'))    el('lbl-periodo').textContent    = `Receita Bruta ${periodo}`;
   if (el('kv-receita-bruta')) el('kv-receita-bruta').textContent = _fmtBi(_D.receita_bruta);
-  if (el('kd-receita-bruta')) el('kd-receita-bruta').textContent = '▼ ' + _pct(_D.receita_bruta, _D.receita_bruta_anterior) + ' vs anterior';
   if (el('kv-resultado'))   el('kv-resultado').textContent   = _fmtMi(_D.resultado_exercicio);
   if (el('kv-custos'))      el('kv-custos').textContent      = _fmtBi(_D.custos_futebol);
   if (el('kv-caixa'))       el('kv-caixa').textContent       = _fmtBi(_D.caixa_equivalentes);
@@ -2035,22 +2034,39 @@ function _rebuildBP(d, dPrev) {
   passivoTbody.innerHTML = hp;
 }
 
-function _updateBPKPIs(d) {
-  const el = id => document.getElementById(id);
+function _updateBPKPIs(d, dPrev) {
   const _D = window.__CBF_DADOS__;
   if (!_D) return;
-  // Os KPIs do BP usam a classe .kval. Atualizar via IDs de container
   const bpGrid = document.querySelector('#bp .kgrid');
   if (!bpGrid) return;
   const cards = bpGrid.querySelectorAll('.kcard');
+  const p = dPrev || {};
+
+  function _computeDelta(cur, prev) {
+    const c = +cur || 0;
+    const pv = +prev || 0;
+    if (!pv) return { text: '', cls: '' };
+    const pct = ((c - pv) / Math.abs(pv) * 100).toFixed(1);
+    const up = parseFloat(pct) >= 0;
+    return { text: (up ? '▲ +' : '▼ ') + pct.replace('.', ',') + '% vs anterior (' + _fmtBi(pv) + ')', cls: up ? 'up' : 'dn' };
+  }
+
+  const d1 = _computeDelta(d.ativo_total, p.ativo_total);
+  const d2 = _computeDelta(d.caixa_equivalentes, p.caixa_equivalentes);
+  const d3 = _computeDelta(d.contas_receber, p.contas_receber);
+  const d4 = _computeDelta(d.ativo_circulante, p.ativo_circulante);
+  const d5 = _computeDelta(d.patrimonio_liquido, p.patrimonio_liquido);
+  const d6 = _computeDelta((+d.receitas_diferidas_cp||0)+(+d.receitas_diferidas_lp||0), (+p.receitas_diferidas_cp||0)+(+p.receitas_diferidas_lp||0));
+
   const vals = [
-    { label: 'Ativo Total', val: _fmtBi(_D.ativo_total), delta: '', sub: 'PL: ' + _fmtBi(_D.patrimonio_liquido) },
-    { label: 'Caixa e Equivalentes', val: _fmtBi(_D.caixa_equivalentes), delta: '', sub: '' },
-    { label: 'Contas a Receber', val: _fmtBi(_D.contas_receber), delta: '', sub: '' },
-    { label: 'Ativo Circulante', val: _fmtBi(_D.ativo_circulante), delta: '', sub: _D.ativo_total ? Math.round(_D.ativo_circulante/_D.ativo_total*100) + '% do ativo total' : '' },
-    { label: 'Patrimônio Líquido', val: _fmtBi(_D.patrimonio_liquido), delta: '', sub: '' },
-    { label: 'Receitas Diferidas (CP+LP)', val: _fmtBi((_D.receitas_diferidas_cp||0)+(_D.receitas_diferidas_lp||0)), delta: '', sub: '' },
+    { label: 'Ativo Total', val: _fmtBi(_D.ativo_total), delta: d1.text, cls: d1.cls, sub: 'PL: ' + _fmtBi(_D.patrimonio_liquido) },
+    { label: 'Caixa e Equivalentes', val: _fmtBi(_D.caixa_equivalentes), delta: d2.text, cls: d2.cls, sub: '' },
+    { label: 'Contas a Receber', val: _fmtBi(_D.contas_receber), delta: d3.text, cls: d3.cls, sub: '' },
+    { label: 'Ativo Circulante', val: _fmtBi(_D.ativo_circulante), delta: d4.text, cls: d4.cls, sub: _D.ativo_total ? Math.round(_D.ativo_circulante/_D.ativo_total*100) + '% do ativo total' : '' },
+    { label: 'Patrimônio Líquido', val: _fmtBi(_D.patrimonio_liquido), delta: d5.text, cls: d5.cls, sub: '' },
+    { label: 'Receitas Diferidas (CP+LP)', val: _fmtBi((_D.receitas_diferidas_cp||0)+(_D.receitas_diferidas_lp||0)), delta: d6.text, cls: d6.cls, sub: '' },
   ];
+
   cards.forEach((card, i) => {
     if (!vals[i]) return;
     const kval = card.querySelector('.kval');
@@ -2059,9 +2075,254 @@ function _updateBPKPIs(d) {
     const ksub = card.querySelector('.ksub');
     if (klabel) klabel.textContent = vals[i].label;
     if (kval) kval.textContent = vals[i].val;
-    if (kdelta) kdelta.textContent = vals[i].delta;
+    if (kdelta) {
+      kdelta.textContent = vals[i].delta;
+      kdelta.className = kdelta.className.replace(/\b(up|dn)\b/g, '').trim();
+      if (vals[i].cls) kdelta.classList.add(vals[i].cls);
+    }
     if (ksub) ksub.textContent = vals[i].sub;
   });
+}
+
+// ── Update Overview KPI deltas from data ──
+function _updateOverviewDeltas(d, dPrev) {
+  if (!d) return;
+  const p = dPrev || {};
+
+  function _setDelta(elId, cur, prev, fmt, invertColor) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const c = Math.abs(+cur || 0);
+    const pv = Math.abs(+prev || 0);
+    if (!pv) return;
+    const pct = ((c - pv) / pv * 100).toFixed(1);
+    const increasing = parseFloat(pct) >= 0;
+    const arrow = increasing ? '▲' : '▼';
+    const sign = increasing ? '+' : '';
+    const prevFmt = fmt === 'bi' ? _fmtBi(pv) : _fmtMi(pv);
+    el.textContent = arrow + ' ' + sign + pct.replace('.', ',') + '% vs anterior (' + prevFmt + ')';
+    el.className = el.className.replace(/\b(up|dn)\b/g, '').trim();
+    const isGood = invertColor ? !increasing : increasing;
+    el.classList.add(isGood ? 'up' : 'dn');
+  }
+
+  _setDelta('kd-receita-bruta', d.receita_bruta, p.receita_bruta, 'bi', false);
+  _setDelta('kd-resultado', d.resultado_exercicio, p.resultado_exercicio, 'mi', false);
+  _setDelta('kd-custos', d.custos_futebol, p.custos_futebol, 'bi', true);
+  _setDelta('kd-caixa', d.caixa_equivalentes, p.caixa_equivalentes, 'bi', false);
+  _setDelta('kd-ativo', d.ativo_total, p.ativo_total, 'bi', false);
+  _setDelta('kd-rec-fin', d.rec_financeiras, p.rec_financeiras, 'mi', false);
+}
+
+// ── Update Receitas KPI cards ──
+function _updateReceitasKPIs(d, dPrev) {
+  const grid = document.getElementById('receitas-kgrid');
+  if (!grid || !d) return;
+  const cards = grid.querySelectorAll('.kcard');
+  const p = dPrev || {};
+
+  const items = [
+    { val: Math.abs(+d.rec_transmissao || 0), prev: Math.abs(+p.rec_transmissao || 0) },
+    { val: Math.abs(+d.rec_patrocinio || 0), prev: Math.abs(+p.rec_patrocinio || 0) },
+    { val: Math.abs(+d.rec_bilheteria || 0), prev: Math.abs(+p.rec_bilheteria || 0) },
+    { val: Math.abs(+d.rec_registros || 0), prev: Math.abs(+p.rec_registros || 0) },
+    { val: Math.abs(+d.rec_desenvolvimento || 0) + Math.abs(+d.rec_academy || 0), prev: Math.abs(+p.rec_desenvolvimento || 0) + Math.abs(+p.rec_academy || 0) },
+  ];
+
+  const totalRec = Math.abs(+d.receita_bruta || 0);
+
+  cards.forEach((card, i) => {
+    if (!items[i]) return;
+    const kval = card.querySelector('.kval');
+    const kdelta = card.querySelector('.kdelta');
+    const ksub = card.querySelector('.ksub');
+
+    if (kval) kval.textContent = _fmtMi(items[i].val);
+
+    if (kdelta && items[i].prev) {
+      const pct = ((items[i].val - items[i].prev) / items[i].prev * 100).toFixed(1);
+      const up = parseFloat(pct) >= 0;
+      kdelta.textContent = (up ? '▲ +' : '▼ ') + pct.replace('.', ',') + '% vs anterior (' + _fmtMi(items[i].prev) + ')';
+      kdelta.className = kdelta.className.replace(/\b(up|dn)\b/g, '').trim();
+      kdelta.classList.add(up ? 'up' : 'dn');
+    } else if (kdelta) {
+      kdelta.textContent = '';
+    }
+
+    if (ksub && totalRec) {
+      ksub.textContent = Math.round(items[i].val / totalRec * 100) + '% da receita bruta';
+    }
+  });
+}
+
+// ── Update Despesas KPI cards ──
+function _updateDespesasKPIs(d, dPrev) {
+  const grid = document.getElementById('despesas-kgrid');
+  if (!grid || !d) return;
+  const cards = grid.querySelectorAll('.kcard');
+  const p = dPrev || {};
+
+  const items = [
+    { val: Math.abs(+d.custo_fomento || 0), prev: Math.abs(+p.custo_fomento || 0) },
+    { val: Math.abs(+d.custo_selecao_principal || 0), prev: Math.abs(+p.custo_selecao_principal || 0) },
+    { val: Math.abs(+d.custo_selecao_femininas || 0), prev: Math.abs(+p.custo_selecao_femininas || 0) },
+    { val: Math.abs(+d.custo_selecao_base || 0), prev: Math.abs(+p.custo_selecao_base || 0) },
+    { val: Math.abs(+d.desp_administrativas || 0), prev: Math.abs(+p.desp_administrativas || 0) },
+    { val: Math.abs(+d.desp_pessoal || 0), prev: Math.abs(+p.desp_pessoal || 0) },
+  ];
+
+  cards.forEach((card, i) => {
+    if (!items[i]) return;
+    const kval = card.querySelector('.kval');
+    const kdelta = card.querySelector('.kdelta');
+
+    if (kval) kval.textContent = _fmtMi(items[i].val);
+
+    if (kdelta && items[i].prev) {
+      const pct = ((items[i].val - items[i].prev) / items[i].prev * 100).toFixed(1);
+      const increasing = parseFloat(pct) >= 0;
+      kdelta.textContent = (increasing ? '▲ +' : '▼ ') + pct.replace('.', ',') + '% vs anterior (' + _fmtMi(items[i].prev) + ')';
+      kdelta.className = kdelta.className.replace(/\b(up|dn)\b/g, '').trim();
+      kdelta.classList.add(increasing ? 'dn' : 'up');
+    } else if (kdelta) {
+      kdelta.textContent = '';
+    }
+  });
+}
+
+// ── Update Indicadores KPI cards ──
+function _updateIndicadoresKPIs(d, dPrev) {
+  const grid = document.getElementById('indicadores-kgrid');
+  if (!grid || !d) return;
+  const cards = grid.querySelectorAll('.kcard');
+  const p = dPrev || {};
+
+  const ac = Math.abs(+d.ativo_circulante || 0);
+  const pc = Math.abs(+d.passivo_circulante || 0);
+  const at = Math.abs(+d.ativo_total || 0);
+  const cx = Math.abs(+d.caixa_equivalentes || 0);
+  const rf = Math.abs(+d.rec_financeiras || 0);
+  const re = +d.resultado_exercicio || 0;
+  const pl = Math.abs(+d.patrimonio_liquido || 0);
+
+  const lc = pc ? (ac / pc) : 0;
+  const li = pc ? (cx / pc) : 0;
+  const pnc = at - ac;
+  const lg = (pc + pnc) > 0 ? at / (pc + pnc) : 0;
+
+  // EBITDA approximation: RE - RF (simplified, no D&A available)
+  const ebitda = re - rf;
+  const rl = Math.abs(+d.receita_liquida || 0);
+  const margemEbitda = rl ? (ebitda / rl * 100) : 0;
+
+  // Cash variation
+  const cxPrev = Math.abs(+p.caixa_equivalentes || 0);
+  const cxDiff = cxPrev ? cx - cxPrev : 0;
+
+  // Previous period indicators
+  const acP = Math.abs(+p.ativo_circulante || 0);
+  const pcP = Math.abs(+p.passivo_circulante || 0);
+  const atP = Math.abs(+p.ativo_total || 0);
+  const lcP = pcP ? (acP / pcP) : 0;
+  const liP = pcP ? (Math.abs(+p.caixa_equivalentes || 0) / pcP) : 0;
+  const pncP = atP - acP;
+  const lgP = (pcP + pncP) > 0 ? atP / (pcP + pncP) : 0;
+
+  // Kanitz = 0.05*RP + 1.65*LG + 3.55*LS - 1.06*LC - 0.33*GE
+  const rp = pl ? re / pl : 0;
+  const ls = lc;
+  const ge = pl ? (pc + pnc) / pl : 0;
+  const kanitz = 0.05 * rp + 1.65 * lg + 3.55 * ls - 1.06 * lc - 0.33 * ge;
+
+  const items = [
+    { label: 'Índice Kanitz (Solvência)', val: kanitz.toFixed(2).replace('.', ','), delta: kanitz > 0 ? '▲ Zona de Solvência' : '▼ Risco', cls: kanitz > 0 ? 'up' : 'dn', sub: 'Posição sólida · baixo risco · boa liquidez' },
+    { label: 'Variação Caixa', val: _fmtMi(cxDiff), delta: cxPrev ? (cxDiff >= 0 ? '▲ Aumento' : '▼ Redução') + ' vs anterior' : '', cls: cxDiff >= 0 ? 'up' : 'dn', sub: '' },
+    { label: 'Receita Financeira', val: _fmtMi(rf), delta: (+p.rec_financeiras) ? ((rf > Math.abs(+p.rec_financeiras) ? '▲ +' : '▼ ') + ((rf - Math.abs(+p.rec_financeiras)) / Math.abs(+p.rec_financeiras) * 100).toFixed(1).replace('.', ',') + '% vs anterior') : '', cls: 'up', sub: '' },
+    { label: 'EBITDA / Margem EBITDA', val: _fmtMi(ebitda), delta: 'Margem ' + margemEbitda.toFixed(1).replace('.', ',') + '%', cls: ebitda >= 0 ? 'up' : 'dn', sub: '' },
+    { label: 'Contratos não recebidos', val: '—', delta: '', cls: 'dn', sub: '' },
+    { label: 'Liquidez Corrente', val: lc.toFixed(2).replace('.', ','), delta: lcP ? (lc.toFixed(2).replace('.', ',') + ' vs ' + lcP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: lc >= lcP ? 'up' : 'dn', sub: 'AC / PC · ' + _fmtBi(ac) + ' / ' + _fmtBi(pc) },
+    { label: 'Liquidez Geral', val: lg.toFixed(2).replace('.', ','), delta: lgP ? ('vs ' + lgP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: lg >= lgP ? 'up' : 'dn', sub: 'AT/(PC+PNC)' },
+    { label: 'Liquidez Imediata', val: li.toFixed(2).replace('.', ','), delta: liP ? (li.toFixed(2).replace('.', ',') + ' vs ' + liP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: li >= liP ? 'up' : 'dn', sub: 'Caixa / PC · ' + _fmtBi(cx) + ' / ' + _fmtBi(pc) },
+  ];
+
+  cards.forEach((card, i) => {
+    if (!items[i]) return;
+    const klabel = card.querySelector('.klabel');
+    const kval = card.querySelector('.kval');
+    const kdelta = card.querySelector('.kdelta');
+    const ksub = card.querySelector('.ksub');
+    if (klabel) klabel.textContent = items[i].label;
+    if (kval) kval.textContent = items[i].val;
+    if (kdelta) {
+      kdelta.textContent = items[i].delta;
+      kdelta.className = kdelta.className.replace(/\b(up|dn)\b/g, '').trim();
+      if (items[i].cls) kdelta.classList.add(items[i].cls);
+    }
+    if (ksub) ksub.textContent = items[i].sub;
+  });
+}
+
+// ── Rebuild Despesas Investment Table ──
+function _rebuildDespesasInvestTable(d, dPrev) {
+  const tbody = document.getElementById('despesas-invest-tbody');
+  const thead = document.getElementById('despesas-invest-thead');
+  const title = document.getElementById('despesas-invest-title');
+  if (!tbody || !d) return;
+
+  const lbl = fmtPeriodo(d.periodo) || d.periodo;
+  const lblP = dPrev ? (fmtPeriodo(dPrev.periodo) || dPrev.periodo) : null;
+
+  if (title) title.textContent = 'Investimento Total no Futebol Brasileiro' + (lblP ? ' · ' + lbl + ' vs ' + lblP : ' · ' + lbl);
+
+  if (thead) {
+    const tr = thead.querySelector('tr');
+    if (tr) {
+      tr.innerHTML = '<th>Linha de Custo</th><th style="text-align:right;">' + lbl + ' (R$Mi)</th>'
+        + (dPrev ? '<th style="text-align:right;">' + lblP + ' (R$Mi)</th><th style="text-align:right;">Var.</th>' : '');
+    }
+  }
+
+  const p = dPrev || {};
+  const fMi = v => {
+    if (v == null) return '—';
+    const mi = Math.abs(v) / 1000;
+    const parts = mi.toFixed(1).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return parts.join(',');
+  };
+
+  const pctCell = (a, b) => {
+    if (!a || !b || Math.abs(b) === 0) return '<td class="num">—</td>';
+    const pct = ((Math.abs(a) - Math.abs(b)) / Math.abs(b) * 100).toFixed(1);
+    const up = parseFloat(pct) >= 0;
+    return '<td class="num ' + (up ? 'dd' : 'du') + '" style="font-family:var(--font-mono);font-size:13px;">' + (up ? '▲ +' : '▼ ') + pct.replace('.', ',') + '%</td>';
+  };
+
+  const row = (label, val, prevVal, isTotal) => {
+    const cls = isTotal ? ' class="dre-row-total"' : '';
+    let h = '<tr' + cls + '><td>' + label + '</td>';
+    h += '<td class="num" style="font-family:var(--font-mono);font-size:13px;">' + fMi(val) + '</td>';
+    if (dPrev) {
+      h += '<td class="num" style="font-family:var(--font-mono);font-size:13px;">' + fMi(prevVal) + '</td>';
+      h += pctCell(val, prevVal);
+    }
+    h += '</tr>';
+    return h;
+  };
+
+  const cols = dPrev ? 4 : 2;
+  const hdr = label => '<tr class="dre-header"><td colspan="' + cols + '">' + label + '</td></tr>';
+
+  let h = '';
+  h += hdr('Custos com Seleções');
+  h += row('Seleção Principal', d.custo_selecao_principal, p.custo_selecao_principal);
+  h += row('Seleções de Base', d.custo_selecao_base, p.custo_selecao_base);
+  h += row('Seleções Femininas', d.custo_selecao_femininas, p.custo_selecao_femininas);
+  h += hdr('Fomento');
+  h += row('Contribuição ao Fomento (Estados + Competições)', d.custo_fomento, p.custo_fomento);
+  h += row('Total Custos com Futebol', d.custos_futebol, p.custos_futebol, true);
+
+  tbody.innerHTML = h;
 }
 
 // ── Carregar dados de um período específico ──
@@ -2193,7 +2454,10 @@ async function loadPeriodo(periodo) {
     ];
     const lc = W.passivo_circulante ? (W.ativo_circulante / W.passivo_circulante) : 0;
     const li = W.passivo_circulante ? (W.caixa_equivalentes / W.passivo_circulante) : 0;
-    GD.liq_2025 = [parseFloat(lc.toFixed(2)), 0, parseFloat(li.toFixed(2))];
+    const plCalc = W.patrimonio_liquido || 0;
+    const pncCalc = (W.ativo_total || 0) - (W.ativo_circulante || 0);
+    const lgCalc = (W.passivo_circulante + pncCalc) ? (W.ativo_total / (W.passivo_circulante + pncCalc)) : 0;
+    GD.liq_2025 = [parseFloat(lc.toFixed(2)), parseFloat(lgCalc.toFixed(2)), parseFloat(li.toFixed(2))];
   }
 
   // Atualizar KPIs
@@ -2203,7 +2467,12 @@ async function loadPeriodo(periodo) {
   const dPrev = _allDados.find(x => x.periodo !== periodo);
   _rebuildDRE(d, dPrev || null);
   _rebuildBP(d, dPrev || null);
-  _updateBPKPIs(d);
+  _updateBPKPIs(d, dPrev || null);
+  _updateOverviewDeltas(d, dPrev || null);
+  _updateReceitasKPIs(d, dPrev || null);
+  _updateDespesasKPIs(d, dPrev || null);
+  _updateIndicadoresKPIs(d, dPrev || null);
+  _rebuildDespesasInvestTable(d, dPrev || null);
 
   // Recriar gráficos
   if (typeof done !== 'undefined') done.clear();
