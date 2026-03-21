@@ -85,7 +85,12 @@ serve(async (req) => {
       throw new Error("Claude não retornou JSON válido")
     }
 
-    const dadosExtraidos = JSON.parse(jsonMatch[1] || jsonMatch[0])
+    const dadosExtraidosRaw = JSON.parse(jsonMatch[1] || jsonMatch[0])
+
+    // Balancete vem em R$ (reais). Converter para R$ milhares para padronizar com DFS.
+    const dadosExtraidos = tipo_documento === 'balancete'
+      ? convertToThousands(dadosExtraidosRaw)
+      : dadosExtraidosRaw
 
     // ── 5. Salvar no banco (merge com dados existentes) ──
     // Buscar dados já existentes para este período (do outro arquivo)
@@ -349,6 +354,28 @@ function xlsxToText(workbook: XLSX.WorkBook): string {
   return parts.join("\n\n")
 }
 
+// ── Converter valores de reais para R$ milhares (dividir por 1000) ──
+// Campos que NÃO devem ser convertidos (strings, metadados)
+const SKIP_KEYS = new Set(["periodo", "fonte", "tipo", "nome", "descricao", "conta"])
+function convertToThousands(obj: any): any {
+  if (obj === null || obj === undefined) return obj
+  if (typeof obj === "number") return Math.round(obj / 1000)
+  if (typeof obj === "string") return obj
+  if (Array.isArray(obj)) return obj.map(item => convertToThousands(item))
+  if (typeof obj === "object") {
+    const result: any = {}
+    for (const [key, value] of Object.entries(obj)) {
+      if (SKIP_KEYS.has(key) || typeof value === "string") {
+        result[key] = value
+      } else {
+        result[key] = convertToThousands(value)
+      }
+    }
+    return result
+  }
+  return obj
+}
+
 // ── Prompt para o Claude extrair os dados ──
 function buildPrompt(periodo: string, filename: string): string {
   return `Você é um especialista em demonstrações financeiras brasileiras.
@@ -454,7 +481,7 @@ function buildBalancetePrompt(periodo: string, filename: string): string {
   return `Você é um especialista em contabilidade e demonstrações financeiras brasileiras.
 Analise os dados acima extraídos do arquivo xlsx de Balancete da CBF (arquivo: ${filename}, período: ${periodo}).
 
-O Balancete contém contas contábeis com saldos acumulados do ano até o mês. Os valores estão em R$ milhares.
+O Balancete contém contas contábeis com saldos acumulados do ano até o mês. Os valores estão em R$ (reais). Retorne os valores EXATOS como estão no arquivo, sem converter ou dividir.
 Extraia os dados e mapeie para o formato padrão abaixo, agregando as contas conforme necessário:
 
 - Receitas: identifique contas de receita (4.x) e classifique por categoria  
