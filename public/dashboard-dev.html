@@ -1325,14 +1325,14 @@ const GD = {
   ativo_hist:  _D?.caixa_serie ? _D.caixa_serie.map(v => Math.round(v * 3.4 / 2)) : [1620,1872,2161,3617,3391],
   caixa_hist:  _D?.caixa_serie || [724,888,1041,2433,1997],
 
-  // Balanço Patrimonial 10 anos (cbp3)
-  bp_labels_10yr: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
-  bp_ativo_10yr:  [800, 960, 1200, 1400, 1500, 1620, 1872, 2161, 3617, 3391],
-  bp_caixa_10yr:  [245, 361, 517, 697, 873, 724, 888, 1041, 2433, 1997],
+  // Balanço Patrimonial 10 anos (cbp3) — dinâmico via loadPeriodo
+  bp_labels_10yr: [],
+  bp_ativo_10yr:  [],
+  bp_caixa_10yr:  [],
 
-  // Disponibilidades 10 anos (cind1)
-  disp_labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
-  disp_data:   [245,361,517,697,873,724,888,1041,2433,1997],
+  // Disponibilidades 10 anos (cind1) — dinâmico via loadPeriodo
+  disp_labels: [],
+  disp_data:   [],
   
   // DFC (cind2) — dados dinâmicos (atualizados por _rebuildDFC)
   dfc_labels: ['Resultado','Ajustes Oper.','Fluxo Invest.'],
@@ -1868,12 +1868,20 @@ const _supaHeaders = {
   'Content-Type': 'application/json'
 };
 
-// Dados históricos hardcoded (2021-2024) — fonte: DFS auditadas
+// Dados históricos hardcoded (2016-2024) — fonte: DFS auditadas
 const HIST = {
-  '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040 },
-  '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040 },
-  '2023': { label:'2023', receita:1172, resultado:238, custos:701,  caixa:1041 },
-  '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433 },
+  '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040, ativo:1620 },
+  '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040, ativo:1872 },
+  '2023': { label:'2023', receita:1172, resultado:238, custos:701,  caixa:1041, ativo:2161 },
+  '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433, ativo:3617 },
+};
+// Dados 10 anos pré-2021 (só ativo e caixa) — fonte: relatórios anuais
+const HIST_10YR = {
+  '2016': { label:'2016', caixa:245, ativo:800 },
+  '2017': { label:'2017', caixa:361, ativo:960 },
+  '2018': { label:'2018', caixa:517, ativo:1200 },
+  '2019': { label:'2019', caixa:697, ativo:1400 },
+  '2020': { label:'2020', caixa:873, ativo:1500 },
 };
 
 // Cache de todos os registros de dados_financeiros
@@ -2498,6 +2506,78 @@ function _rebuildDespesasInvestTable(d, dPrev) {
   tbody.innerHTML = h;
 }
 
+// ── Tabelas Complementares: renderizar nas páginas existentes ──
+function _renderTabelasComplementares(tabelas) {
+  _limparTabelasComplementares();
+  tabelas.forEach(tab => {
+    const page = document.getElementById(tab.pagina);
+    if (!page) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ccard tc-complementar';
+    wrapper.style.marginTop = '20px';
+
+    // Título
+    const titulo = document.createElement('div');
+    titulo.className = 'ctitle';
+    titulo.style.marginBottom = '12px';
+    titulo.textContent = tab.titulo;
+    wrapper.appendChild(titulo);
+
+    // Tabela
+    const table = document.createElement('table');
+    table.style.width = '100%';
+
+    // Cabeçalho
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    tab.colunas.forEach(col => {
+      const th = document.createElement('th');
+      th.style.cssText = 'text-align:right;padding:6px 10px;font-size:11px;color:#8B949E;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap';
+      th.textContent = col;
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    // Corpo
+    const tbody = document.createElement('tbody');
+    tab.linhas.forEach((linha, idx) => {
+      const tr = document.createElement('tr');
+      // Detectar se é linha de total (primeira coluna contém "total")
+      const firstVal = String(linha[tab.colunas[0]] || '').toLowerCase();
+      const isTotal = firstVal.includes('total') || firstVal.includes('subtotal');
+
+      tab.colunas.forEach((col, ci) => {
+        const td = document.createElement('td');
+        const val = linha[col];
+        const isNum = typeof val === 'number';
+        td.style.cssText = 'padding:6px 10px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);'
+          + (isNum ? 'text-align:right;font-variant-numeric:tabular-nums;' : '')
+          + (ci === 0 ? 'text-align:left;color:#FAFAFA;' : 'color:#C9D1D9;')
+          + (isTotal ? 'font-weight:700;border-top:1px solid rgba(255,255,255,.12);' : '');
+
+        if (isNum) {
+          td.textContent = val.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        } else {
+          td.textContent = val != null ? String(val) : '—';
+        }
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrapper.appendChild(table);
+
+    page.appendChild(wrapper);
+  });
+}
+
+function _limparTabelasComplementares() {
+  document.querySelectorAll('.tc-complementar').forEach(el => el.remove());
+}
+
 // ── Carregar dados de um período específico ──
 async function loadPeriodo(periodo) {
   const d = _allDados.find(x => x.periodo === periodo);
@@ -2515,6 +2595,7 @@ async function loadPeriodo(periodo) {
       resultado: Math.round(+row.resultado_exercicio / 1000),
       custos:    Math.round(Math.abs(+row.custos_futebol) / 1000),
       caixa:     Math.round(+row.caixa_equivalentes / 1000),
+      ativo:     Math.round(+row.ativo_total / 1000),
     };
   });
 
@@ -2644,6 +2725,20 @@ async function loadPeriodo(periodo) {
     ];
   }
 
+  // Atualizar séries 10 anos (dinâmico: HIST_10YR + HIST + supaMap)
+  if (typeof GD !== 'undefined') {
+    const merged10 = { ...HIST_10YR, ...HIST, ...supaMap };
+    const anos10 = Object.keys(merged10).sort();
+    GD.bp_labels_10yr = anos10;
+    GD.bp_ativo_10yr  = anos10.map(a => merged10[a].ativo || 0);
+    GD.bp_caixa_10yr  = anos10.map(a => merged10[a].caixa || 0);
+    GD.disp_labels    = anos10;
+    GD.disp_data      = anos10.map(a => merged10[a].caixa || 0);
+    // Atualizar título do gráfico
+    const elBp3 = document.querySelector('#bp .ctitle');
+    if (elBp3) elBp3.textContent = 'Evolução do Ativo Total · ' + anos10[0] + '–' + anos10[anos10.length-1] + ' - em milhares de reais';
+  }
+
   // Atualizar GD de Balanço Patrimonial e Indicadores
   if (typeof GD !== 'undefined') {
     const W = window.__CBF_DADOS__;
@@ -2706,6 +2801,20 @@ async function loadPeriodo(periodo) {
     }
   } catch(e) {
     console.warn('[CBF] Erro ao buscar insights:', e.message);
+  }
+
+  // Buscar e renderizar tabelas complementares
+  try {
+    const tcRes = await fetch(SUPA_URL + '/rest/v1/dev_tabelas_complementares?periodo=eq.' + periodo + '&select=pagina,titulo,colunas,linhas', { headers: _supaHeaders });
+    const tcData = await tcRes.json();
+    if (Array.isArray(tcData) && tcData.length > 0) {
+      _renderTabelasComplementares(tcData);
+      console.log('[CBF] Tabelas complementares carregadas:', tcData.length);
+    } else {
+      _limparTabelasComplementares();
+    }
+  } catch(e) {
+    console.warn('[CBF] Erro ao buscar tabelas complementares:', e.message);
   }
 
   // Atualizar barra de info

@@ -15,7 +15,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
   const [authError, setAuthError] = useState('')
-  const [activeTab, setActiveTab] = useState<'upload' | 'users' | 'insights'>('upload')
+  const [activeTab, setActiveTab] = useState<'upload' | 'tabelas' | 'users' | 'insights'>('upload')
 
   const [file, setFile] = useState<File | null>(null)
   const [tipoDoc, setTipoDoc] = useState<'dfs'|'balancete'>('dfs')
@@ -35,6 +35,17 @@ export default function AdminPage() {
   const [newUser, setNewUser] = useState({ username: '', password: '', nome_completo: '' })
   const [editingUser, setEditingUser] = useState<string | null>(null)
   const [editFields, setEditFields] = useState({ password: '', nome_completo: '', ativo: true })
+
+  // ── Tabela Complementar State ──
+  const [tcFile, setTcFile] = useState<File | null>(null)
+  const [tcPeriodo, setTcPeriodo] = useState(() => {
+    const now = new Date()
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  })
+  const [tcStatus, setTcStatus] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
+  const [tcMessage, setTcMessage] = useState('')
+  const [tcTabelas, setTcTabelas] = useState<any[]>([])
+  const tcFileRef = useRef<HTMLInputElement>(null)
 
   // ── Insights Editor State ──
   const [insPeriodos, setInsPeriodos] = useState<{periodo:string,updated_at:string}[]>([])
@@ -188,6 +199,65 @@ export default function AdminPage() {
     }
   }
 
+  // ── Tabela Complementar CRUD ──
+  async function loadTcTabelas() {
+    try {
+      const res = await fetch('/api/upload-tabela')
+      if (res.ok) setTcTabelas(await res.json())
+    } catch {}
+  }
+
+  async function handleTcUpload(e: React.FormEvent) {
+    e.preventDefault()
+    if (!tcFile) return
+
+    setTcStatus('uploading')
+    setTcMessage('Processando planilha...')
+
+    const formData = new FormData()
+    formData.append('file', tcFile)
+    formData.append('periodo', tcPeriodo)
+
+    try {
+      const res = await fetch('/api/upload-tabela', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro no upload')
+      }
+
+      const msgs = [`✅ ${data.tabelas} tabela(s) processada(s):`]
+      if (data.resultados) msgs.push(...data.resultados)
+      if (data.erros) msgs.push('', '⚠️ Avisos:', ...data.erros)
+
+      setTcStatus('done')
+      setTcMessage(msgs.join('\n'))
+      setTcFile(null)
+      if (tcFileRef.current) tcFileRef.current.value = ''
+      loadTcTabelas()
+
+    } catch (err: any) {
+      setTcStatus('error')
+      setTcMessage(`❌ ${err.message}`)
+    }
+  }
+
+  async function deleteTcTabela(id: string, titulo: string) {
+    if (!confirm(`Excluir tabela "${titulo}"?`)) return
+    const res = await fetch('/api/upload-tabela', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    if (res.ok) {
+      loadTcTabelas()
+    }
+  }
+
   // ── Autenticação simples ──
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -321,6 +391,10 @@ export default function AdminPage() {
             style={activeTab === 'insights' ? styles.tabActive : styles.tab}
             onClick={() => { setActiveTab('insights'); loadInsPeriodos() }}
           >✏️ Editar Insights</button>
+          <button
+            style={activeTab === 'tabelas' ? styles.tabActive : styles.tab}
+            onClick={() => { setActiveTab('tabelas'); loadTcTabelas() }}
+          >📋 Tabelas Complementares</button>
         </div>
 
         {activeTab === 'upload' && (<>
@@ -462,6 +536,106 @@ export default function AdminPage() {
                     <td style={styles.td}>{new Date(u.uploaded_at).toLocaleString('pt-BR')}</td>
                     <td style={styles.td}>
                       {u.processed_at ? new Date(u.processed_at).toLocaleString('pt-BR') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        </>)}
+
+        {activeTab === 'tabelas' && (<>
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>📋 Upload de Tabela Complementar</h2>
+          <p style={styles.cardSub}>
+            Suba uma planilha .xlsx com dados complementares. Formato obrigatório:<br/>
+            <strong>Coluna 1</strong> = Página (overview, receitas, despesas, balanco, bp, indicadores, historico)<br/>
+            <strong>Coluna 2</strong> = Título da tabela/gráfico<br/>
+            <strong>Colunas 3+</strong> = Dados que serão exibidos como tabela na página indicada
+          </p>
+
+          <form onSubmit={handleTcUpload} style={styles.uploadForm}>
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Período de referência</label>
+              <input
+                type="month"
+                value={tcPeriodo}
+                onChange={e => setTcPeriodo(e.target.value)}
+                style={styles.input}
+                required
+              />
+            </div>
+
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Arquivo xlsx</label>
+              <input
+                ref={tcFileRef}
+                type="file"
+                accept=".xlsx"
+                onChange={e => setTcFile(e.target.files?.[0] || null)}
+                style={styles.fileInput}
+                required
+              />
+              {tcFile && (
+                <p style={styles.fileName}>
+                  📎 {tcFile.name} ({(tcFile.size / 1024 / 1024).toFixed(1)} MB)
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                ...styles.btn,
+                opacity: tcStatus === 'uploading' ? 0.6 : 1,
+                cursor: tcStatus === 'uploading' ? 'not-allowed' : 'pointer'
+              }}
+              disabled={tcStatus === 'uploading'}
+            >
+              {tcStatus === 'uploading' ? '⏳ Processando...' : '📋 Enviar Tabela'}
+            </button>
+          </form>
+
+          {tcMessage && (
+            <div style={{...styles.statusBox, background: tcStatus === 'error' ? 'rgba(248,81,73,.1)' : 'rgba(63,185,80,.1)', color: tcStatus === 'error' ? '#F85149' : '#3FB950'}}>
+              <p style={{whiteSpace:'pre-wrap'}}>{tcMessage}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Tabelas existentes */}
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>Tabelas Complementares Existentes</h2>
+          {tcTabelas.length === 0 ? (
+            <p style={{color:'#8B949E',fontSize:13}}>Nenhuma tabela complementar cadastrada.</p>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Período</th>
+                  <th style={styles.th}>Página</th>
+                  <th style={styles.th}>Título</th>
+                  <th style={styles.th}>Colunas</th>
+                  <th style={styles.th}>Linhas</th>
+                  <th style={styles.th}>Arquivo</th>
+                  <th style={styles.th}>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tcTabelas.map((t: any) => (
+                  <tr key={t.id}>
+                    <td style={styles.td}>{t.periodo}</td>
+                    <td style={styles.td}><span style={{...styles.badge, background:'rgba(245,200,0,.12)', color:'#F5C800'}}>{t.pagina}</span></td>
+                    <td style={styles.td}>{t.titulo}</td>
+                    <td style={styles.td}>{t.colunas?.length || 0}</td>
+                    <td style={styles.td}>{t.linhas?.length || 0}</td>
+                    <td style={styles.td}>{t.filename || '—'}</td>
+                    <td style={styles.td}>
+                      <button
+                        style={{...styles.btn, padding:'4px 10px', fontSize:11, background:'#F85149'}}
+                        onClick={() => deleteTcTabela(t.id, t.titulo)}
+                      >🗑 Excluir</button>
                     </td>
                   </tr>
                 ))}
