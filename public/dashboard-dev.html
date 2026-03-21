@@ -2518,6 +2518,10 @@ async function loadPeriodo(periodo) {
         Math.round(Math.abs(+dP.rec_bilheteria) / 1000),
         Math.round(Math.abs(+dP.rec_registros) / 1000)
       ];
+    } else {
+      GD.comp_2024 = [];
+      GD.sel_2024 = [];
+      GD.liq_2024 = [];
     }
     GD.cus_barras = [
       window.__CBF_DADOS__.custo_fomento,
