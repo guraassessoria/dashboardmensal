@@ -808,9 +808,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="ccard">
     <div class="ctitle" style="margin-bottom:16px;">em milhares de reais</div>
-    <table>
-      <thead><tr><th>Descrição</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th><th style="text-align:right;">Var. %</th></tr></thead>
-      <tbody>
+    <table id="dre-table">
+      <thead id="dre-thead"><tr><th>Descrição</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th><th style="text-align:right;">Var. %</th></tr></thead>
+      <tbody id="dre-tbody">
         <tr class="dre-header"><td colspan="4">Receita Bruta</td></tr>
         <tr><td>Patrocínios</td><td class="num">437.931</td><td class="num">451.397</td><td class="num dd">▼ −3,0%</td></tr>
         <tr><td>Direito de Transmissão e Comerciais</td><td class="num">637.903</td><td class="num">723.900</td><td class="num dd">▼ −11,9%</td></tr>
@@ -905,8 +905,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="two" style="margin-bottom:0;align-items:start;">
       <div>
         <table>
-          <thead><tr><th>ATIVO</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
-          <tbody>
+          <thead id="bp-ativo-thead"><tr><th>ATIVO</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
+          <tbody id="bp-ativo-tbody">
             <tr class="dre-header"><td colspan="3">Circulante</td></tr>
             <tr><td>Caixa e Equivalentes</td><td class="num">1.996.870</td><td class="num">2.433.286</td></tr>
             <tr><td>Contas a Receber</td><td class="num">291.645</td><td class="num">263.638</td></tr>
@@ -925,8 +925,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
       <div>
         <table>
-          <thead><tr><th>PASSIVO + PL</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
-          <tbody>
+          <thead id="bp-passivo-thead"><tr><th>PASSIVO + PL</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
+          <tbody id="bp-passivo-tbody">
             <tr class="dre-header"><td colspan="3">Circulante</td></tr>
             <tr><td>Fornecedores e C. a Pagar</td><td class="num">141.366</td><td class="num">154.114</td></tr>
             <tr><td>Receitas Antecipadas CP</td><td class="num">364.074</td><td class="num">307.379</td></tr>
@@ -1250,12 +1250,17 @@ function _bi(v, fb) { return v != null ? v : fb; }
 function _fmtBi(v) {
   if (v == null) return '—';
   const n = Math.abs(v);
-  if (n >= 1000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000).toFixed(2).replace('.',',') + ' Bi';
-  return (v < 0 ? '− ' : '') + 'R$ ' + Math.round(n) + ' Mi';
+  // v em R$ milhares
+  if (n >= 1000000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000000).toFixed(2).replace('.',',') + ' Bi';
+  if (n >= 1000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000).toFixed(1).replace('.',',') + ' Mi';
+  return (v < 0 ? '− ' : '') + 'R$ ' + Math.round(n) + ' Mil';
 }
 function _fmtMi(v) {
   if (v == null) return '—';
-  return (v < 0 ? '− ' : '') + 'R$ ' + Math.abs(Math.round(v)) + ' Mi';
+  const n = Math.abs(v);
+  const mi = n / 1000;
+  if (mi >= 100) return (v < 0 ? '− ' : '') + 'R$ ' + Math.round(mi) + ' Mi';
+  return (v < 0 ? '− ' : '') + 'R$ ' + mi.toFixed(1).replace('.',',') + ' Mi';
 }
 function _pct(a, b) {
   if (!a || !b || b === 0) return '';
@@ -1347,7 +1352,8 @@ const GD = {
 
 // ── Atualizar KPI cards no DOM com dados dinâmicos ──
 function _atualizarKPIs() {
-  if (!_D) return; // sem dados dinâmicos, mantém os hardcoded no HTML
+  const _D = window.__CBF_DADOS__;
+  if (!_D) return;
 
   const periodo = _D.periodoFormatado || '2025';
 
@@ -1885,6 +1891,179 @@ function fmtPeriodo(p) {
   return m[parseInt(mes)-1] + '/' + ano;
 }
 
+// ── Helpers para reconstruir tabelas dinamicamente ──
+function _fmtNum(v) {
+  if (v == null) return '—';
+  const n = Math.round(v);
+  if (n < 0) return '(' + Math.abs(n).toLocaleString('pt-BR') + ')';
+  return n.toLocaleString('pt-BR');
+}
+
+function _rebuildDRE(d, dPrev) {
+  const tbody = document.getElementById('dre-tbody');
+  const thead = document.getElementById('dre-thead');
+  if (!tbody) return;
+
+  const lbl = fmtPeriodo(d.periodo) || d.periodo;
+  const lblPrev = dPrev ? (fmtPeriodo(dPrev.periodo) || dPrev.periodo) : null;
+  const cols = dPrev ? 4 : 2;
+
+  if (thead) {
+    const tr = thead.querySelector('tr');
+    if (tr) {
+      tr.innerHTML = '<th>Descrição</th><th style="text-align:right;">' + lbl + '</th>'
+        + (dPrev ? '<th style="text-align:right;">' + lblPrev + '</th><th style="text-align:right;">Var. %</th>' : '');
+    }
+  }
+
+  const pctCell = (a, b) => {
+    if (a == null || b == null || b === 0) return '<td class="num">—</td>';
+    const p = ((a - b) / Math.abs(b) * 100);
+    const cls = p >= 0 ? 'du' : 'dd';
+    const arrow = p >= 0 ? '▲' : '▼';
+    return '<td class="num ' + cls + '">' + arrow + ' ' + (p >= 0 ? '+' : '') + p.toFixed(1) + '%</td>';
+  };
+
+  const row = (label, val, prevVal, isTotal, isCost) => {
+    const fv = isCost && val != null ? _fmtNum(-Math.abs(val)) : _fmtNum(val);
+    const fp = dPrev ? (isCost && prevVal != null ? _fmtNum(-Math.abs(prevVal)) : _fmtNum(prevVal)) : '';
+    const cls = isTotal ? ' class="dre-row-total"' : '';
+    const prevTd = dPrev ? '<td class="num">' + fp + '</td>' : '';
+    const pct = dPrev ? pctCell(val, prevVal) : '';
+    return '<tr' + cls + '><td>' + label + '</td><td class="num">' + fv + '</td>' + prevTd + pct + '</tr>';
+  };
+
+  const hdr = label => '<tr class="dre-header"><td colspan="' + cols + '">' + label + '</td></tr>';
+  const p = dPrev || {};
+  const deducoes = (d.receita_bruta && d.receita_liquida) ? d.receita_liquida - d.receita_bruta : null;
+  const deducoesPrev = (p.receita_bruta && p.receita_liquida) ? p.receita_liquida - p.receita_bruta : null;
+
+  let h = '';
+  h += hdr('Receita Bruta');
+  h += row('Patrocínios', d.rec_patrocinio, p.rec_patrocinio);
+  h += row('Direito de Transmissão e Comerciais', d.rec_transmissao, p.rec_transmissao);
+  h += row('Bilheteria e Premiações', d.rec_bilheteria, p.rec_bilheteria);
+  h += row('Registros e Transferências', d.rec_registros, p.rec_registros);
+  h += row('Programa de Desenvolvimento', d.rec_desenvolvimento, p.rec_desenvolvimento);
+  h += row('CBF Academy', d.rec_academy, p.rec_academy);
+  h += row('Total das Receitas', d.receita_bruta, p.receita_bruta, true);
+  h += row('Deduções da Receita (COFINS/ISS)', deducoes, deducoesPrev);
+  h += row('Receita Líquida', d.receita_liquida, p.receita_liquida, true);
+
+  h += hdr('Custos com Futebol');
+  h += row('Seleção Principal', d.custo_selecao_principal, p.custo_selecao_principal, false, true);
+  h += row('Seleções de Base', d.custo_selecao_base, p.custo_selecao_base, false, true);
+  h += row('Seleções Femininas', d.custo_selecao_femininas, p.custo_selecao_femininas, false, true);
+  h += row('Contribuição ao Fomento', d.custo_fomento, p.custo_fomento, false, true);
+  h += row('Total dos Custos com Futebol', d.custos_futebol, p.custos_futebol, true, true);
+  h += row('Superávit / (Déficit) Bruto', d.superavit_bruto, p.superavit_bruto, true);
+
+  h += hdr('Despesas Operacionais');
+  h += row('Despesas com Pessoal', d.desp_pessoal, p.desp_pessoal, false, true);
+  h += row('Despesas Administrativas', d.desp_administrativas, p.desp_administrativas, false, true);
+  h += row('Impostos e Taxas', d.desp_impostos_taxas, p.desp_impostos_taxas, false, true);
+  h += row('Total das Despesas Operacionais', d.despesas_operacionais, p.despesas_operacionais, true, true);
+
+  h += hdr('Resultado Financeiro');
+  h += row('Receitas Financeiras', d.res_fin_receitas, p.res_fin_receitas);
+  h += row('Despesas Financeiras', d.res_fin_despesas, p.res_fin_despesas, false, true);
+  h += row('Variação Cambial', d.res_fin_cambial, p.res_fin_cambial);
+  h += row('Total do Resultado Financeiro', d.resultado_financeiro, p.resultado_financeiro, true);
+
+  // Resultado final
+  const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);font-size:14px;' : 'color:var(--pos);font-size:14px;';
+  h += '<tr class="dre-row-total" style="border-top:2px solid rgba(192,57,43,.4);"><td><strong>RESULTADO DO EXERCÍCIO</strong></td><td class="num" style="' + stl + '"><strong>' + _fmtNum(d.resultado_exercicio) + '</strong></td>';
+  if (dPrev) {
+    const stlP = p.resultado_exercicio < 0 ? 'color:var(--neg);font-size:14px;' : 'color:var(--pos);font-size:14px;';
+    h += '<td class="num" style="' + stlP + '"><strong>' + _fmtNum(p.resultado_exercicio) + '</strong></td>';
+    h += pctCell(d.resultado_exercicio, p.resultado_exercicio);
+  }
+  h += '</tr>';
+
+  tbody.innerHTML = h;
+}
+
+function _rebuildBP(d, dPrev) {
+  const ativoTbody = document.getElementById('bp-ativo-tbody');
+  const passivoTbody = document.getElementById('bp-passivo-tbody');
+  const ativoThead = document.getElementById('bp-ativo-thead');
+  const passivoThead = document.getElementById('bp-passivo-thead');
+  if (!ativoTbody || !passivoTbody) return;
+
+  const lbl = fmtPeriodo(d.periodo) || d.periodo;
+  const lblPrev = dPrev ? (fmtPeriodo(dPrev.periodo) || dPrev.periodo) : null;
+
+  [ativoThead, passivoThead].forEach(th => {
+    if (!th) return;
+    const ths = th.querySelectorAll('th');
+    if (ths.length >= 2) ths[1].textContent = lbl;
+    if (ths.length >= 3) { if (dPrev) { ths[2].textContent = lblPrev; ths[2].style.display = ''; } else { ths[2].style.display = 'none'; } }
+  });
+
+  const f = _fmtNum;
+  const p = dPrev || {};
+  const prevTd = v => dPrev ? '<td class="num">' + f(v) + '</td>' : '';
+  const hdr = label => '<tr class="dre-header"><td colspan="' + (dPrev ? 3 : 2) + '">' + label + '</td></tr>';
+  const row = (label, val, pv, isTotal, style) => '<tr' + (isTotal ? ' class="dre-row-total"' : '') + '><td>' + label + '</td><td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(val) + '</td>' + (dPrev ? '<td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(pv) + '</td>' : '') + '</tr>';
+
+  const circulanteTotal = d.ativo_circulante;
+  const naoCirculante = d.ativo_total && d.ativo_circulante ? d.ativo_total - d.ativo_circulante : null;
+
+  let ha = '';
+  ha += hdr('Circulante');
+  ha += row('Caixa e Equivalentes', d.caixa_equivalentes, p.caixa_equivalentes);
+  ha += row('Contas a Receber', d.contas_receber, p.contas_receber);
+  ha += row('Tributos a Recuperar', d.tributos_recuperar, p.tributos_recuperar);
+  ha += row('Total Circulante', d.ativo_circulante, p.ativo_circulante, true);
+  ha += hdr('Não Circulante');
+  ha += row('Depósitos Judiciais', d.depositos_judiciais, p.depositos_judiciais);
+  ha += row('Imobilizado', d.imobilizado, p.imobilizado);
+  ha += row('Total do Ativo', d.ativo_total, p.ativo_total, true);
+  ativoTbody.innerHTML = ha;
+
+  let hp = '';
+  hp += hdr('Circulante');
+  hp += row('Total Circulante', d.passivo_circulante, p.passivo_circulante, true);
+  hp += hdr('Não Circulante');
+  hp += row('Receitas Diferidas LP', d.receitas_diferidas_lp, p.receitas_diferidas_lp);
+  hp += row('Provisão Contingências', d.prov_contingencias, p.prov_contingencias);
+  hp += hdr('Patrimônio Líquido');
+  hp += row('Patrimônio Social', d.patrimonio_social, p.patrimonio_social);
+  const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);' : 'color:var(--pos);';
+  hp += row('Resultado do Exercício', d.resultado_exercicio, p.resultado_exercicio, false, stl);
+  hp += row('Total Passivo + PL', d.ativo_total, p.ativo_total, true);
+  passivoTbody.innerHTML = hp;
+}
+
+function _updateBPKPIs(d) {
+  const el = id => document.getElementById(id);
+  const _D = window.__CBF_DADOS__;
+  if (!_D) return;
+  // Os KPIs do BP usam a classe .kval. Atualizar via IDs de container
+  const bpGrid = document.querySelector('#bp .kgrid');
+  if (!bpGrid) return;
+  const cards = bpGrid.querySelectorAll('.kcard');
+  const vals = [
+    { label: 'Ativo Total', val: _fmtBi(_D.ativo_total), delta: '', sub: 'PL: ' + _fmtBi(_D.patrimonio_liquido) },
+    { label: 'Caixa e Equivalentes', val: _fmtBi(_D.caixa_equivalentes), delta: '', sub: '' },
+    { label: 'Contas a Receber', val: _fmtBi(_D.contas_receber), delta: '', sub: '' },
+    { label: 'Ativo Circulante', val: _fmtBi(_D.ativo_circulante), delta: '', sub: _D.ativo_total ? Math.round(_D.ativo_circulante/_D.ativo_total*100) + '% do ativo total' : '' },
+    { label: 'Patrimônio Líquido', val: _fmtBi(_D.patrimonio_liquido), delta: '', sub: '' },
+    { label: 'Receitas Diferidas (CP+LP)', val: _fmtBi((_D.receitas_diferidas_cp||0)+(_D.receitas_diferidas_lp||0)), delta: '', sub: '' },
+  ];
+  cards.forEach((card, i) => {
+    if (!vals[i]) return;
+    const kval = card.querySelector('.kval');
+    const klabel = card.querySelector('.klabel');
+    const kdelta = card.querySelector('.kdelta');
+    const ksub = card.querySelector('.ksub');
+    if (klabel) klabel.textContent = vals[i].label;
+    if (kval) kval.textContent = vals[i].val;
+    if (kdelta) kdelta.textContent = vals[i].delta;
+    if (ksub) ksub.textContent = vals[i].sub;
+  });
+}
+
 // ── Carregar dados de um período específico ──
 async function loadPeriodo(periodo) {
   const d = _allDados.find(x => x.periodo === periodo);
@@ -1920,18 +2099,28 @@ async function loadPeriodo(periodo) {
     source_file: d.source_file,
     geradoEm: d.updated_at,
 
-    receita_bruta:       +d.receita_bruta,
-    receita_liquida:     +d.receita_liquida,
+    receita_bruta:       +d.receita_bruta || 0,
+    receita_liquida:     +d.receita_liquida || 0,
     resultado_exercicio: +(d.resultado_exercicio ?? d.resultado_periodo ?? 0),
-    custos_futebol:      Math.abs(+d.custos_futebol),
-    caixa_equivalentes:  +d.caixa_equivalentes,
-    ativo_total:         +d.ativo_total,
-    rec_financeiras:     +d.rec_financeiras,
-    patrimonio_liquido:  +d.patrimonio_liquido,
-    liquidez_corrente:   +d.liquidez_corrente,
-    liquidez_imediata:   +d.liquidez_imediata,
-    fluxo_operacional:   +d.fluxo_operacional,
-    fluxo_investimento:  +d.fluxo_investimento,
+    custos_futebol:      Math.abs(+d.custos_futebol || 0),
+    caixa_equivalentes:  +d.caixa_equivalentes || 0,
+    ativo_total:         +d.ativo_total || 0,
+    rec_financeiras:     +d.rec_financeiras || 0,
+    patrimonio_liquido:  +d.patrimonio_liquido || 0,
+    liquidez_corrente:   +d.liquidez_corrente || 0,
+    liquidez_imediata:   +d.liquidez_imediata || 0,
+    fluxo_operacional:   +d.fluxo_operacional || 0,
+    fluxo_investimento:  +d.fluxo_investimento || 0,
+    contas_receber:      +d.contas_receber || 0,
+    tributos_recuperar:  +d.tributos_recuperar || 0,
+    depositos_judiciais: +d.depositos_judiciais || 0,
+    imobilizado:         +d.imobilizado || 0,
+    receitas_diferidas_cp: +d.receitas_diferidas_cp || 0,
+    receitas_diferidas_lp: +d.receitas_diferidas_lp || 0,
+    prov_contingencias:  +d.prov_contingencias || 0,
+    patrimonio_social:   +d.patrimonio_social || 0,
+    ativo_circulante:    +d.ativo_circulante || 0,
+    passivo_circulante:  +d.passivo_circulante || 0,
 
     labels,
     receita_serie:   rec_serie,
@@ -1960,17 +2149,6 @@ async function loadPeriodo(periodo) {
     desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) / 1000),
     desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) / 1000),
     desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) / 1000),
-
-    ativo_circulante:      +d.ativo_circulante,
-    passivo_circulante:    +d.passivo_circulante,
-    contas_receber:        +d.contas_receber,
-    tributos_recuperar:    +d.tributos_recuperar,
-    depositos_judiciais:   +d.depositos_judiciais,
-    imobilizado:           +d.imobilizado,
-    receitas_diferidas_cp: +d.receitas_diferidas_cp,
-    receitas_diferidas_lp: +d.receitas_diferidas_lp,
-    prov_contingencias:    +d.prov_contingencias,
-    patrimonio_social:     +d.patrimonio_social,
   };
 
   // Atualizar GD
@@ -1997,8 +2175,35 @@ async function loadPeriodo(periodo) {
     ];
   }
 
+  // Atualizar GD de Balanço Patrimonial e Indicadores
+  if (typeof GD !== 'undefined') {
+    const W = window.__CBF_DADOS__;
+    GD.ativo_composicao = [
+      Math.round((W.caixa_equivalentes||0)/1000),
+      Math.round((W.contas_receber||0)/1000),
+      Math.round((W.tributos_recuperar||0)/1000),
+      Math.round((W.depositos_judiciais||0)/1000),
+      Math.round((W.imobilizado||0)/1000)
+    ];
+    GD.passivo_composicao = [
+      Math.round((W.passivo_circulante||0)/1000),
+      Math.round((W.receitas_diferidas_lp||0)/1000),
+      Math.round((W.prov_contingencias||0)/1000),
+      Math.round((W.patrimonio_liquido||0)/1000)
+    ];
+    const lc = W.passivo_circulante ? (W.ativo_circulante / W.passivo_circulante) : 0;
+    const li = W.passivo_circulante ? (W.caixa_equivalentes / W.passivo_circulante) : 0;
+    GD.liq_2025 = [parseFloat(lc.toFixed(2)), 0, parseFloat(li.toFixed(2))];
+  }
+
   // Atualizar KPIs
   if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
+
+  // Reconstruir tabelas DRE e BP
+  const dPrev = _allDados.find(x => x.periodo !== periodo);
+  _rebuildDRE(d, dPrev || null);
+  _rebuildBP(d, dPrev || null);
+  _updateBPKPIs(d);
 
   // Recriar gráficos
   if (typeof done !== 'undefined') done.clear();
