@@ -20,9 +20,13 @@ const ABAS_ALVO = [
 ]
 
 serve(async (req) => {
+  let _uploadId = ''
+  let _env = 'prod'
   try {
     const body = await req.json()
     const { upload_id, storage_path, periodo, filename, tipo_documento = 'dfs', env = 'prod' } = body
+    _uploadId = upload_id
+    _env = env
     const isDev = env === 'dev'
     const t = (name: string) => isDev ? `dev_${name}` : name
 
@@ -325,17 +329,18 @@ serve(async (req) => {
   } catch (err: any) {
     console.error("Erro no processamento:", err)
 
-    // Marcar upload como erro se tiver upload_id
-    try {
-      const body = await req.clone().json()
-      if (body.upload_id) {
-        const table = body.env === 'dev' ? 'dev_uploads' : 'uploads'
+    // Marcar upload como erro
+    if (_uploadId) {
+      try {
+        const table = _env === 'dev' ? 'dev_uploads' : 'uploads'
         await supabase
           .from(table)
-          .update({ status: "error", error_msg: err.message })
-          .eq("id", body.upload_id)
+          .update({ status: "error", error_msg: err.message?.substring(0, 500) })
+          .eq("id", _uploadId)
+      } catch (e) {
+        console.error("Falha ao marcar erro:", e)
       }
-    } catch {}
+    }
 
     return new Response(JSON.stringify({ ok: false, error: err.message }), {
       status: 500,
@@ -344,15 +349,25 @@ serve(async (req) => {
   }
 })
 
-// ── Converter workbook xlsx para texto legível ──
+// ── Converter workbook xlsx para texto legível (otimizado para limites de token) ──
+const MAX_CHARS = 80000 // ~20k tokens
 function xlsxToText(workbook: XLSX.WorkBook): string {
   const parts: string[] = []
+  let totalChars = 0
   for (const name of workbook.SheetNames) {
     const sheet = workbook.Sheets[name]
     if (!sheet) continue
     const csv = XLSX.utils.sheet_to_csv(sheet, { FS: "\t", blankrows: false })
     if (csv.trim().length === 0) continue
-    parts.push(`### Aba: ${name}\n${csv}`)
+    // Truncar abas muito grandes (manter primeiras 500 linhas)
+    const lines = csv.split("\n")
+    const truncated = lines.length > 500 ? lines.slice(0, 500).join("\n") + "\n[... truncado]" : csv
+    if (totalChars + truncated.length > MAX_CHARS) {
+      parts.push(`### Aba: ${name}\n[Aba omitida - limite de caracteres atingido]`)
+      break
+    }
+    parts.push(`### Aba: ${name}\n${truncated}`)
+    totalChars += truncated.length
   }
   return parts.join("\n\n")
 }
