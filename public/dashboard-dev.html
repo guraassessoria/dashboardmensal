@@ -2487,6 +2487,12 @@ async function loadPeriodo(periodo) {
     ];
     // Comparison data from previous period
     const dP = _allDados.find(x => x.periodo !== periodo);
+    GD.comp_2025 = [
+      Math.round(Math.abs(+d.rec_transmissao) / 1000),
+      Math.round(Math.abs(+d.rec_patrocinio) / 1000),
+      Math.round(Math.abs(+d.rec_bilheteria) / 1000),
+      Math.round(Math.abs(+d.rec_registros) / 1000)
+    ];
     if (dP) {
       GD.sel_2024 = [
         Math.round(Math.abs(+dP.custo_selecao_principal) / 1000),
@@ -2498,12 +2504,6 @@ async function loadPeriodo(periodo) {
         Math.round(Math.abs(+dP.rec_patrocinio) / 1000),
         Math.round(Math.abs(+dP.rec_bilheteria) / 1000),
         Math.round(Math.abs(+dP.rec_registros) / 1000)
-      ];
-      GD.comp_2025 = [
-        Math.round(Math.abs(+d.rec_transmissao) / 1000),
-        Math.round(Math.abs(+d.rec_patrocinio) / 1000),
-        Math.round(Math.abs(+d.rec_bilheteria) / 1000),
-        Math.round(Math.abs(+d.rec_registros) / 1000)
       ];
     }
     GD.cus_barras = [
