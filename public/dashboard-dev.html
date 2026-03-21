@@ -2012,7 +2012,7 @@ async function loadPeriodo(periodo) {
 
   // Buscar insights do período
   try {
-    const insRes = await fetch(SUPA_URL + '/rest/v1/insights_gerados?periodo=eq.' + periodo + '&select=conteudo', { headers: _supaHeaders });
+    const insRes = await fetch(SUPA_URL + '/rest/v1/dev_insights_gerados?periodo=eq.' + periodo + '&select=conteudo', { headers: _supaHeaders });
     const insArr = await insRes.json();
     if (Array.isArray(insArr) && insArr.length > 0) {
       _aplicarInsights(insArr[0].conteudo);
@@ -2045,7 +2045,7 @@ async function loadPeriodo(periodo) {
 (async function() {
   try {
     // Buscar todos os registros de dados_financeiros
-    const dadosRes = await fetch(SUPA_URL + '/rest/v1/dados_financeiros?select=*&order=periodo.desc', { headers: _supaHeaders });
+    const dadosRes = await fetch(SUPA_URL + '/rest/v1/dev_dados_financeiros?select=*&order=periodo.desc', { headers: _supaHeaders });
     const dados = await dadosRes.json();
     if (!Array.isArray(dados) || dados.length === 0) {
       console.warn('[CBF] Sem dados no Supabase');
@@ -2054,7 +2054,7 @@ async function loadPeriodo(periodo) {
     _allDados = dados;
 
     // Buscar periodo_atual da configuração
-    const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?select=chave,valor', { headers: _supaHeaders });
+    const cfgRes = await fetch(SUPA_URL + '/rest/v1/dev_configuracao?select=chave,valor', { headers: _supaHeaders });
     const cfgList = await cfgRes.json();
     const cfgMap = Object.fromEntries((cfgList || []).map(c => [c.chave, c.valor]));
     const periodoAtual = cfgMap['periodo_atual'] || dados[0].periodo;

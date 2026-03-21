@@ -22,13 +22,15 @@ const ABAS_ALVO = [
 serve(async (req) => {
   try {
     const body = await req.json()
-    const { upload_id, storage_path, periodo, filename, tipo_documento = 'dfs' } = body
+    const { upload_id, storage_path, periodo, filename, tipo_documento = 'dfs', env = 'prod' } = body
+    const isDev = env === 'dev'
+    const t = (name: string) => isDev ? `dev_${name}` : name
 
-    console.log(`Processando upload: ${filename} | Período: ${periodo} | Tipo: ${tipo_documento}`)
+    console.log(`[${env}] Processando upload: ${filename} | Período: ${periodo} | Tipo: ${tipo_documento}`)
 
     // ── 1. Atualizar status para 'processing' ──
     await supabase
-      .from("uploads")
+      .from(t("uploads"))
       .update({ status: "processing" })
       .eq("id", upload_id)
 
@@ -95,7 +97,7 @@ serve(async (req) => {
     // ── 5. Salvar no banco (merge com dados existentes) ──
     // Buscar dados já existentes para este período (do outro arquivo)
     const { data: existingRow } = await supabase
-      .from("dados_financeiros")
+      .from(t("dados_financeiros"))
       .select("*")
       .eq("periodo", periodo)
       .single()
@@ -178,7 +180,7 @@ serve(async (req) => {
     }
 
     const { error: upsertError } = await supabase
-      .from("dados_financeiros")
+      .from(t("dados_financeiros"))
       .upsert(novosDados, { onConflict: "periodo" })
 
     if (upsertError) {
@@ -196,7 +198,7 @@ serve(async (req) => {
 
     // Buscar dados do período anterior para comparações
     const { data: dadosAnteriores } = await supabase
-      .from("dados_financeiros")
+      .from(t("dados_financeiros"))
       .select("*")
       .neq("periodo", periodo)
       .order("periodo", { ascending: false })
@@ -210,7 +212,7 @@ serve(async (req) => {
     if (bothFilesAvailable) {
       const otherTipo = tipo_documento === 'dfs' ? 'balancete' : 'dfs'
       const { data: otherUpload } = await supabase
-        .from("uploads")
+        .from(t("uploads"))
         .select("storage_path, filename")
         .eq("periodo", periodo)
         .eq("tipo_documento", otherTipo)
@@ -274,7 +276,7 @@ serve(async (req) => {
           const insightsJSON = JSON.parse(insightsMatch[1] || insightsMatch[0])
 
           const { error: insightError } = await supabase
-            .from("insights_gerados")
+            .from(t("insights_gerados"))
             .upsert({
               periodo,
               upload_id,
@@ -299,12 +301,12 @@ serve(async (req) => {
 
     // ── 6. Atualizar período atual na config ──
     await supabase
-      .from("configuracao")
+      .from(t("configuracao"))
       .upsert({ chave: "periodo_atual", valor: periodo, updated_at: new Date().toISOString() })
 
     // ── 7. Marcar upload como concluído ──
     await supabase
-      .from("uploads")
+      .from(t("uploads"))
       .update({ status: "done", processed_at: new Date().toISOString() })
       .eq("id", upload_id)
 
@@ -327,8 +329,9 @@ serve(async (req) => {
     try {
       const body = await req.clone().json()
       if (body.upload_id) {
+        const table = body.env === 'dev' ? 'dev_uploads' : 'uploads'
         await supabase
-          .from("uploads")
+          .from(table)
           .update({ status: "error", error_msg: err.message })
           .eq("id", body.upload_id)
       }

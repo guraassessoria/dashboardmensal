@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { tbl } from '@/lib/supabase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   if (periodo) {
     const { data, error } = await supabase
-      .from('insights_gerados')
+      .from(tbl('insights_gerados'))
       .select('*')
       .eq('periodo', periodo)
       .single()
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   // Sem periodo: retorna lista de períodos disponíveis
   const { data, error } = await supabase
-    .from('insights_gerados')
+    .from(tbl('insights_gerados'))
     .select('periodo, updated_at')
     .order('periodo', { ascending: false })
 
@@ -52,7 +53,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const { error } = await supabase
-      .from('insights_gerados')
+      .from(tbl('insights_gerados'))
       .upsert({
         periodo,
         conteudo,

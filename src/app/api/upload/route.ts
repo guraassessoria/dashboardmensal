@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { tbl, isDev } from '@/lib/supabase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // Registrar upload no banco
     const { data: uploadRecord, error: dbError } = await supabase
-      .from('uploads')
+      .from(tbl('uploads'))
       .insert({
         filename: file.name,
         file_type: ['csv'].includes(ext || '') ? 'xlsx' : ext,
@@ -85,7 +86,8 @@ export async function POST(req: NextRequest) {
         storage_path: storagePath,
         periodo,
         filename: file.name,
-        tipo_documento: tipoDocumento
+        tipo_documento: tipoDocumento,
+        env: isDev ? 'dev' : 'prod'
       })
     }).catch(err => console.error('Erro ao disparar Edge Function:', err))
     // Não await — processamento é assíncrono
