@@ -282,13 +282,14 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 </header>
 <nav>
   <div class="ni">
-    <button class="ntab active" onclick="sp('overview')">Resumo Executivo</button>
+    <button class="ntab active" onclick="sp('bp')">Balanço Patrimonial</button>
+    <button class="ntab" onclick="sp('balanco')">Demonstração de Resultado</button>
     <button class="ntab" onclick="sp('receitas')">Receitas</button>
-    <button class="ntab" onclick="sp('despesas')">Investimentos</button>
-    <button class="ntab" onclick="sp('balanco')">DRE Completa</button>
-    <button class="ntab" onclick="sp('bp')">Balanço Patrimonial</button>
-    <button class="ntab" onclick="sp('indicadores')">Indicadores Financeiros</button>
+    <button class="ntab" onclick="sp('despesas')">Custos e Despesas (Investimento)</button>
+    <!--<button class="ntab" onclick="sp('competicoes')">Competições (Aprimoramento)</button>-->
+    <button class="ntab" onclick="sp('indicadores')">Indicadores</button>
     <button class="ntab" onclick="sp('historico')">Série Histórica</button>
+    <button class="ntab" onclick="sp('overview')">Resumo Executivo</button>
   </div>
   <button class="pdf-btn" title="Chrome/Edge: no diálogo de impressão, ative 'Gráficos de fundo' para preservar as cores" onclick="exportPDF()" title="No diálogo de impressão: ative Gráficos de fundo · desative Cabeçalhos e rodapés">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -300,7 +301,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <main class="main">
 
 <!-- ═ OVERVIEW ═ -->
-<div id="overview" class="page landscape active">
+<div id="overview" class="page landscape">
   <div class="stitle">Sumário Executivo<br></div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
@@ -311,55 +312,47 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="ksub" id="ks-fonte"></div>
     </div>
     <div class="kcard">
+      <div class="klabel">Custo com Futebol</div>
+      <div class="kval" id="kv-custos">R$ 1,18 Bi</div>
+      <div class="kdelta dn">▲ +9,1% vs 2024 (R$1,08 bilhões)</div>
+      <div class="ksub"></div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">Despesa</div>
+      <div class="kval">R$ 438 Mi</div>
+      <div class="kdelta dn">▲ +157,6% vs 2024 (R$170 milhões)</div>
+      <div class="ksub"></div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">Resultado Financeiro</div>
+      <div class="kval" id="kv-rec-fin">R$ 318 Mi</div>
+      <div class="kdelta up">▲ +141% vs 2024 (R$132 milhões)</div>
+      <div class="ksub"></div>
+    </div>
+    <div class="kcard">
       <div class="klabel">Resultado do Exercício</div>
       <div class="kval" id="kv-resultado">− R$ 182 Mi</div>
       <div class="kdelta dn" id="kd-resultado">▼ Déficit vs Superávit R$107 Mi (anterior)</div>
       <div class="ksub"></div>
     </div>
     <div class="kcard">
-      <div class="klabel">Custos com Futebol</div>
-      <div class="kval" id="kv-custos">R$ 1,18 Bi</div>
-      <div class="kdelta dn">▲ +9,1% vs 2024 (R$1,08 bilhões)</div>
-      <div class="ksub"></div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Caixa e Equivalentes</div>
+      <div class="klabel">Liquidez</div>
       <div class="kval" id="kv-caixa">R$ 2,0 Bi</div>
       <div class="kdelta dn">▼ −18% vs 2024 (R$2,43 bilhões)</div>
-      <div class="ksub">Aplicações financeiras conservadoras</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Ativo Total</div>
-      <div class="kval" id="kv-ativo">R$ 3,39 Bi</div>
-      <div class="kdelta dn">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
-      <div class="ksub">PL: R$ 1,26 bilhões</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Receitas Financeiras</div>
-      <div class="kval" id="kv-rec-fin">R$ 318 Mi</div>
-      <div class="kdelta up">▲ +141% vs 2024 (R$132 milhões)</div>
       <div class="ksub"></div>
     </div>
   </div>
 
-  <!-- Nike Banner -->
-  <div class="ccard" style="background:linear-gradient(135deg,rgba(0,156,59,.12) 0%,rgba(0,48,135,.15) 100%);border-color:rgba(245,201,0,.25);">
-    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-      <div style="font-family:var(--font-heading);font-size:56px;color:var(--yellow);line-height:1;flex-shrink:0;">NIKE</div>
-      <div style="flex:1;min-width:240px;">
-        <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:6px;">Contrato</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6;">Antecipação de <strong style="color:var(--yellow)">R$ 1,3 bilhão</strong> recebido em 2024. Em 2025, a Nike segue sendo o maior patrocinador, registrando receitas de <strong style="color:var(--white)">R$ 218 milhões no ano</strong>.</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:var(--font-mono);font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:1px;">NOVO CONTRATO · VIGÊNCIA</div>
-        <div style="font-family:var(--font-heading);font-size:30px;color:var(--pos);">2027 → 2038</div>
-      </div>
+  <div class="ccard" style="margin-bottom:20px;">
+    <div class="insight" style="margin:0;">
+      <div class="ilabel">Contexto</div>
+      <p>A receita bruta de <strong>R$ 1,19 bilhão</strong> em 2025 reflete ciclo operacional com menor volume de jogos e receitas de transmissão. Os custos com futebol somaram R$ 1,18 bilhão, com aumento concentrado em fomento aos estados e competições. O resultado financeiro de R$ 318 milhões, impulsionado pela remuneração de aplicações sobre o caixa de R$ 2 bilhões, contribuiu para atenuar o déficit do exercício, de R$ 182 milhões. A posição de liquidez permanece robusta, assegurando capacidade de investimento nos próximos ciclos.</p>
     </div>
   </div>
 
   <div class="two">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição da Receita</div>
+      <div class="ctitle" style="margin-bottom:4px;">Composição da Receita Bruta</div>
       <div class="cwrap" style="height:400px;"><canvas id="c1"></canvas></div>
     </div>
     <div class="ccard">
@@ -387,39 +380,33 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="kcard">
       <div class="klabel">Direitos de Transmissão e Comerciais</div>
       <div class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
-      <div class="kdelta dn">▼ −11,9% vs 2024 (R$723,9 milhões)</div>
-      <div class="ksub">Maior fonte, 53% da receita bruta</div>
+      <div class="kdelta dn">▼ −11,9%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Patrocínios</div>
       <div class="kval" style="font-size:28px;">R$ 437,9 Mi</div>
-      <div class="kdelta dn">▼ −3,0% vs 2024 (R$451,4 milhões)</div>
-      <div class="ksub"></div>
+      <div class="kdelta dn">▼ −3,0%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Bilheteria e Premiações</div>
       <div class="kval" style="font-size:28px;">R$ 54,8 Mi</div>
-      <div class="kdelta dn">▼ −18,1% vs 2024 (R$67,0 milhões)</div>
-      <div class="ksub">Jogos da Seleção e competições</div>
+      <div class="kdelta dn">▼ −18,1%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Registros e Transferências</div>
       <div class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
-      <div class="kdelta up">▲ +32,9% vs 2024 (R$38,4 milhões)</div>
-      <div class="ksub">Transferências de atletas e clubes no mercado</div>
+      <div class="kdelta up">▲ +32,9%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Prog. Desenvolvimento + Academy</div>
       <div class="kval" style="font-size:28px;">R$ 11,6 Mi</div>
-      <div class="kdelta dn">▼ −46% vs 2024 (R$21,7 milhões)</div>
-      <div class="ksub">CBF Academy e programas de base</div>
+      <div class="kdelta dn">▼ −46%</div>
     </div>
   </div>
 
   <div class="c32" style="grid-template-columns:1fr;gap:20px;">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Receitas 2025 vs 2024 por Categoria</div>
-      <div class="csub" style="margin-bottom:18px;">Comparativo em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Receitas 2025-2024</div>
       <div class="cwrap" style="height:300px;"><canvas id="c4"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">💡 Destaque</div>
@@ -435,7 +422,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div class="two" style="gap:24px;margin-bottom:0;">
       <!-- REDUÇÕES -->
       <div>
-        <div style="font-size:14px;font-weight:600;color:var(--neg);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">⬇ Principais Reduções · −R$ 126,6 Mi</div>
+        <div style="font-size:14px;font-weight:600;color:var(--neg);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">⬇ Reduções · −R$ 126,6 Mi</div>
         <div style="background:rgba(220,225,230,0.25);border:1px solid rgba(220,225,230,0.3);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Seleção Principal</strong>
@@ -484,7 +471,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
       <!-- CRESCIMENTOS -->
       <div>
-        <div style="font-size:14px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">⬆ Principais Crescimentos · +R$ 40,6 Mi</div>
+        <div style="font-size:14px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">⬆ Aumentos · +R$ 40,6 Mi</div>
         <div style="background:rgba(220,225,230,0.25);border:1px solid rgba(220,225,230,0.3);border-radius:10px;padding:16px 18px;margin-bottom:10px;">
           <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
             <strong style="color:var(--white);font-size:14px;">Seleções de Base e Feminina</strong>
@@ -539,13 +526,13 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div>
         <div style="font-size:18px;font-weight:600;color:var(--neg);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Contratos encerrados</div>
         <table>
-          <thead><tr><th>Patrocinador</th><th style="text-align:right;">Valor (R$)</th></tr></thead>
+          <thead><tr><th>Patrocinador</th><th style="text-align:right;">Valor</th></tr></thead>
           <tbody>
             <tr><td>Mastercard</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 6,4 milhões</td></tr>
             <tr><td>Gol Linhas Aéreas</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 34,9 milhões</td></tr>
             <tr><td>Semp Toshiba</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 10,2 milhões</td></tr>
             <tr><td>Itaucard</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 6,4 milhões</td></tr>
-            <tr><td>Empreendimentos Pague Menos</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 9,4 milhões</td></tr>
+            <tr><td>Pague Menos</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 9,4 milhões</td></tr>
             <tr><td>Neoenergia</td><td class="num" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">−R$ 25,2 milhões</td></tr>
           </tbody>
         </table>
@@ -553,7 +540,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div>
         <div style="font-size:18px;font-weight:600;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Novos contratos</div>
         <table>
-          <thead><tr><th>Patrocinador</th><th style="text-align:right;">Valor (R$)</th></tr></thead>
+          <thead><tr><th>Patrocinador</th><th style="text-align:right;">Valor</th></tr></thead>
           <tbody>
             <tr><td>Springer/Midea</td><td class="num du" style="font-family:var(--font-mono);font-size:13px;color:var(--cbf-white);">+R$ 2,6 milhões</td></tr>
           </tbody>
@@ -570,12 +557,6 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Fomento Estados e Competições</div>
-      <div class="kval">R$ 756,7 Mi</div>
-      <div class="kdelta dn">▲ +3,1% vs 2024 (R$734,1 milhões)</div>
-      <div class="ksub">Maior item · 64% dos custos com futebol</div>
-    </div>
-    <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleção Principal</div>
       <div class="kval">R$ 281,1 Mi</div>
       <div class="kdelta dn">▲ +39,7% vs 2024 (R$201,1 milhões)</div>
@@ -590,36 +571,32 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="kval">R$ 44,7 Mi</div>
       <div class="kdelta dn">▲ +65,6% vs 2024 (R$27,0 milhões)</div>
     </div>
-    <div class="kcard" style="background:rgba(220,225,230,0.25);">
-      <div class="klabel">Desp. Administrativas</div>
-      <div class="kval">R$ 369,1 Mi</div>
-      <div class="kdelta dn">▲ +153% vs 2024 (R$145,8 milhões)</div>
-      <div class="ksub">Inclui provisões e gastos extraordinários</div>
+    <div class="kcard" style="background:rgba(160,165,175,0.18);">
+      <div class="klabel">Fomento aos Estados e Competições</div>
+      <div class="kval">R$ 756,7 Mi</div>
+      <div class="kdelta dn">▲ +3,1% vs 2024 (R$734,1 milhões)</div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
-      <div class="klabel">Desp. com Pessoal</div>
+      <div class="klabel">Administrativas</div>
+      <div class="kval">R$ 369,1 Mi</div>
+      <div class="kdelta dn">▲ +153% vs 2024 (R$145,8 milhões)</div>
+    </div>
+    <div class="kcard" style="background:rgba(220,225,230,0.25);">
+      <div class="klabel">Pessoal</div>
       <div class="kval">R$ 58,2 Mi</div>
       <div class="kdelta dn">▲ +15,6% vs 2024 (R$50,3 milhões)</div>
     </div>
   </div>
 
-  <div class="cgrid" style="grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Estrutura de Custos e Despesas</div>
-      <div class="csub" style="margin-bottom:18px;">Distribuição dos investimentos  - em milhares de reais</div>
-      <div class="cwrap" style="height:270px;"><canvas id="c7"></canvas></div>
-    </div>
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Custos das Seleções 2025 vs 2024</div>
-      <div class="csub" style="margin-bottom:18px;">Crescimento por categoria - em milhares de reais</div>
-      <div class="cwrap" style="height:270px;"><canvas id="c8"></canvas></div>
-    </div>
+  <div class="ccard" style="margin-bottom:20px;">
+    <div class="ctitle" style="margin-bottom:4px;">Custos das Seleções 2025-2024</div>
+    <div class="cwrap" style="height:300px;"><canvas id="c8"></canvas></div>
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro · 2025 vs 2024</div>
+    <div class="ctitle" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro · 2025-2024</div>
     <table>
-      <thead><tr><th>Linha de Custo</th><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
+      <thead><tr><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
       <tbody>
         <tr class="dre-header"><td colspan="4">Custos com Seleções</td></tr>
         <tr><td>Seleção Principal</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">281,1</td><td class="num" style="font-family:var(--font-mono);font-size:13px;">201,1</td><td class="num dd" style="font-family:var(--font-mono);font-size:13px;">▲ +39,7%</td></tr>
@@ -649,10 +626,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:4px;">Competições e Fomento aos Estados</div>
-    <div class="csub" style="margin-bottom:16px;">R$ 477 milhões investidos em competições nacionais · Fomento total: R$ 757 milhões</div>
+    <div class="ctitle" style="margin-bottom:4px;">Competições</div>
     <table>
-          <thead><tr><th>Competição</th><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
+          <thead><tr><th style="text-align:right;">2025 (R$Mi)</th><th style="text-align:right;">2024 (R$Mi)</th><th style="text-align:right;">Var.</th></tr></thead>
           <tbody>
             <tr><td>Brasileiro Série A</td><td class="num">21</td><td class="num">12</td><td class="num dd">▲ +9</td></tr>
             <tr><td>Brasileiro Série B</td><td class="num">69</td><td class="num">159</td><td class="num du">▼ −90</td></tr>
@@ -669,6 +645,11 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <tr class="dre-row-total"><td>Total Competições</td><td class="num">477</td><td class="num">487</td><td class="num du">▼ −10</td></tr>
           </tbody>
         </table>
+  </div>
+
+  <div class="ccard" style="margin-top:20px;">
+    <div class="ctitle" style="margin-bottom:4px;">Despesas Administrativas 2025-2024</div>
+    <div class="cwrap" style="height:260px;"><canvas id="cdespop1"></canvas></div>
   </div>
 
   <div class="ccard" style="margin-top:20px;">
@@ -725,9 +706,14 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Serviços PF (Autônomos)</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Serviços PF</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+20,7M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:75%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Pessoal</div>
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+7,9M</div>
+            <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:38%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 0 2px;border-top:1px solid rgba(255,255,255,.15);">
             <div style="flex:1;font-size:12px;font-weight:700;color:var(--white);">Total</div>
@@ -806,9 +792,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   <div class="stitle">Demonstração do Resultado</div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">em milhares de reais</div>
+    <div class="ctitle" style="margin-bottom:16px;">Em milhares de Reais</div>
     <table>
-      <thead><tr><th>Descrição</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th><th style="text-align:right;">Var. %</th></tr></thead>
+      <thead><tr><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th><th style="text-align:right;">Var. %</th></tr></thead>
       <tbody>
         <tr class="dre-header"><td colspan="4">Receita Bruta</td></tr>
         <tr><td>Patrocínios</td><td class="num">437.931</td><td class="num">451.397</td><td class="num dd">▼ −3,0%</td></tr>
@@ -825,7 +811,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
         <tr><td>Seleção Principal</td><td class="num">(281.071)</td><td class="num">(201.149)</td><td class="num dd">▲ +39,7%</td></tr>
         <tr><td>Seleções de Base</td><td class="num">(44.709)</td><td class="num">(26.997)</td><td class="num dd">▲ +65,6%</td></tr>
         <tr><td>Seleções Femininas</td><td class="num">(94.251)</td><td class="num">(116.467)</td><td class="num du">▼ −19,1%</td></tr>
-        <tr><td>Contribuição ao Fomento (Estados e Competições)</td><td class="num">(756.674)</td><td class="num">(734.119)</td><td class="num dd">▲ +3,1%</td></tr>
+        <tr><td>Contribuição ao Fomento nos Estados e Competições</td><td class="num">(756.674)</td><td class="num">(734.119)</td><td class="num dd">▲ +3,1%</td></tr>
         <tr class="dre-row-total"><td>Total dos Custos com Futebol</td><td class="num">(1.176.706)</td><td class="num">(1.078.732)</td><td class="num dd">▲ +9,1%</td></tr>
         <tr class="dre-row-total"><td>Superávit / (Déficit) Bruto</td><td class="num">(67.334)</td><td class="num">141.129</td><td class="num dd">▼ −147,7%</td></tr>
 
@@ -859,20 +845,14 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
 
 <!-- ═ BALANÇO PATRIMONIAL ═ -->
-<div id="bp" class="page landscape">
+<div id="bp" class="page landscape active">
   <div class="stitle">Composição Patrimonial</div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
     <div class="kcard">
-      <div class="klabel">Ativo Total</div>
-      <div class="kval" id="kv-ativo">R$ 3,39 Bi</div>
-      <div class="kdelta dn">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Caixa e Equivalentes</div>
+      <div class="klabel">Liquidez</div>
       <div class="kval">R$ 1,997 Bi</div>
       <div class="kdelta dn">▼ −18% vs 2024 (R$2,43 bilhões)</div>
-      <div class="ksub">Redução de R$436 milhões</div>
     </div>
     <div class="kcard">
       <div class="klabel">Contas a Receber</div>
@@ -880,22 +860,24 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="kdelta up">▲ +10,6% vs 2024 (R$264 milhões)</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Ativo Circulante</div>
-      <div class="kval">R$ 2,41 Bi</div>
-      <div class="kdelta dn">▼ −12,8% vs 2024 (R$2,77 bilhões)</div>
-      <div class="ksub">71% do ativo total</div>
+      <div class="klabel">Tributos a Recuperar</div>
+      <div class="kval">R$ 111,4 Mi</div>
+      <div class="kdelta up">▲ +111,7% vs 2024 (R$52,6 milhões)</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Patrimônio Líquido</div>
-      <div class="kval">R$ 1,26 Bi</div>
-      <div class="kdelta dn">▼ −12,6% vs 2024 (R$1,44 bilhões)</div>
-      <div class="ksub">Patrimônio Social: R$1,44 bilhões</div>
+      <div class="klabel">Fornecedores</div>
+      <div class="kval">R$ 141,4 Mi</div>
+      <div class="kdelta up">▼ −8,3% vs 2024 (R$154,1 milhões)</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Receitas Diferidas (CP+LP)</div>
+      <div class="klabel">Receitas Antecipadas</div>
       <div class="kval">R$ 1,21 Bi</div>
-      <div class="kdelta up">▼ −11,6% vs 2024 (R$1,37 bilhões)</div>
-      <div class="ksub">Amortização contrato NIKE</div>
+      <div class="kdelta dn">▼ −11,6% vs 2024 (R$1,37 bilhões)</div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">Contingências</div>
+      <div class="kval">R$ 671,6 Mi</div>
+      <div class="kdelta dn">▲ +16,5% vs 2024 (R$576,5 milhões)</div>
     </div>
   </div>
 
@@ -945,8 +927,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="two">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição do Ativo</div>
-      <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Ativo</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp1"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">📋 Composição</div>
@@ -954,8 +935,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
     </div>
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição do Passivo + PL</div>
-      <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Passivo + Patrimônio Líquido</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp2"></canvas></div>
       <div class="insight" style="margin-top:12px;">
         <div class="ilabel">⚖️ Nota</div>
@@ -965,11 +945,11 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Evolução do Ativo Total · 2016–2025 - em milhares de reais</div>
-    <div class="cwrap" style="height:220px;"><canvas id="cbp3"></canvas></div>
+    <div class="ctitle" style="margin-bottom:4px;">Liquidez – 10 anos</div>
+    <div class="cwrap" style="height:260px;"><canvas id="cind1"></canvas></div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">📈 10 anos de crescimento</div>
-      <p>O Ativo Total cresceu de <strong>R$ 800 Mi (2016) para R$ 3,39 Bi (2025)</strong>, multiplicação de 4,2× em uma década. As disponibilidades saíram de R$ 245 Mi para R$ 1,99 Bi (<strong>+R$ 1,75 Bi</strong>). O salto de 2023→2024 foi impulsionado pelo adiantamento Nike de R$ 1,3 Bi. Em 2025, leve recuo pelo consumo operacional, estrutura patrimonial robusta.</p>
+      <div class="ilabel">💡 Evolução da Liquidez</div>
+      <p>As disponibilidades da CBF evoluíram de <strong>R$ 245 milhões (2016)</strong> para <strong>R$ 1,997 bilhão (2025)</strong>, crescimento de 8,2× na última década. A posição de caixa mantém cobertura integral das obrigações de curto prazo (3,27× o passivo circulante). O patamar elevado, sustentado pela gestão financeira conservadora e pelo adiantamento contratual recebido em 2024, garante à CBF capacidade de honrar compromissos operacionais e investir no desenvolvimento do futebol brasileiro sem necessidade de endividamento.</p>
     </div>
   </div>
 
@@ -980,69 +960,39 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <div id="indicadores" class="page landscape">
   <div class="stitle">Indicadores Financeiros</div>
 
-  <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
-    <div class="kcard">
-      <div class="klabel">Índice Kanitz (Solvência)</div>
-      <div class="kval">17,33</div>
-      <div class="kdelta up">▲ Zona de Solvência</div>
-      <div class="ksub">Posição sólida · baixo risco · boa liquidez</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Redução Caixa 2024→2025</div>
-      <div class="kval">−R$ 436 Mi</div>
-      <div class="kdelta dn">▼ Brax, Fields, Icasa</div>
-      <div class="ksub"></div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Receita Financeira</div>
-      <div class="kval">R$ 318 Mi</div>
-      <div class="kdelta up">▲ +141% vs 2024 (R$132 milhões)</div>
-      <div class="ksub"></div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">EBITDA / Margem EBITDA 2025</div>
-      <div class="kval">−R$ 494 Mi</div>
-      <div class="kdelta dn">▼ −40,4% vs −1,8% em 2024</div>
-      <div class="ksub">LL (−182) − RF (−318) + D&amp;A (+6,7) · Operação consome antes do efeito financeiro</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Contratos não recebidos</div>
-      <div class="kval">−R$ 101 Mi</div>
-      <div class="kdelta dn">▼ Brax + Fields</div>
-      <div class="ksub">Série B, Copa do Nordeste, Competições Fem.</div>
-    </div>
+  <div class="kgrid" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel">Liquidez Corrente</div>
       <div class="kval">3,95</div>
       <div class="kdelta dn">▼ 3,95 (2025) vs 5,21 (2024)</div>
-      <div class="ksub">AC / PC · R$2.414Bi / R$611Mi · Posição confortável</div>
+      <div class="ksub">AC / PC · R$2.414Bi / R$611Mi</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Geral</div>
       <div class="kval">1,59</div>
       <div class="kdelta dn">▼ vs 1,66 em 2024</div>
-      <div class="ksub">AT/(PC+PNC) · Leve redução pelo aumento do passivo não circulante</div>
+      <div class="ksub">AT/(PC+PNC)</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Imediata</div>
       <div class="kval">3,27</div>
       <div class="kdelta dn">▼ 3,27 (2025) vs 4,58 (2024)</div>
-      <div class="ksub">Caixa / PC · R$1.997Bi / R$611Mi · Boa cobertura imediata</div>
+      <div class="ksub">Caixa / PC · R$1.997Bi / R$611Mi</div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">EBITDA</div>
+      <div class="kval">−R$ 494 Mi</div>
+      <div class="kdelta dn">▼ −40,4% vs −1,8% em 2024</div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">Índice Kanitz (Solvência)</div>
+      <div class="kval">17,33</div>
+      <div class="kdelta up">▲ Zona de Solvência</div>
     </div>
   </div>
 
-  <div class="cgrid" style="grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Evolução das Disponibilidades · 10 Anos</div>
-      <div class="csub" style="margin-bottom:16px;">Caixa + Aplicações Financeiras</div>
-      <div class="cwrap" style="height:260px;"><canvas id="cind1"></canvas></div>
-      <div class="insight" style="margin-top:12px;">
-        <div class="ilabel">💡 Tendência</div>
-        <p>Crescimento consistente de R$244 milhões (2015) para R$1.997 milhões (2025). O salto de 2023→2024 (+134%) foi o maior da série histórica, puxado pelo adiantamento Nike. Em 2025, leve recuo de <strong>−18%</strong> pelo consumo operacional e pagamentos como Icasa (R$81 milhões).</p>
-      </div>
-    </div>
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Demonstração do Fluxo de Caixa - em milhares de reais</div>
+  <div class="ccard" style="margin-bottom:20px;">
+    <div class="ctitle" style="margin-bottom:4px;">Demonstração do Fluxo de Caixa - em milhares de reais</div>
       <div class="csub" style="margin-bottom:16px;">Composição da variação de −R$ 436 milhões nas disponibilidades</div>
       <div class="cwrap" style="height:380px;"><canvas id="cind2"></canvas></div>
       <div style="margin-top:16px;">
@@ -1075,7 +1025,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Análise de Indicadores · Contexto Narrativo</div>
+    <div class="ctitle" style="margin-bottom:16px;">Análise de Indicadores</div>
     <div class="two" style="gap:16px;margin-bottom:0;">
       <div>
         <div style="margin-bottom:16px;">
@@ -1103,11 +1053,6 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
     </div>
   </div>
-  <div class="ccard" style="margin-top:20px;">
-    <div class="ctitle" style="margin-bottom:4px;">Índices de Liquidez · 2025 vs 2024</div>
-    <div class="csub" style="margin-bottom:16px;">Liquidez Corrente · Geral · Imediata</div>
-    <div class="cwrap" style="height:260px;"><canvas id="cliq"></canvas></div>
-  </div>
 
 </div>
 
@@ -1116,8 +1061,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   <div class="stitle">Evolução Financeira<br><span style="color:var(--yellow)">2021 → 2025</span></div>
 
   <div class="ccard" style="margin-bottom:20px;">
-    <div class="ctitle" style="margin-bottom:4px;">Receita Bruta Anual · Série Histórica em milhares de reais</div>
-    <div class="csub" style="margin-bottom:18px;">2021–2025</div>
+    <div class="ctitle" style="margin-bottom:4px;">Receita Bruta</div>
     <div class="cwrap" style="height:260px;"><canvas id="c11"></canvas></div>
     <div class="insight" style="margin-top:12px;">
       <div class="ilabel">📈 Perspectiva 2026–2027</div>
@@ -1127,16 +1071,30 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="cgrid" style="grid-template-columns:repeat(2,1fr);">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">DRE Histórica · 2021–2025</div>
-      <div class="csub" style="margin-bottom:18px;">Receita, Custos, Despesas e Resultado - em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Demonstração do Resultado</div>
       <div class="cwrap" style="height:250px;"><canvas id="c12"></canvas></div>
     </div>
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:14px;">Indicadores DRE · Evolução 2021→2025</div>
+      <div class="ctitle" style="margin-bottom:14px;">Demonstração do Resultado – Indicadores</div>
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Receita Bruta: +22,9% (2021→2025)</span><span class="pv">R$971→R$1.193 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:45%;background:#F5C900"></div></div></div>
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Invest. Futebol: +70,6% (2021→2025)</span><span class="pv">R$690→R$1.177 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:65%;background:#009C3B"></div></div></div>
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Despesas: +157,6% (2021→2025)</span><span class="pv">R$170→R$438 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:80%;background:#003DA5"></div></div></div>
       <div class="pi"><div class="ph"><span class="pl">Resultado: −364% (2021→2025)</span><span class="pv">R$69→R$−182 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:90%;background:#ffffff"></div></div></div>
+    </div>
+  </div>
+
+  <div class="cgrid" style="grid-template-columns:repeat(3,1fr);margin-top:20px;">
+    <div class="ccard">
+      <div class="ctitle" style="margin-bottom:4px;">Liquidez Corrente</div>
+      <div class="cwrap" style="height:220px;"><canvas id="cliq_corrente"></canvas></div>
+    </div>
+    <div class="ccard">
+      <div class="ctitle" style="margin-bottom:4px;">Liquidez Geral</div>
+      <div class="cwrap" style="height:220px;"><canvas id="cliq_geral"></canvas></div>
+    </div>
+    <div class="ccard">
+      <div class="ctitle" style="margin-bottom:4px;">Liquidez Imediata</div>
+      <div class="cwrap" style="height:220px;"><canvas id="cliq_imediata"></canvas></div>
     </div>
   </div>
 </div>
@@ -1147,9 +1105,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
 </main>
 
-<footer>
-  <p>Confederação Brasileira de Futebol · Demonstrações Financeiras 2025 </p>
-</footer>
+
 </div><!-- /dashboard-content -->
 
 <script>
@@ -1159,7 +1115,7 @@ function sp(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.add('active');
-  const ids = ['overview','receitas','despesas','balanco','bp','indicadores','historico'];
+  const ids = ['bp','balanco','receitas','despesas','indicadores','historico','overview'];
   const tabIdx = ids.indexOf(id);
   if (tabIdx >= 0) document.querySelectorAll('.ntab')[tabIdx].classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1287,9 +1243,10 @@ const GD = {
   sel_2025: _D ? [
     Math.round((_D.custo_selecao_principal||0)),
     Math.round((_D.custo_selecao_base||0)),
-    Math.round((_D.custo_selecao_femininas||0))
-  ] : [281, 45, 94],
-  sel_2024: [201, 27, 116],
+    Math.round((_D.custo_selecao_femininas||0)),
+    Math.round((_D.custo_fomento||0))
+  ] : [281, 45, 94, 757],
+  sel_2024: [201, 27, 116, 731],
   
   // Estrutura custos (c7)
   cus_barras: _D ? [
@@ -1340,6 +1297,11 @@ const GD = {
     _D.liquidez_imediata || 3.27
   ] : [3.95, 1.59, 3.27],
   liq_2024: [5.21, 1.66, 4.58],
+
+  // Liquidez histórica 5 anos (Corrente, Geral, Imediata)
+  liq_hist_corrente: [4.12, 4.85, 5.45, 5.21, 3.95],
+  liq_hist_geral:    [1.42, 1.55, 1.68, 1.66, 1.59],
+  liq_hist_imediata: [3.50, 4.10, 4.72, 4.58, 3.27],
 };
 
 // ── Atualizar KPI cards no DOM com dados dinâmicos ──
@@ -1447,25 +1409,9 @@ function initCharts() {
     },
     scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
-  // c7 - Estrutura custos 2025 horizontal
-  safeChart('c7', {type:'bar', data:{
-    labels:['Fomento','Sel. Principal','Desp. Admin.','Sel. Femininas','Pessoal','Sel. Base'],
-    datasets:[{label:'R$Mi', data:GD.cus_barras, backgroundColor:[C.g,C.y,'#6EA8FE',C.b,C.gray,C.purple], borderRadius:6}]
-  }, options:{indexAxis:'y', maintainAspectRatio:false,
-    plugins:{
-      legend:{display:false},
-      tooltip:{callbacks:{
-        label:function(ctx){
-          const total=1177; const pct=((ctx.parsed.x/total)*100).toFixed(1);
-          return ' R$ '+ctx.parsed.x+' Mi ('+pct+'% do total)';
-        }
-      }}
-    },
-    scales:{x:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}, y:{grid:{display:false}}}}});
-
-  // c8 - Seleções 2024 vs 2025
+  // c8 - Seleções e Fomento 2025-2024
   safeChart('c8', {type:'bar', data:{
-    labels:['Sel. Principal','Sel. Base','Sel. Femininas'],
+    labels:['Sel. Principal','Sel. Base','Sel. Femininas','Fomento Estados e Competições'],
     datasets:[
       {label:'2025 (R$Mi)', data:GD.sel_2025, backgroundColor:C.y, borderRadius:4},
       {label:'2024 (R$Mi)', data:GD.sel_2024, backgroundColor:'#009C3B', borderRadius:4}
@@ -1475,7 +1421,7 @@ function initCharts() {
       legend:{position:'bottom',labels:{color:'#ffffff',boxWidth:10}},
       tooltip:{callbacks:{
         label:function(ctx){
-          const v2025=[281,45,94]; const v2024=[201,27,116];
+          const v2025=[281,45,94,757]; const v2024=[201,27,116,731];
           const i=ctx.dataIndex; const pct=((v2025[i]-v2024[i])/v2024[i]*100).toFixed(1);
           return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===0?' ('+pct+'% vs 2024)':'');
         }
@@ -1520,12 +1466,7 @@ function initCharts() {
     tooltip:{callbacks:{label:_doughnutTooltip}}
   }}});
 
-  safeChart('cbp3', {type:'line', data:{
-    labels:GD.bp_labels_10yr,
-    datasets:[
-      {label:'Ativo Total (R$Mi)', data:GD.bp_ativo_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5}
-    ]
-  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
+  // cbp3 removed — Evolução do Ativo Total chart no longer displayed
 
   // ── INDICADORES ──
   safeChart('cind1', {type:'line', data:{
@@ -1545,25 +1486,16 @@ function initCharts() {
     },
     scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{suggestedMin:-220, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
 
-  // ── LIQUIDEZ ──
-  safeChart('cliq', {type:'bar', data:{
-    labels:['Liquidez Corrente','Liquidez Geral','Liquidez Imediata'],
-    datasets:[
-      {label:'2025 (R$Mi)', data:GD.liq_2025, backgroundColor:C.y, borderRadius:4},
-      {label:'2024 (R$Mi)', data:GD.liq_2024, backgroundColor:'#009C3B', borderRadius:4}
-    ]
-  }, options:{maintainAspectRatio:false,
-    plugins:{
-      legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}},
-      tooltip:{callbacks:{label:function(ctx){
-        const idx=ctx.dataIndex;
-        const labels=[['3,95','5,21'],['1,59','1,66'],['3,27','4,58']];
-        const yr=ctx.dataset.label;
-        return ' '+yr+': '+ctx.parsed.y.toFixed(2);
-      }}}
-    },
-    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, min:0, max:7,
-      ticks:{callback:v=>v.toFixed(1)}}}}});
+  // cliq removed — Liquidez chart moved to Série Histórica as individual per-index charts
+
+  // ── LIQUIDEZ HISTÓRICA (Série Histórica) ──
+  const liqHistLabels = ['2021','2022','2023','2024','2025'];
+  const liqHistOpts = (max) => ({maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y.toFixed(2)}}},
+    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, min:0, max:max, ticks:{callback:v=>v.toFixed(1)}}}});
+  safeChart('cliq_corrente', {type:'bar', data:{labels:liqHistLabels, datasets:[{data:GD.liq_hist_corrente, backgroundColor:['#009C3B','#009C3B','#009C3B','#009C3B',C.y], borderRadius:4}]}, options:liqHistOpts(7), plugins:[barValuePlugin]});
+  safeChart('cliq_geral', {type:'bar', data:{labels:liqHistLabels, datasets:[{data:GD.liq_hist_geral, backgroundColor:['#009C3B','#009C3B','#009C3B','#009C3B',C.y], borderRadius:4}]}, options:liqHistOpts(3), plugins:[barValuePlugin]});
+  safeChart('cliq_imediata', {type:'bar', data:{labels:liqHistLabels, datasets:[{data:GD.liq_hist_imediata, backgroundColor:['#009C3B','#009C3B','#009C3B','#009C3B',C.y], borderRadius:4}]}, options:liqHistOpts(6), plugins:[barValuePlugin]});
 
   // ── DESPESAS OPERACIONAIS ──
   safeChart('cdespop1', {type:'bar', data:{
@@ -1895,7 +1827,8 @@ initCharts();
       GD.sel_2025 = [
         window.__CBF_DADOS__.custo_selecao_principal,
         window.__CBF_DADOS__.custo_selecao_base,
-        window.__CBF_DADOS__.custo_selecao_femininas
+        window.__CBF_DADOS__.custo_selecao_femininas,
+        window.__CBF_DADOS__.custo_fomento
       ];
       GD.cus_barras = [
         window.__CBF_DADOS__.custo_fomento,
