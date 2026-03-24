@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "supabase functions deploy process-upload --project-ref uqthbzqpsgfflljxepen",
+    "query": "supabase db query --linked",
+    "uploads:dev": "supabase db query --linked \"SELECT id, filename, status, uploaded_at, NOW() - uploaded_at AS elapsed FROM dev_uploads ORDER BY uploaded_at DESC LIMIT 10;\"",
+    "uploads:stuck": "supabase db query --linked \"SELECT id, filename, status, uploaded_at FROM dev_uploads WHERE status = 'processing' ORDER BY uploaded_at DESC;\"",
+    "uploads:fix": "supabase db query --linked \"UPDATE dev_uploads SET status = 'error', error_msg = 'Marcado manualmente' WHERE status = 'processing';\"",
+    "logs": "supabase functions deploy process-upload --project-ref uqthbzqpsgfflljxepen --no-verify-jwt"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
@@ -19,6 +25,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
+    "supabase": "^2.83.0",
     "typescript": "^5"
   }
 }
