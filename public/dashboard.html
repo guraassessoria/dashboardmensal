@@ -1173,7 +1173,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     var html = '';
 
     rows.forEach(function(row) {
-      var total = sum(row.v);
+      var total = row.v ? sum(row.v) : 0;
       if (row.t === 'section') {
         html += '<tr style="background:#2E4057;">';
         html += '<td colspan="11" style="padding:9px 14px;font-size:12px;font-weight:500;color:#fff;letter-spacing:1px;text-transform:uppercase;position:sticky;left:0;background:#2E4057;z-index:2;border-bottom:0.5px solid #3a5068;">' + row.label + '</td>';
