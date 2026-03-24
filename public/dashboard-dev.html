@@ -302,7 +302,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <main class="main">
 
 <!-- ═ OVERVIEW ═ -->
-<div id="overview" class="page landscape active">
+<div id="overview" class="page landscape">
   <div class="stitle">Sumário Executivo<br></div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
@@ -706,13 +706,13 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
 
 <!-- ═ BALANÇO PATRIMONIAL ═ -->
-<div id="bp" class="page landscape">
+<div id="bp" class="page landscape active">
   <div class="stitle">Composição Patrimonial</div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
     <div class="kcard">
       <div class="klabel">Ativo Total</div>
-      <div class="kval" id="kv-ativo">R$ 3,39 Bi</div>
+      <div class="kval" id="kv-ativo-bp">R$ 3,39 Bi</div>
       <div class="kdelta dn">▼ −6,3% vs 2024 (R$3,62 bilhões)</div>
     </div>
     <div class="kcard">
@@ -774,13 +774,13 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
           <thead id="bp-passivo-thead"><tr><th>PASSIVO + PL</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
           <tbody id="bp-passivo-tbody">
             <tr class="dre-header"><td colspan="3">Circulante</td></tr>
-            <tr><td>Fornecedores e C. a Pagar</td><td class="num">141.366</td><td class="num">154.114</td></tr>
-            <tr><td>Receitas Antecipadas CP</td><td class="num">364.074</td><td class="num">307.379</td></tr>
+            <tr><td>Fornecedores e Contas a Pagar</td><td class="num">141.366</td><td class="num">154.114</td></tr>
+            <tr><td>Receitas Antecipadas</td><td class="num">364.074</td><td class="num">307.379</td></tr>
             <tr><td>Obrig. Trabalhistas/Fiscais</td><td class="num">33.558</td><td class="num">19.489</td></tr>
-            <tr><td>Outros Circulantes</td><td class="num">71.753</td><td class="num">50.606</td></tr>
+            <tr><td>Outros</td><td class="num">71.753</td><td class="num">50.606</td></tr>
             <tr class="dre-row-total"><td>Total Circulante</td><td class="num">610.750</td><td class="num">531.588</td></tr>
             <tr class="dre-header"><td colspan="3">Não Circulante</td></tr>
-            <tr><td>Receitas Diferidas Lnos Estados e Competições49.270</td><td class="num">1.067.009</td></tr>
+            <tr><td>Receitas Antecipadas</td><td class="num">849.270</td><td class="num">1.067.009</td></tr>
             <tr><td>Provisão Contingências</td><td class="num">671.631</td><td class="num">576.539</td></tr>
             <tr class="dre-header"><td colspan="3">Patrimônio Líquido</td></tr>
             <tr><td>Patrimônio Social</td><td class="num">1.442.301</td><td class="num">1.335.643</td></tr>
@@ -979,9 +979,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Invest. Futebol: +70,6% (2021→2025)</span><span class="pv">R$690→R$1.177 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:65%;background:#009C3B"></div></div></div>
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Despesas: +157,6% (2021→2025)</span><span class="pv">R$170→R$438 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:80%;background:#003DA5"></div></div></div>
       <div class="pi"><div class="ph"><span class="pl">Resultado: −364% (2021→2025)</span><span class="pv">R$69→R$−182 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:90%;background:#ffffff"></div></div></div>
-    </div>nos Estados e Competições
+    </div>
   </div>
-</div>Déficit
+</div>
 
 
 
@@ -1081,13 +1081,12 @@ function safeChart(id, cfg) {
 // Quando window.__CBF_DADOS__ existe, usa esses dados.
 // Caso contrário, usa os valores hardcoded abaixo (fallback).
 // ══════════════════════════════════════════════════════
-ontas
 const _D = window.__CBF_DADOS__ || null;
 
 // ── Helpers ──
 function _bi(v, fb) { return v != null ? v : fb; }
 function _fmtBi(v) {
-  if (v == null) return '—';Antecipadas
+  if (v == null) return '—';
   const n = Math.abs(v);
   // v em R$ milhares
   if (n >= 1000000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000000).toFixed(2).replace('.',',') + ' Bi';
@@ -1210,7 +1209,6 @@ function _atualizarKPIs() {
   if (el('kv-ativo'))       el('kv-ativo').textContent       = _fmtBi(_D.ativo_total);
   if (el('kv-rec-fin'))     el('kv-rec-fin').textContent     = _fmtMi(_D.rec_financeiras);
   if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} · ${periodo}`;
-Variação em Ativos
   // Atualizar título do header
   const hTitle = document.querySelector('.htitles p');
   if (hTitle && _D.source_file) {
@@ -2856,6 +2854,11 @@ async function loadPeriodo(periodo) {
         Math.round(Math.abs(+dP.rec_bilheteria) / 1000),
         Math.round(Math.abs(+dP.rec_registros) / 1000)
       ];
+      const lcP = dP.passivo_circulante ? (dP.ativo_circulante / dP.passivo_circulante) : 0;
+      const liP = dP.passivo_circulante ? (dP.caixa_equivalentes / dP.passivo_circulante) : 0;
+      const pncP = (dP.ativo_total || 0) - (dP.ativo_circulante || 0);
+      const lgP = (dP.passivo_circulante + pncP) ? (dP.ativo_total / (dP.passivo_circulante + pncP)) : 0;
+      GD.liq_2024 = [parseFloat(lcP.toFixed(2)), parseFloat(lgP.toFixed(2)), parseFloat(liP.toFixed(2))];
     } else {
       GD.comp_2024 = [];
       GD.sel_2024 = [];
