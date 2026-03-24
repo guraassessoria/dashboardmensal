@@ -1105,7 +1105,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;overflow-y:visible;">
       <table id="tbl-comp" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1100px;">
         <thead>
-          <tr id="comp-head" style="position:sticky;z-index:10;background:#003087;">
+          <tr id="comp-head" style="background:#003087;">
             <th style="text-align:left;padding:10px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);position:sticky;left:0;z-index:11;background:#003087;min-width:200px;">Linha DRE</th>
             <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série A</th>
             <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série B</th>
@@ -1210,17 +1210,54 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
     tbody.innerHTML = html;
 
-    // Sticky thead: calcula top dinamicamente baseado na altura da navbar
-    function setStickyTop() {
-      var chrome = document.querySelector('.sticky-chrome');
-      var head = document.getElementById('comp-head');
-      if (chrome && head) {
-        head.style.top = chrome.offsetHeight + 'px';
+    // ── Cabeçalho fixo via clone JS (sticky não funciona dentro de overflow-x:auto) ──
+    var origTr  = document.getElementById('comp-head');
+    var wrapper = document.querySelector('#competicoes .ccard > div');
+
+    function navH() {
+      var c = document.querySelector('.sticky-chrome');
+      return c ? c.offsetHeight : 0;
+    }
+
+    function syncHScroll() {
+      var fc = document.getElementById('comp-fixed-hdr');
+      if (fc) fc.querySelector('table').style.transform = 'translateX(-' + wrapper.scrollLeft + 'px)';
+    }
+
+    function updateFixedHeader() {
+      var nh  = navH();
+      var tr  = origTr.getBoundingClientRect();
+      var wr  = wrapper.getBoundingClientRect();
+      var fc  = document.getElementById('comp-fixed-hdr');
+
+      if (tr.top < nh && wr.bottom > nh + 30) {
+        // mostrar cabeçalho fixo
+        if (!fc) {
+          fc = document.createElement('div');
+          fc.id = 'comp-fixed-hdr';
+          fc.style.cssText = 'position:fixed;overflow:hidden;z-index:200;pointer-events:none;';
+          var tbl = document.createElement('table');
+          tbl.style.cssText = 'border-collapse:collapse;font-size:12px;min-width:1100px;';
+          var thead = document.createElement('thead');
+          thead.appendChild(origTr.cloneNode(true));
+          tbl.appendChild(thead);
+          fc.appendChild(tbl);
+          document.body.appendChild(fc);
+          wrapper.addEventListener('scroll', syncHScroll, {passive:true});
+        }
+        fc.style.top   = nh + 'px';
+        fc.style.left  = wr.left + 'px';
+        fc.style.width = wr.width + 'px';
+        syncHScroll();
+      } else if (fc) {
+        fc.remove();
+        wrapper.removeEventListener('scroll', syncHScroll);
       }
     }
-    setStickyTop();
-    window.addEventListener('resize', setStickyTop);
-    setTimeout(setStickyTop, 300);
+
+    window.addEventListener('scroll', updateFixedHeader, {passive:true});
+    window.addEventListener('resize', updateFixedHeader, {passive:true});
+    setTimeout(updateFixedHeader, 400);
 
   })();
   </script>
