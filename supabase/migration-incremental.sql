@@ -6,8 +6,7 @@
 
 -- 1. Coluna tipo_documento na tabela uploads
 ALTER TABLE uploads 
-  ADD COLUMN IF NOT EXISTS tipo_documento TEXT DEFAULT 'dfs' 
-  CHECK (tipo_documento IN ('dfs', 'balancete'));
+  ADD COLUMN IF NOT EXISTS tipo_documento TEXT DEFAULT 'dfs';
 
 -- 2. Tabela de usuários do dashboard
 CREATE TABLE IF NOT EXISTS dashboard_users (

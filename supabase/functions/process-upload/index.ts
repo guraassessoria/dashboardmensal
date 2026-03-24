@@ -55,32 +55,26 @@ serve(async (req) => {
     const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" })
 
     // Detectar se a DFS contém uma aba de balancete embutida
-    const balanceteSheetName = tipo_documento === 'dfs'
-      ? workbook.SheetNames.find((n: string) => BALANCETE_SHEET_NAMES.some(b => n.toLowerCase().includes(b.toLowerCase())))
-      : null
+    const balanceteSheetName = workbook.SheetNames.find((n: string) => BALANCETE_SHEET_NAMES.some(b => n.toLowerCase().includes(b.toLowerCase())))
     const hasEmbeddedBalancete = !!balanceteSheetName
 
     if (hasEmbeddedBalancete) {
       console.log(`📋 Balancete embutido detectado na aba: "${balanceteSheetName}"`)
     }
 
-    // DFS: priorizar abas relevantes (BP, DRE, DFC, notas) para não estourar o limite de chars
+    // Priorizar abas relevantes (BP, DRE, DFC, notas) para não estourar o limite de chars
     // Se tem balancete embutido, incluir também a aba de balancete nas prioritárias
     const prioritySheets = hasEmbeddedBalancete
       ? [...ABAS_ALVO, balanceteSheetName!]
       : ABAS_ALVO
 
-    const sheetText = tipo_documento === 'balancete'
-      ? xlsxToText(workbook)
-      : xlsxToText(workbook, prioritySheets)
+    const sheetText = xlsxToText(workbook, prioritySheets)
 
     // ── 3. Enviar para Claude API com prompt adequado ao tipo ──
     // Se DFS tem balancete embutido, usar prompt híbrido que extrai ambos
-    const prompt = tipo_documento === 'balancete'
-      ? buildBalancetePrompt(periodo, filename)
-      : hasEmbeddedBalancete
-        ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
-        : buildPrompt(periodo, filename)
+    const prompt = hasEmbeddedBalancete
+      ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
+      : buildPrompt(periodo, filename)
 
     const claudeCtrl = new AbortController()
     const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 120_000)
@@ -121,11 +115,7 @@ serve(async (req) => {
     }
 
     const dadosExtraidosRaw = JSON.parse(jsonMatch[1] || jsonMatch[0])
-
-    // Balancete vem em R$ (reais). Converter para R$ milhares para padronizar com DFS.
-    let dadosExtraidos = tipo_documento === 'balancete'
-      ? convertToThousands(dadosExtraidosRaw)
-      : dadosExtraidosRaw
+    let dadosExtraidos = dadosExtraidosRaw
 
     // ── 4.5. Validação pós-extração + correção automática ──
     const validacao1 = validateExtraction(dadosExtraidos, tipo_documento)
@@ -167,7 +157,7 @@ serve(async (req) => {
 
           if (corrMatch) {
             const corrections = JSON.parse(corrMatch[1] || corrMatch[0])
-            const convertedCorrections = tipo_documento === 'balancete' ? convertToThousands(corrections) : corrections
+            const convertedCorrections = corrections
 
             // Mesclar correções no dadosExtraidos
             dadosExtraidos = deepMerge(dadosExtraidos, convertedCorrections, 'incoming')
@@ -205,31 +195,22 @@ serve(async (req) => {
 
     const existingRaw = existingRow?.dados_raw || {}
 
-    // Merge: dados_raw combina ambas as fontes com deep merge inteligente
-    // DFS tem prioridade sobre balancete para dados consolidados
-    const mergePriority = tipo_documento === 'dfs' ? 'incoming' as const : 'existing' as const
-    const mergedRaw = deepMerge(existingRaw, dadosExtraidos, mergePriority)
+    // Merge: dados_raw combina com deep merge inteligente
+    // DFS sempre tem prioridade (incoming)
+    const mergedRaw = deepMerge(existingRaw, dadosExtraidos, 'incoming')
     mergedRaw._sources = {
       ...(existingRaw._sources || {}),
-      [tipo_documento]: { filename, processed_at: new Date().toISOString() },
+      dfs: { filename, processed_at: new Date().toISOString() },
       ...(hasEmbeddedBalancete ? { balancete: { filename, processed_at: new Date().toISOString(), embedded: true } } : {})
     }
 
     // Helper: merge com prioridade baseada na fonte.
     // DFS é a fonte autoritativa para DRE/BP/DFC. Balancete só preenche nulls.
     // Se o documento atual é DFS, seus valores têm prioridade (a=DFS, b=existing).
-    // Se o documento atual é balancete, os valores existentes (vindos do DFS) têm prioridade (a=balancete, b=existing/DFS).
-    const isDfs = tipo_documento === 'dfs'
+    // DFS (incoming) sempre tem prioridade sobre dados existentes
     const pick = (incoming: any, existing: any) => {
-      // Se DFS está sendo processado agora, preferir DFS (incoming)
-      if (isDfs) {
-        if (incoming !== null && incoming !== undefined) return incoming
-        return existing
-      }
-      // Se balancete está sendo processado, preferir existing (provavelmente DFS)
-      if (existing !== null && existing !== undefined && existing !== 0) return existing
-      if (incoming !== null && incoming !== undefined && incoming !== 0) return incoming
-      return existing ?? incoming
+      if (incoming !== null && incoming !== undefined) return incoming
+      return existing
     }
 
     // Construir objeto de dados: novos valores preenchem os que estavam null
@@ -528,28 +509,6 @@ function xlsxToText(workbook: XLSX.WorkBook, prioritySheets?: string[]): string 
   return parts.join("\n\n")
 }
 
-// ── Converter valores de reais para R$ milhares (dividir por 1000) ──
-// Campos que NÃO devem ser convertidos (strings, metadados)
-const SKIP_KEYS = new Set(["periodo", "fonte", "tipo", "nome", "descricao", "conta"])
-function convertToThousands(obj: any): any {
-  if (obj === null || obj === undefined) return obj
-  if (typeof obj === "number") return Math.round(obj / 1000)
-  if (typeof obj === "string") return obj
-  if (Array.isArray(obj)) return obj.map(item => convertToThousands(item))
-  if (typeof obj === "object") {
-    const result: any = {}
-    for (const [key, value] of Object.entries(obj)) {
-      if (SKIP_KEYS.has(key) || typeof value === "string") {
-        result[key] = value
-      } else {
-        result[key] = convertToThousands(value)
-      }
-    }
-    return result
-  }
-  return obj
-}
-
 // ── Prompt para o Claude extrair os dados ──
 function buildPrompt(periodo: string, filename: string): string {
   const [ano, mes] = periodo.split('-')
@@ -790,146 +749,6 @@ Retorne APENAS um JSON válido:
 Use os valores exatos do arquivo. Se um campo não existir, use null.
 Para "competicoes", liste todas as competições da Nota 13.
 Para "contas_detalhadas", extraia do Balancete as 20 maiores contas de cada categoria com saldos convertidos para R$ milhares (dividido por 1000).`
-}
-
-// ── Prompt para o Claude extrair dados do BALANCETE ──
-function buildBalancetePrompt(periodo: string, filename: string): string {
-  return `Você é um especialista em contabilidade e demonstrações financeiras brasileiras.
-Analise os dados acima extraídos do arquivo xlsx de Balancete da CBF (arquivo: ${filename}, período: ${periodo}).
-
-O Balancete contém contas contábeis com saldos acumulados do ano até o mês. Os valores estão em R$ (reais). Retorne os valores EXATOS como estão no arquivo, sem converter ou dividir.
-Extraia os dados e mapeie para o formato padrão abaixo, agregando as contas conforme necessário:
-
-- Receitas: identifique contas de receita (4.x) e classifique por categoria  
-- Custos: identifique contas de custo/despesa (5.x, 6.x) e classifique
-- Ativo/Passivo: identifique contas patrimoniais (1.x = ativo, 2.x = passivo, 3.x = PL)
-- DFC: se disponível, extraia fluxos de caixa; caso contrário use null
-
-Retorne APENAS um JSON válido no seguinte formato:
-
-\`\`\`json
-{
-  "periodo": "${periodo}",
-  "fonte": "${filename}",
-  "tipo": "balancete",
-  "dre": {
-    "receita_bruta": 0,
-    "deducoes": 0,
-    "receita_liquida": 0,
-    "custos_futebol": 0,
-    "superavit_bruto": 0,
-    "despesas_operacionais": 0,
-    "resultado_financeiro": 0,
-    "outras_receitas": 0,
-    "outras_despesas": 0,
-    "resultado_antes_ir": 0,
-    "ir_csll": 0,
-    "resultado_exercicio": 0
-  },
-  "receitas": {
-    "patrocinio": 0,
-    "transmissao": 0,
-    "bilheteria": 0,
-    "registros": 0,
-    "desenvolvimento": 0,
-    "academy": 0,
-    "legado": 0
-  },
-  "custos_futebol": {
-    "selecao_principal": 0,
-    "selecoes_base": 0,
-    "selecoes_femininas": 0,
-    "fomento": 0
-  },
-  "despesas": {
-    "pessoal": 0,
-    "administrativas": 0,
-    "impostos_taxas": 0
-  },
-  "resultado_financeiro": {
-    "receitas_financeiras": 0,
-    "despesas_financeiras": 0,
-    "variacao_cambial": 0,
-    "total": 0
-  },
-  "balanco": {
-    "ativo_total": 0,
-    "ativo_circulante": 0,
-    "caixa_equivalentes": 0,
-    "contas_receber": 0,
-    "tributos_recuperar": 0,
-    "adiantamentos": 0,
-    "despesas_antecipadas": 0,
-    "contas_receber_lp": 0,
-    "depositos_judiciais": 0,
-    "investimentos": 0,
-    "imobilizado": 0,
-    "intangivel": 0,
-    "passivo_circulante": 0,
-    "fornecedores": 0,
-    "programas_desenvolvimento": 0,
-    "obrig_trabalhistas": 0,
-    "provisao_ferias": 0,
-    "receitas_diferidas_cp": 0,
-    "receitas_diferidas_lp": 0,
-    "fornecedores_lp": 0,
-    "prov_contingencias": 0,
-    "patrimonio_social": 0,
-    "resultado_acumulado": 0,
-    "patrimonio_liquido": 0
-  },
-  "dfc": {
-    "resultado_exercicio": 0,
-    "ajustes_operacionais": {
-      "provisoes_contingentes": 0,
-      "variacao_cambial": 0,
-      "demais_provisoes_ajustes": 0,
-      "depreciacao_amortizacao": 0
-    },
-    "superavit_bruto_antes_capital_giro": 0,
-    "variacao_ativos": {
-      "contas_receber": 0,
-      "adto_fornecedores": 0,
-      "despesas_antecipadas": 0,
-      "impostos_recuperar": 0,
-      "depositos_judiciais": 0,
-      "total": 0
-    },
-    "variacao_passivos": {
-      "fornecedores_contas_pagar": 0,
-      "tributos_encargos": 0,
-      "adto_transmissao_patrocinio": 0,
-      "receita_diferida": 0,
-      "ir_csll": 0,
-      "total": 0
-    },
-    "fluxo_operacional": 0,
-    "investimento": {
-      "compra_imobilizado": 0,
-      "baixa_imobilizado": 0
-    },
-    "fluxo_investimento": 0,
-    "variacao_total": 0,
-    "saldo_inicial": 0,
-    "saldo_final": 0
-  },
-  "contas_detalhadas": {
-    "receitas_por_conta": [
-      { "conta": "4.1.01.01", "descricao": "descricao", "saldo": 0 }
-    ],
-    "custos_por_conta": [
-      { "conta": "5.1.01.01", "descricao": "descricao", "saldo": 0 }
-    ],
-    "despesas_por_conta": [
-      { "conta": "6.1.01.01", "descricao": "descricao", "saldo": 0 }
-    ]
-  }
-}
-\`\`\`
-
-Use os valores exatos do arquivo. Se um campo não existir ou não puder ser classificado, use null.
-O campo "contas_detalhadas" deve conter as 20 maiores contas de cada categoria (receita, custo, despesa) com seus saldos.
-Agrupe contas que claramente pertencem à mesma categoria para os campos resumidos.`
 }
 
 // ── Prompt para gerar insights analíticos ──

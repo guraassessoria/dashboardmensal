@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   periodo     TEXT,          -- ex: "2025-12", "2026-01"
   status      TEXT DEFAULT 'pending' CHECK (status IN ('pending','processing','done','error')),
   error_msg   TEXT,
-  tipo_documento TEXT DEFAULT 'dfs' CHECK (tipo_documento IN ('dfs', 'balancete')),
+  tipo_documento TEXT DEFAULT 'dfs',
   uploaded_at TIMESTAMPTZ DEFAULT now(),
   processed_at TIMESTAMPTZ
 );

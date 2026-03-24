@@ -21,7 +21,6 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<'upload' | 'tabelas' | 'users' | 'insights'>('upload')
 
   const [file, setFile] = useState<File | null>(null)
-  const [tipoDoc, setTipoDoc] = useState<'dfs'|'balancete'>('dfs')
   const [periodo, setPeriodo] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -303,7 +302,7 @@ export default function AdminPage() {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('periodo', periodo)
-    formData.append('tipo_documento', tipoDoc)
+    formData.append('tipo_documento', 'dfs')
 
     try {
       const res = await fetch('/api/upload', {
@@ -437,31 +436,10 @@ export default function AdminPage() {
             </div>
 
             <div style={styles.fieldGroup}>
-              <label style={styles.label}>Tipo de documento</label>
-              <div style={{display:'flex', gap:12}}>
-                {['dfs','balancete'].map(t => (
-                  <label key={t} style={{display:'flex',alignItems:'center',gap:6,cursor:'pointer',fontSize:13,color:'#FAFAFA'}}>
-                    <input
-                      type="radio"
-                      name="tipo"
-                      value={t}
-                      checked={tipoDoc === t}
-                      onChange={() => setTipoDoc(t as 'dfs'|'balancete')}
-                      style={{accentColor:'#F5C800'}}
-                    />
-                    {t === 'dfs' ? '📊 DFS Anual' : '📋 Balancete Mensal'}
-                  </label>
-                ))}
-              </div>
-              <p style={{fontSize:11,color:'#8B949E',margin:'4px 0 0'}}>
-                {tipoDoc === 'dfs'
-                  ? 'Demonstrações Financeiras completas (anual). Se o arquivo contiver uma aba de Balancete, ela será extraída automaticamente.'
-                  : 'Balancete mensal avulso — use apenas se o balancete NÃO estiver incluído no arquivo DFS'}
+              <label style={styles.label}>Arquivo DFS (xlsx)</label>
+              <p style={{fontSize:11,color:'#8B949E',margin:'0 0 8px'}}>
+                Demonstrações Financeiras completas. Se o arquivo contiver uma aba de Balancete, ela será extraída automaticamente.
               </p>
-            </div>
-
-            <div style={styles.fieldGroup}>
-              <label style={styles.label}>Arquivo {tipoDoc === 'dfs' ? 'DFS (xlsx)' : 'Balancete (xlsx ou csv)'}</label>
               <input
                 ref={fileRef}
                 type="file"
@@ -532,10 +510,10 @@ export default function AdminPage() {
                     <td style={styles.td}>
                       <span style={{
                         ...styles.badge,
-                        background: u.tipo_documento === 'dfs' ? 'rgba(245,200,0,.12)' : 'rgba(139,148,158,.15)',
-                        color: u.tipo_documento === 'dfs' ? '#F5C800' : '#8B949E'
+                        background: 'rgba(245,200,0,.12)',
+                        color: '#F5C800'
                       }}>
-                        {u.tipo_documento === 'dfs' ? '📊 DFs' : '📋 Balancete'}
+                        📊 DFs
                       </span>
                     </td>
                     <td style={styles.td}>{u.filename}</td>
