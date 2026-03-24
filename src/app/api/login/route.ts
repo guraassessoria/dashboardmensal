@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const sb = supabaseAdmin()
   const { data: user, error } = await sb
     .from('dashboard_users')
-    .select('id, username, password_hash, nome_completo, ativo')
+    .select('id, username, password_hash, nome_completo, ativo, role')
     .eq('username', username.trim().toLowerCase())
     .single()
 
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    nome: user.nome_completo || user.username
+    nome: user.nome_completo || user.username,
+    role: user.role || 'editor'
   })
 }

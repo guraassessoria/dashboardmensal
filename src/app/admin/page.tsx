@@ -436,8 +436,8 @@ export default function AdminPage() {
               </div>
               <p style={{fontSize:11,color:'#8B949E',margin:'4px 0 0'}}>
                 {tipoDoc === 'dfs'
-                  ? 'Demonstrações Financeiras completas (anual)'
-                  : 'Balancete mensal — valores acumulados do ano até o mês'}
+                  ? 'Demonstrações Financeiras completas (anual). Se o arquivo contiver uma aba de Balancete, ela será extraída automaticamente.'
+                  : 'Balancete mensal avulso — use apenas se o balancete NÃO estiver incluído no arquivo DFS'}
               </p>
             </div>
 

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const sb = supabaseAdmin()
   const { data, error } = await sb
     .from('dashboard_users')
-    .select('id, username, nome_completo, ativo, created_at, updated_at')
+    .select('id, username, nome_completo, ativo, role, created_at, updated_at')
     .order('created_at', { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await sb
     .from('dashboard_users')
     .insert({ username: username.trim().toLowerCase(), password_hash, nome_completo: nome_completo || null })
-    .select('id, username, nome_completo, ativo, created_at')
+    .select('id, username, nome_completo, ativo, role, created_at')
     .single()
 
   if (error) {
@@ -61,7 +61,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
-  const { id, password, nome_completo, ativo } = await req.json()
+  const { id, password, nome_completo, ativo, role } = await req.json()
 
   if (!id) {
     return NextResponse.json({ error: 'id é obrigatório' }, { status: 400 })
@@ -71,13 +71,14 @@ export async function PUT(req: NextRequest) {
   if (password) updates.password_hash = await bcrypt.hash(password, 10)
   if (nome_completo !== undefined) updates.nome_completo = nome_completo
   if (ativo !== undefined) updates.ativo = ativo
+  if (role && ['admin', 'editor'].includes(role)) updates.role = role
 
   const sb = supabaseAdmin()
   const { data, error } = await sb
     .from('dashboard_users')
     .update(updates)
     .eq('id', id)
-    .select('id, username, nome_completo, ativo, updated_at')
+    .select('id, username, nome_completo, ativo, role, updated_at')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

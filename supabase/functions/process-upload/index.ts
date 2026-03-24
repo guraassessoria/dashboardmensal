@@ -19,6 +19,9 @@ const ABAS_ALVO = [
   "14.Despesas Operacionais", "15.Resultado Financeiro"
 ]
 
+// Nomes possíveis da aba de balancete dentro da DFS
+const BALANCETE_SHEET_NAMES = ["Balancete", "balancete", "BALANCETE", "Balanc", "100.Balancete"]
+
 serve(async (req) => {
   let _uploadId = ''
   let _env = 'prod'
@@ -50,14 +53,34 @@ serve(async (req) => {
     // Parsear xlsx localmente com SheetJS
     const arrayBuffer = await fileData.arrayBuffer()
     const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" })
+
+    // Detectar se a DFS contém uma aba de balancete embutida
+    const balanceteSheetName = tipo_documento === 'dfs'
+      ? workbook.SheetNames.find((n: string) => BALANCETE_SHEET_NAMES.some(b => n.toLowerCase().includes(b.toLowerCase())))
+      : null
+    const hasEmbeddedBalancete = !!balanceteSheetName
+
+    if (hasEmbeddedBalancete) {
+      console.log(`📋 Balancete embutido detectado na aba: "${balanceteSheetName}"`)
+    }
+
     // DFS: priorizar abas relevantes (BP, DRE, DFC, notas) para não estourar o limite de chars
+    // Se tem balancete embutido, incluir também a aba de balancete nas prioritárias
+    const prioritySheets = hasEmbeddedBalancete
+      ? [...ABAS_ALVO, balanceteSheetName!]
+      : ABAS_ALVO
+
     const sheetText = tipo_documento === 'balancete'
       ? xlsxToText(workbook)
-      : xlsxToText(workbook, ABAS_ALVO)
+      : xlsxToText(workbook, prioritySheets)
 
     // ── 3. Enviar para Claude API com prompt adequado ao tipo ──
+    // Se DFS tem balancete embutido, usar prompt híbrido que extrai ambos
     const prompt = tipo_documento === 'balancete'
       ? buildBalancetePrompt(periodo, filename)
+      : hasEmbeddedBalancete
+        ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
+        : buildPrompt(periodo, filename)
       : buildPrompt(periodo, filename)
 
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
@@ -181,7 +204,8 @@ serve(async (req) => {
     const mergedRaw = deepMerge(existingRaw, dadosExtraidos, mergePriority)
     mergedRaw._sources = {
       ...(existingRaw._sources || {}),
-      [tipo_documento]: { filename, processed_at: new Date().toISOString() }
+      [tipo_documento]: { filename, processed_at: new Date().toISOString() },
+      ...(hasEmbeddedBalancete ? { balancete: { filename, processed_at: new Date().toISOString(), embedded: true } } : {})
     }
 
     // Helper: merge com prioridade baseada na fonte.
@@ -666,6 +690,99 @@ Retorne APENAS um JSON válido no seguinte formato (sem texto antes ou depois, s
 
 Use os valores exatos do arquivo. Se um campo não existir no arquivo, use null.
 Para o campo "competicoes", liste todas as competições da Nota 13 com seus valores de 2025 e 2024.`
+}
+
+// ── Prompt híbrido: DFS com balancete embutido ──
+function buildHybridPrompt(periodo: string, filename: string, balanceteSheetName: string): string {
+  const [ano, mes] = periodo.split('-')
+  const dataRef = `${mes}/${ano}`
+
+  return `Você é um especialista em demonstrações financeiras brasileiras.
+Analise os dados acima extraídos do arquivo xlsx das Demonstrações Financeiras da CBF (arquivo: ${filename}, período: ${periodo}).
+
+Este arquivo contém TANTO as Demonstrações Financeiras (BP, DRE, DFC, Notas) QUANTO uma aba de Balancete ("${balanceteSheetName}").
+
+## INSTRUÇÕES DE EXTRAÇÃO
+
+### Das abas de DFs (BP, DRE, DFC, Notas 12-15):
+- Use SEMPRE a PRIMEIRA coluna numérica (período ${dataRef})
+- Valores em R$ milhares
+- Extraia DRE, receitas, custos, despesas, resultado financeiro, balanço e DFC
+
+### Da aba de Balancete ("${balanceteSheetName}"):
+- O balancete contém contas contábeis com saldos acumulados
+- Os valores do balancete estão em R$ (reais) — DIVIDA por 1000 para padronizar em R$ milhares
+- Extraia as 20 maiores contas de cada categoria para "contas_detalhadas"
+- Mapeie: 4.x = receitas, 5.x/6.x = custos/despesas, 1.x = ativo, 2.x = passivo, 3.x = PL
+
+### Prioridade de dados:
+- Para campos consolidados (DRE, balanço, DFC): use os valores das DFs (são mais confiáveis)
+- Para "contas_detalhadas": use exclusivamente os dados do Balancete
+- O balancete serve para DETALHAR e COMPLEMENTAR, não para substituir as DFs
+
+## RESULTADO FINANCEIRO
+Na DRE, a seção "Resultado Financeiro" fica ENTRE "Total das despesas operacionais" e "Outros Resultados Operacionais".
+
+## PATRIMÔNIO
+Na aba BP, "Patrimônio Social" está na seção "Patrimônio Líquido".
+
+Retorne APENAS um JSON válido:
+
+\`\`\`json
+{
+  "periodo": "${periodo}",
+  "fonte": "${filename}",
+  "dre": {
+    "receita_bruta": 0, "deducoes": 0, "receita_liquida": 0, "custos_futebol": 0,
+    "superavit_bruto": 0, "despesas_operacionais": 0, "resultado_financeiro": 0,
+    "outras_receitas": 0, "outras_despesas": 0, "resultado_antes_ir": 0,
+    "ir_csll": 0, "resultado_exercicio": 0
+  },
+  "receitas": {
+    "patrocinio": 0, "transmissao": 0, "bilheteria": 0, "registros": 0,
+    "desenvolvimento": 0, "academy": 0, "legado": 0
+  },
+  "custos_futebol": {
+    "selecao_principal": 0, "selecoes_base": 0, "selecoes_femininas": 0, "fomento": 0
+  },
+  "despesas": { "pessoal": 0, "administrativas": 0, "impostos_taxas": 0 },
+  "resultado_financeiro": {
+    "receitas_financeiras": 0, "despesas_financeiras": 0, "variacao_cambial": 0, "total": 0
+  },
+  "balanco": {
+    "ativo_total": 0, "ativo_circulante": 0, "caixa_equivalentes": 0, "contas_receber": 0,
+    "tributos_recuperar": 0, "adiantamentos": 0, "despesas_antecipadas": 0,
+    "contas_receber_lp": 0, "depositos_judiciais": 0, "investimentos": 0,
+    "imobilizado": 0, "intangivel": 0, "passivo_circulante": 0, "fornecedores": 0,
+    "programas_desenvolvimento": 0, "obrig_trabalhistas": 0, "provisao_ferias": 0,
+    "receitas_diferidas_cp": 0, "receitas_diferidas_lp": 0, "fornecedores_lp": 0,
+    "prov_contingencias": 0, "patrimonio_social": 0, "resultado_acumulado": 0,
+    "patrimonio_liquido": 0
+  },
+  "dfc": {
+    "resultado_exercicio": 0,
+    "ajustes_operacionais": { "provisoes_contingentes": 0, "variacao_cambial": 0, "demais_provisoes_ajustes": 0, "depreciacao_amortizacao": 0 },
+    "superavit_bruto_antes_capital_giro": 0,
+    "variacao_ativos": { "contas_receber": 0, "adto_fornecedores": 0, "despesas_antecipadas": 0, "impostos_recuperar": 0, "depositos_judiciais": 0, "total": 0 },
+    "variacao_passivos": { "fornecedores_contas_pagar": 0, "tributos_encargos": 0, "adto_transmissao_patrocinio": 0, "receita_diferida": 0, "ir_csll": 0, "total": 0 },
+    "fluxo_operacional": 0,
+    "investimento": { "compra_imobilizado": 0, "baixa_imobilizado": 0 },
+    "fluxo_investimento": 0, "variacao_total": 0, "saldo_inicial": 0, "saldo_final": 0
+  },
+  "competicoes": [
+    { "nome": "Brasileiro Série A", "valor_2025": 0, "valor_2024": 0 }
+  ],
+  "contas_detalhadas": {
+    "receitas_por_conta": [ { "conta": "4.1.01.01", "descricao": "descricao", "saldo": 0 } ],
+    "custos_por_conta": [ { "conta": "5.1.01.01", "descricao": "descricao", "saldo": 0 } ],
+    "despesas_por_conta": [ { "conta": "6.1.01.01", "descricao": "descricao", "saldo": 0 } ]
+  }
+}
+\`\`\`
+
+Use os valores exatos do arquivo. Se um campo não existir, use null.
+Para "competicoes", liste todas as competições da Nota 13.
+Para "contas_detalhadas", extraia do Balancete as 20 maiores contas de cada categoria com saldos convertidos para R$ milhares (dividido por 1000).`
 }
 
 // ── Prompt para o Claude extrair dados do BALANCETE ──
