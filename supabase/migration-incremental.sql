@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS dashboard_users (
   password_hash  TEXT NOT NULL,
   nome_completo  TEXT,
   ativo          BOOLEAN DEFAULT true,
+  role           TEXT NOT NULL DEFAULT 'editor',  -- admin | editor | consulta
   created_at     TIMESTAMPTZ DEFAULT now(),
   updated_at     TIMESTAMPTZ DEFAULT now()
 );

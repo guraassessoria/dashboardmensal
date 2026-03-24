@@ -2811,7 +2811,8 @@ async function loadPeriodo(periodo) {
     bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,156,59,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
     document.body.appendChild(bar);
   }
-  bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span>' + (getUserRole() === 'admin' ? '<a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">⚙️ Admin</a>' : '');
+  var userRole = getUserRole();
+  bar.innerHTML = '<span>📊 <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span>' + (userRole === 'admin' || userRole === 'editor' ? '<a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">⚙️ Admin</a>' : '');
 
   // Atualizar seletor
   const sel = document.getElementById('periodo-selector');
@@ -2879,6 +2880,10 @@ async function loadPeriodo(periodo) {
 -->
 
 <script>
+// ═ ROLE SYSTEM ═
+var ROLE_KEY = 'cbf_dashboard_role';
+function getUserRole() { return sessionStorage.getItem(ROLE_KEY) || 'consulta'; }
+
 // ═ LOGIN SYSTEM ═
 (function(){
   const SESSION_KEY = 'cbf_dashboard_auth';

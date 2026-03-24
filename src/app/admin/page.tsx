@@ -7,6 +7,7 @@ interface DashUser {
   username: string
   nome_completo: string | null
   ativo: boolean
+  role?: string
   created_at: string
   updated_at?: string
 }
@@ -32,9 +33,9 @@ export default function AdminPage() {
   const [users, setUsers] = useState<DashUser[]>([])
   const [usersLoading, setUsersLoading] = useState(false)
   const [userMsg, setUserMsg] = useState('')
-  const [newUser, setNewUser] = useState({ username: '', password: '', nome_completo: '' })
+  const [newUser, setNewUser] = useState({ username: '', password: '', nome_completo: '', role: 'editor' })
   const [editingUser, setEditingUser] = useState<string | null>(null)
-  const [editFields, setEditFields] = useState({ password: '', nome_completo: '', ativo: true })
+  const [editFields, setEditFields] = useState({ password: '', nome_completo: '', ativo: true, role: 'editor' })
 
   // ── Tabela Complementar State ──
   const [tcFile, setTcFile] = useState<File | null>(null)
@@ -151,7 +152,7 @@ export default function AdminPage() {
       body: JSON.stringify(newUser)
     })
     if (res.ok) {
-      setNewUser({ username: '', password: '', nome_completo: '' })
+      setNewUser({ username: '', password: '', nome_completo: '', role: 'editor' })
       setUserMsg('✅ Usuário criado com sucesso')
       loadUsers()
     } else {
@@ -166,6 +167,7 @@ export default function AdminPage() {
     if (editFields.password) body.password = editFields.password
     if (editFields.nome_completo !== undefined) body.nome_completo = editFields.nome_completo
     body.ativo = editFields.ativo
+    if (editFields.role) body.role = editFields.role
 
     const res = await fetch('/api/users', {
       method: 'PUT',
@@ -684,6 +686,15 @@ export default function AdminPage() {
               onChange={e => setNewUser(p => ({ ...p, nome_completo: e.target.value }))}
               style={{ ...styles.input, flex: '2 1 200px' }}
             />
+            <select
+              value={newUser.role}
+              onChange={e => setNewUser(p => ({ ...p, role: e.target.value }))}
+              style={{ ...styles.input, flex: '0 0 120px', cursor: 'pointer' }}
+            >
+              <option value="admin">Admin</option>
+              <option value="editor">Editor</option>
+              <option value="consulta">Consulta</option>
+            </select>
             <button type="submit" style={{ ...styles.btn, flex: '0 0 auto', width: 'auto', padding: '12px 20px' }}>
               + Criar
             </button>
@@ -698,7 +709,7 @@ export default function AdminPage() {
             <table style={styles.table}>
               <thead>
                 <tr>
-                  {['Usuário', 'Nome Completo', 'Status', 'Criado em', 'Ações'].map(h => (
+                  {['Usuário', 'Nome Completo', 'Perfil', 'Status', 'Criado em', 'Ações'].map(h => (
                     <th key={h} style={styles.th}>{h}</th>
                   ))}
                 </tr>
@@ -715,6 +726,17 @@ export default function AdminPage() {
                           placeholder="Nome completo"
                           style={{ ...styles.input, padding: '6px 10px', fontSize: 12 }}
                         />
+                      </td>
+                      <td style={styles.td}>
+                        <select
+                          value={editFields.role}
+                          onChange={e => setEditFields(p => ({ ...p, role: e.target.value }))}
+                          style={{ ...styles.input, padding: '6px 10px', fontSize: 12, cursor: 'pointer' }}
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="editor">Editor</option>
+                          <option value="consulta">Consulta</option>
+                        </select>
                       </td>
                       <td style={styles.td}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#FAFAFA', cursor: 'pointer' }}>
@@ -754,6 +776,15 @@ export default function AdminPage() {
                       <td style={styles.td}>
                         <span style={{
                           ...styles.badge,
+                          background: u.role === 'admin' ? 'rgba(245,200,0,.15)' : u.role === 'consulta' ? 'rgba(139,148,158,.15)' : 'rgba(63,185,80,.15)',
+                          color: u.role === 'admin' ? '#F5C800' : u.role === 'consulta' ? '#8B949E' : '#3FB950'
+                        }}>
+                          {u.role === 'admin' ? '🔑 Admin' : u.role === 'consulta' ? '👁️ Consulta' : '✏️ Editor'}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{
+                          ...styles.badge,
                           background: u.ativo ? 'rgba(63,185,80,.15)' : 'rgba(248,81,73,.15)',
                           color: u.ativo ? '#3FB950' : '#F85149'
                         }}>
@@ -769,7 +800,8 @@ export default function AdminPage() {
                               setEditFields({
                                 password: '',
                                 nome_completo: u.nome_completo || '',
-                                ativo: u.ativo
+                                ativo: u.ativo,
+                                role: u.role || 'editor'
                               })
                             }}
                             style={{ ...styles.actionBtn, background: 'rgba(245,200,0,.12)', color: '#F5C800' }}

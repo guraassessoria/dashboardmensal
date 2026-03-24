@@ -135,12 +135,10 @@ CREATE TABLE IF NOT EXISTS dashboard_users (
   password_hash  TEXT NOT NULL,
   nome_completo  TEXT,
   ativo          BOOLEAN DEFAULT true,
+  role           TEXT NOT NULL DEFAULT 'editor',  -- admin | editor | consulta
   created_at     TIMESTAMPTZ DEFAULT now(),
   updated_at     TIMESTAMPTZ DEFAULT now()
 );
-
--- Seed: usuários iniciais (senhas em bcrypt — precisam ser geradas na aplicação)
--- Os usuários abaixo são criados via API /api/users
 
 ALTER TABLE dashboard_users ENABLE ROW LEVEL SECURITY;
 

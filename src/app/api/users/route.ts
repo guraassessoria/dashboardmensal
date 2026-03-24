@@ -30,18 +30,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
-  const { username, password, nome_completo } = await req.json()
+  const { username, password, nome_completo, role } = await req.json()
 
   if (!username || !password) {
     return NextResponse.json({ error: 'username e password são obrigatórios' }, { status: 400 })
   }
 
   const password_hash = await bcrypt.hash(password, 10)
+  const validRole = role && ['admin', 'editor', 'consulta'].includes(role) ? role : 'editor'
 
   const sb = supabaseAdmin()
   const { data, error } = await sb
     .from('dashboard_users')
-    .insert({ username: username.trim().toLowerCase(), password_hash, nome_completo: nome_completo || null })
+    .insert({ username: username.trim().toLowerCase(), password_hash, nome_completo: nome_completo || null, role: validRole })
     .select('id, username, nome_completo, ativo, role, created_at')
     .single()
 
@@ -71,7 +72,7 @@ export async function PUT(req: NextRequest) {
   if (password) updates.password_hash = await bcrypt.hash(password, 10)
   if (nome_completo !== undefined) updates.nome_completo = nome_completo
   if (ativo !== undefined) updates.ativo = ativo
-  if (role && ['admin', 'editor'].includes(role)) updates.role = role
+  if (role && ['admin', 'editor', 'consulta'].includes(role)) updates.role = role
 
   const sb = supabaseAdmin()
   const { data, error } = await sb
