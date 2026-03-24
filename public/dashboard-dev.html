@@ -343,26 +343,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
     </div>
   </div>
 
-  <div class="two">
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição da Receita</div>
-      <div class="cwrap" style="height:400px;"><canvas id="c1"></canvas></div>
-    </div>
-    <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Custos com Futebol</div>
-      <div class="cwrap" style="height:400px;"><canvas id="c2"></canvas></div>
-    </div>
-  </div>
-
-  <div class="ccard" style="margin-bottom:0;">
-    <div class="ctitle" style="margin-bottom:4px;">Resultado Anual 2021–2025 - em milhares de reais</div>
-    <div class="csub" style="margin-bottom:18px;">Superávit/Déficit por exercício fiscal</div>
-    <div class="cwrap" style="height:320px;"><canvas id="c3"></canvas></div>
-    <div class="insight warn" id="insight-resumo-deficit">
-      <div class="ilabel">Análise</div>
-      <p></p>
-    </div>
-  </div>
+  <div id="overview-body"></div>
 </div>
 
 <!-- ═ RECEITAS ═ -->
@@ -1080,8 +1061,170 @@ function _atualizarKPIs() {
   if (yr && _D.periodo) yr.textContent = _D.periodo.split('-')[0];
 }
 
+// ── Gerar conteúdo dinâmico do Resumo Executivo ──
+function _buildOverviewBody() {
+  var c = document.getElementById('overview-body');
+  if (!c) return;
+  var _D = window.__CBF_DADOS__;
+  var rb = Math.round(_D ? _D.receita_bruta : 1193);
+  var rl = Math.round(_D ? _D.receita_liquida : 1109);
+  var cf = Math.round(_D ? _D.custos_futebol : 1177);
+  var re = Math.round(_D ? _D.resultado_exercicio : -182);
+  var rf = Math.round(_D ? _D.rec_financeiras : 318);
+  var dp = Math.round(_D ? _D.desp_pessoal : 58);
+  var da = Math.round(_D ? _D.desp_administrativas : 369);
+  var dit = Math.round(_D ? _D.desp_impostos_taxas : 11);
+  var at = Math.round(_D ? _D.ativo_total : 3391);
+  var cx = Math.round(_D ? _D.caixa_equivalentes : 1997);
+  var pl = Math.round(_D ? _D.patrimonio_liquido : 1260);
+  var ac = Math.round(_D ? _D.ativo_circulante : 2414);
+  var pc = Math.round(_D ? _D.passivo_circulante : 611);
+  var cr = Math.round(_D ? _D.contas_receber : 292);
+  var dj = Math.round(_D ? _D.depositos_judiciais : 607);
+  var imob = Math.round(_D ? _D.imobilizado : 309);
+  var rdlp = Math.round(_D ? _D.receitas_diferidas_lp : 849);
+  var prcont = Math.round(_D ? _D.prov_contingencias : 672);
+  var lc = _D ? (_D.liquidez_corrente || 3.95) : 3.95;
+  var li = _D ? (_D.liquidez_imediata || 3.27) : 3.27;
+  var fo = Math.round(_D ? (_D.fluxo_operacional || -330) : -330);
+  var defBruto = rl - cf;
+  var totalDesp = dp + da + dit;
+  var isDeficit = re < 0;
+  var cusBarras = GD.cus_barras;
+  var cusBarLabels = ['Fomento Estados','Sel. Principal','Desp. Administrativas','Sel. Femininas','Desp. Pessoal','Sel. Base'];
+  var maxCus = Math.max.apply(null, cusBarras);
+  var cusColors = ['#003087','#1F6FEB','#58A6FF','#8CC8FF','#bc8cff','#B8DEFF'];
+  var labels = GD.hist_labels;
+  var recSerie = GD.hist_receita;
+  var cusSerie = GD.hist_custos;
+  var firstLabel = labels[0] || '2021';
+  var lastLabel = labels[labels.length - 1] || '2025';
+  var fMi = _fmtMi;
+  var fBi = _fmtBi;
+  var h = '';
+
+  // ── Insight Resumo (preenchido por _aplicarInsights) ──
+  h += '<div class="insight warn" id="insight-resumo-deficit" style="margin-bottom:20px;">';
+  h += '<div class="ilabel">Visão Geral</div>';
+  h += '<p></p>';
+  h += '</div>';
+
+  // ── Doughnut Charts: Receita + Custos ──
+  h += '<div class="two">';
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:4px;">Composição da Receita</div><div class="cwrap" style="height:400px;"><canvas id="c1"></canvas></div></div>';
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:4px;">Custos com Futebol</div><div class="cwrap" style="height:400px;"><canvas id="c2"></canvas></div></div>';
+  h += '</div>';
+
+  // ── DRE Resumida ──
+  var dreRows = [
+    ['Receita Bruta', rb, ''],
+    ['Custos com Futebol', -cf, 'neg'],
+    [(defBruto < 0 ? 'Déficit' : 'Superávit') + ' Bruto', defBruto, defBruto < 0 ? 'neg' : 'pos'],
+    ['Despesas Operacionais', -totalDesp, 'neg'],
+    ['Resultado Financeiro', rf, 'pos'],
+    ['RESULTADO DO EXERCÍCIO', re, re < 0 ? 'neg' : 'pos']
+  ];
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:4px;">DRE Resumida</div>';
+  h += '<div class="csub" style="margin-bottom:14px;">Principais linhas – em milhões de reais</div><table><tbody>';
+  for (var i = 0; i < dreRows.length; i++) {
+    var r = dreRows[i];
+    var bold = i === dreRows.length - 1;
+    var clr = r[2] === 'neg' ? 'color:var(--neg);' : (r[2] === 'pos' ? 'color:var(--pos);' : '');
+    var bdr = bold ? 'border-top:2px solid rgba(192,57,43,.4);' : '';
+    var fmt = r[1] < 0 ? '(' + Math.abs(r[1]).toLocaleString('pt-BR') + ')' : r[1].toLocaleString('pt-BR');
+    h += '<tr class="dre-row-total" style="' + bdr + '"><td>' + (bold ? '<strong>' + r[0] + '</strong>' : r[0]) + '</td><td class="num" style="' + clr + '">' + (bold ? '<strong>' + fmt + '</strong>' : fmt) + '</td></tr>';
+  }
+  h += '</tbody></table>';
+  h += '<div style="text-align:right;margin-top:8px;"><a href="#" onclick="sp(\'balanco\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver DRE completa →</a></div></div>';
+
+  // ── Estrutura de Custos e Despesas ──
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:4px;">Estrutura de Custos e Despesas</div>';
+  h += '<div class="csub" style="margin-bottom:14px;">Distribuição por categoria – em milhões de reais</div>';
+  h += '<div style="display:flex;flex-direction:column;gap:10px;">';
+  for (var j = 0; j < cusBarLabels.length; j++) {
+    var val = cusBarras[j] || 0;
+    var pctW = maxCus > 0 ? (val / maxCus * 100).toFixed(0) : 0;
+    h += '<div><div style="display:flex;justify-content:space-between;margin-bottom:3px;">';
+    h += '<span style="font-size:13px;color:var(--white);">' + cusBarLabels[j] + '</span>';
+    h += '<span style="font-family:var(--font-mono);font-size:13px;color:var(--yellow);">R$ ' + val + ' Mi</span></div>';
+    h += '<div style="background:rgba(255,255,255,.08);border-radius:4px;height:14px;overflow:hidden;">';
+    h += '<div style="background:' + cusColors[j] + ';height:100%;width:' + pctW + '%;border-radius:4px;transition:width .5s;"></div></div></div>';
+  }
+  h += '</div>';
+  h += '<div style="text-align:right;margin-top:12px;"><a href="#" onclick="sp(\'despesas\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver detalhamento completo →</a></div></div>';
+
+  // ── Indicadores Financeiros ──
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:14px;">Indicadores Financeiros</div>';
+  h += '<div class="kgrid" style="grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:0;">';
+  h += '<div class="kcard" style="margin-bottom:0;"><div class="klabel">Liquidez Corrente</div><div class="kval" style="font-size:28px;">' + lc.toFixed(2) + '</div><div class="ksub">AC / PC · ' + fBi(ac) + ' / ' + fMi(pc) + '</div></div>';
+  h += '<div class="kcard" style="margin-bottom:0;"><div class="klabel">Liquidez Imediata</div><div class="kval" style="font-size:28px;">' + li.toFixed(2) + '</div><div class="ksub">Caixa / PC · ' + fBi(cx) + ' / ' + fMi(pc) + '</div></div>';
+  h += '<div class="kcard" style="margin-bottom:0;"><div class="klabel">Fluxo Operacional</div><div class="kval" style="font-size:28px;color:' + (fo < 0 ? 'var(--neg)' : 'var(--pos)') + ';">' + fMi(fo) + '</div><div class="ksub">Atividades operacionais</div></div>';
+  h += '<div class="kcard" style="margin-bottom:0;"><div class="klabel">Patrimônio Líquido</div><div class="kval" style="font-size:28px;">' + fBi(pl) + '</div><div class="ksub">' + (at > 0 ? (pl/at*100).toFixed(0) : 0) + '% do ativo total</div></div>';
+  h += '</div>';
+  h += '<div style="text-align:right;margin-top:12px;"><a href="#" onclick="sp(\'indicadores\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver indicadores completos →</a></div></div>';
+
+  // ── Composição Patrimonial ──
+  var ativoItems = [['Caixa e Equivalentes', cx], ['Contas a Receber', cr], ['Depósitos Judiciais', dj], ['Imobilizado', imob], ['Outros', Math.max(0, at - cx - cr - dj - imob)]];
+  var passItems = [['Passivo Circulante', pc], ['Receitas Diferidas LP', rdlp], ['Provisão Contingências', prcont], ['Patrimônio Líquido', pl]];
+  h += '<div class="two"><div class="ccard"><div class="ctitle" style="margin-bottom:12px;">Ativo · ' + fBi(at) + '</div>';
+  for (var k = 0; k < ativoItems.length; k++) {
+    var pctA = at > 0 ? (ativoItems[k][1]/at*100).toFixed(0) : 0;
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">';
+    h += '<span style="font-size:12px;color:rgba(255,255,255,.7);">' + ativoItems[k][0] + '</span>';
+    h += '<span style="font-family:var(--font-mono);font-size:12px;color:var(--white);">' + fMi(ativoItems[k][1]) + ' <span style="color:var(--gray);">(' + pctA + '%)</span></span></div>';
+  }
+  h += '<div style="text-align:right;margin-top:8px;"><a href="#" onclick="sp(\'bp\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver balanço completo →</a></div></div>';
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:12px;">Passivo + PL · ' + fBi(at) + '</div>';
+  for (var m = 0; m < passItems.length; m++) {
+    var pctP = at > 0 ? (passItems[m][1]/at*100).toFixed(0) : 0;
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">';
+    h += '<span style="font-size:12px;color:rgba(255,255,255,.7);">' + passItems[m][0] + '</span>';
+    h += '<span style="font-family:var(--font-mono);font-size:12px;color:var(--white);">' + fMi(passItems[m][1]) + ' <span style="color:var(--gray);">(' + pctP + '%)</span></span></div>';
+  }
+  h += '<div style="text-align:right;margin-top:8px;"><a href="#" onclick="sp(\'bp\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver balanço completo →</a></div></div></div>';
+
+  // ── Resultado Anual + Insight ──
+  h += '<div class="ccard"><div class="ctitle" style="margin-bottom:4px;">Resultado Anual ' + firstLabel + '–' + lastLabel + ' - em milhares de reais</div>';
+  h += '<div class="csub" style="margin-bottom:18px;">Superávit/Déficit por exercício fiscal</div>';
+  h += '<div class="cwrap" style="height:320px;"><canvas id="c3"></canvas></div>';
+  h += '<div class="insight warn"><div class="ilabel">' + (isDeficit ? 'Déficit' : 'Superávit') + '</div>';
+  if (isDeficit) {
+    h += '<p>O déficit de <strong>' + fMi(Math.abs(re)) + '</strong> em ' + lastLabel + ' decorre da compressão da margem operacional, com os custos do futebol, de ' + fBi(cf) + ', em patamar próximo à receita bruta, de ' + fBi(rb) + ', em um contexto de maior nível de investimento e retração das receitas operacionais. Ainda assim, a CBF preserva sólida posição financeira, sustentada por<strong> caixa de ' + fBi(cx) + '</strong> e receitas financeiras de ' + fMi(rf) + ', impulsionadas principalmente pelo adiantamento contratual da Nike.</p>';
+  } else {
+    h += '<p>Superávit de <strong>' + fMi(re) + '</strong> em ' + lastLabel + '. A CBF mantém posição financeira sólida com <strong>caixa de ' + fBi(cx) + '</strong> e receitas financeiras de ' + fMi(rf) + '.</p>';
+  }
+  h += '</div></div>';
+
+  // ── Evolução Histórica ──
+  if (labels.length >= 2) {
+    var recVar = recSerie[0] > 0 ? ((recSerie[recSerie.length-1] - recSerie[0]) / recSerie[0] * 100).toFixed(1) : 0;
+    var cusVar = cusSerie[0] > 0 ? ((cusSerie[cusSerie.length-1] - cusSerie[0]) / cusSerie[0] * 100).toFixed(1) : 0;
+    var despSerie = GD.hist_despesas;
+    var despVar = despSerie[0] > 0 ? ((despSerie[despSerie.length-1] - despSerie[0]) / despSerie[0] * 100).toFixed(1) : 0;
+    var resFirst = GD.hist_resultado[0];
+    var resLast = GD.hist_resultado[GD.hist_resultado.length - 1];
+    var resVar = resFirst !== 0 ? ((resLast - resFirst) / Math.abs(resFirst) * 100).toFixed(1) : 0;
+    var trends = [
+      { label: 'Receita Bruta: ' + (recVar >= 0 ? '+' : '') + recVar + '% (' + firstLabel + '→' + lastLabel + ')', sub: 'R$' + recSerie[0] + '→R$' + recSerie[recSerie.length-1] + ' Mi', pct: Math.min(Math.abs(recVar)/200*100, 100), color: '#F5C900' },
+      { label: 'Invest. Futebol: ' + (cusVar >= 0 ? '+' : '') + cusVar + '% (' + firstLabel + '→' + lastLabel + ')', sub: 'R$' + cusSerie[0] + '→R$' + cusSerie[cusSerie.length-1] + ' Mi', pct: Math.min(Math.abs(cusVar)/200*100, 100), color: '#009C3B' },
+      { label: 'Despesas: ' + (despVar >= 0 ? '+' : '') + despVar + '% (' + firstLabel + '→' + lastLabel + ')', sub: 'R$' + despSerie[0] + '→R$' + despSerie[despSerie.length-1] + ' Mi', pct: Math.min(Math.abs(despVar)/200*100, 100), color: '#003DA5' },
+      { label: 'Resultado: ' + (resVar >= 0 ? '+' : '') + resVar + '% (' + firstLabel + '→' + lastLabel + ')', sub: 'R$' + resFirst + '→R$' + resLast + ' Mi', pct: Math.min(Math.abs(resVar)/400*100, 100), color: '#ffffff' }
+    ];
+    h += '<div class="ccard" style="margin-bottom:0;"><div class="ctitle" style="margin-bottom:14px;">Evolução ' + firstLabel + ' → ' + lastLabel + '</div>';
+    for (var n = 0; n < trends.length; n++) {
+      var t = trends[n];
+      h += '<div class="pi" style="margin-bottom:' + (n < trends.length - 1 ? '18' : '0') + 'px;"><div class="ph"><span class="pl">' + t.label + '</span><span class="pv">' + t.sub + '</span></div>';
+      h += '<div class="pb" style="height:9px;"><div class="pf" style="width:' + t.pct + '%;background:' + t.color + '"></div></div></div>';
+    }
+    h += '<div style="text-align:right;margin-top:12px;"><a href="#" onclick="sp(\'historico\');return false;" style="color:var(--yellow);font-size:12px;text-decoration:none;">Ver série histórica completa →</a></div></div>';
+  }
+
+  c.innerHTML = h;
+}
+
 // Executar atualização de KPIs imediatamente
 _atualizarKPIs();
+_buildOverviewBody();
 
 // ── Aplicar insights dinâmicos vindos do Supabase ──
 function _aplicarInsights(ins) {
@@ -2605,8 +2748,9 @@ async function loadPeriodo(periodo) {
     GD.liq_2025 = [parseFloat(lc.toFixed(2)), parseFloat(lgCalc.toFixed(2)), parseFloat(li.toFixed(2))];
   }
 
-  // Atualizar KPIs
+  // Atualizar KPIs e overview dinâmico
   if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
+  if (typeof _buildOverviewBody === 'function') _buildOverviewBody();
 
   // Reconstruir tabelas DRE e BP
   const [yyP, mmP] = periodo.split('-');
