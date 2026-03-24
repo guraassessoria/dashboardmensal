@@ -82,6 +82,8 @@ serve(async (req) => {
         ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
         : buildPrompt(periodo, filename)
 
+    const claudeCtrl = new AbortController()
+    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 120_000)
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -89,6 +91,7 @@ serve(async (req) => {
         "x-api-key": ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01"
       },
+      signal: claudeCtrl.signal,
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 4096,
@@ -100,6 +103,7 @@ serve(async (req) => {
         }]
       })
     })
+    clearTimeout(claudeTimeout)
 
     if (!claudeResponse.ok) {
       const err = await claudeResponse.text()
@@ -133,6 +137,8 @@ serve(async (req) => {
       const correctionPrompt = buildCorrectionPrompt(validacao1.missing, periodo, tipo_documento)
 
       try {
+        const corrCtrl = new AbortController()
+        const corrTimeout = setTimeout(() => corrCtrl.abort(), 60_000)
         const correctionResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -140,6 +146,7 @@ serve(async (req) => {
             "x-api-key": ANTHROPIC_API_KEY,
             "anthropic-version": "2023-06-01"
           },
+          signal: corrCtrl.signal,
           body: JSON.stringify({
             model: "claude-sonnet-4-20250514",
             max_tokens: 2048,
@@ -151,6 +158,7 @@ serve(async (req) => {
             }]
           })
         })
+        clearTimeout(corrTimeout)
 
         if (correctionResponse.ok) {
           const corrData = await correctionResponse.json()
