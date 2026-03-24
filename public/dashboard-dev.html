@@ -283,13 +283,14 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 </header>
 <nav>
   <div class="ni">
-    <button class="ntab active" onclick="sp('overview')">Resumo Executivo</button>
-    <button class="ntab" onclick="sp('receitas')">Receitas</button>
-    <button class="ntab" onclick="sp('despesas')">Investimentos</button>
+    <button class="ntab active" onclick="sp('bp')">Balanço Patrimonial</button>
     <button class="ntab" onclick="sp('balanco')">DRE Completa</button>
-    <button class="ntab" onclick="sp('bp')">Balanço Patrimonial</button>
+    <button class="ntab" onclick="sp('receitas')">Receitas</button>
+    <button class="ntab" onclick="sp('despesas')">Custos e Despesas</button>
+    <button class="ntab" onclick="sp('competicoes')">Competições</button>
     <button class="ntab" onclick="sp('indicadores')">Indicadores Financeiros</button>
     <button class="ntab" onclick="sp('historico')">Série Histórica</button>
+    <button class="ntab" onclick="sp('overview')">Resumo Executivo</button>
   </div>
   <button class="pdf-btn" title="Chrome/Edge: no diálogo de impressão, ative 'Gráficos de fundo' para preservar as cores" onclick="exportPDF()" title="No diálogo de impressão: ative Gráficos de fundo · desative Cabeçalhos e rodapés">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -544,6 +545,166 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
 
 
+<!-- ═ COMPETIÇÕES ═ -->
+<div id="competicoes" class="page landscape">
+  <div class="stitle">Demonstração de Resultados por Competição</div>
+  <div class="csub" style="margin-top:-20px;margin-bottom:24px;font-size:13px;color:rgba(255,255,255,.5);">em milhares de reais</div>
+  <div class="ccard" style="padding:0;overflow:hidden;">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;overflow-y:visible;">
+      <table id="tbl-comp" style="width:100%;border-collapse:collapse;font-size:12px;min-width:1100px;">
+        <thead>
+          <tr id="comp-head" style="background:#003087;">
+            <th style="text-align:left;padding:10px 14px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);position:sticky;left:0;z-index:11;background:#003087;min-width:200px;"></th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série A</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série B</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série C</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Br. Série D</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Copa do Brasil</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Copa do Nordeste</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Fem. A1</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Fem. A2</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;">Fem. A3</th>
+            <th style="text-align:right;padding:10px 10px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#F5C900;border-bottom:1px solid rgba(255,255,255,.15);white-space:nowrap;border-left:1px solid rgba(255,255,255,.2);">TOTAL</th>
+          </tr>
+        </thead>
+        <tbody id="comp-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    var rows = [
+      {t:'section', label:'RECEITAS'},
+      {t:'detail',  label:'Direito de Transmissão',            v:[0,0,14805875,1000000,727600359,75980972,22900000,0,0]},
+      {t:'detail',  label:'Publicidade / Patrocínio',          v:[80200000,44000000,0,0,0,0,0,0,0]},
+      {t:'subtotal',label:'Total de Receitas',                 v:[80200000,44000000,14805875,1000000,727600359,75980972,22900000,0,0]},
+      {t:'section', label:'CUSTOS OPERACIONAIS'},
+      {t:'detail',  label:'Logística (passagens e estadias)',  v:[-7931678,-47373028,-34150667,-62873496,-24056306,-7761600,-9783681,-5598304,-4749465]},
+      {t:'detail',  label:'PAF Arbitragem',                   v:[0,-12320077,-3591754,-6228621,0,0,-1308558,-412557,-420820]},
+      {t:'detail',  label:'Tecnologia do VAR',               v:[-9663030,-6790804,-437720,-38980,-1666732,-245311,-344698,-41500,-112406]},
+      {t:'detail',  label:'Doping',                           v:[-882960,-967731,-140685,-26305,-149510,0,-46570,-53580,-11460]},
+      {t:'detail',  label:'Seguros',                          v:[-1093719,-887244,-466929,-1042534,-239025,-164053,-5774,-114702,-411]},
+      {t:'detail',  label:'Prêmios, Troféus e Placas',        v:[-62070,-42700,-43300,-42902,0,-63900,-53150,-40900,-39700]},
+      {t:'detail',  label:'Publicidade / Serv. Publicitários',v:[-2969848,0,0,-880632,0,0,0,0,0]},
+      {t:'detail',  label:'Correios e Malotes',               v:[-50589,-125368,-11734,-110021,-43792,-4780,-12244,-26212,-36677]},
+      {t:'detail',  label:'Conduções',                        v:[-301992,-29325,-3541,-24914,-15423,-72718,-2393,-468,-156]},
+      {t:'detail',  label:'Material Esportivo',               v:[0,0,-419,-299,0,0,-2227,-279,-279]},
+      {t:'detail',  label:'Lanches e Refeições',              v:[-283,-1843,-791,-1410,0,-140,0,-741,0]},
+      {t:'detail',  label:'Locações Diversas',                v:[0,-5253,-3742,-37493,0,-11965,-3875,-5519,0]},
+      {t:'detail',  label:'Outros Serviços Profissionais',    v:[0,-6216,-1066323,-75380,-48000,-7702,-170180,-213621,-318502]},
+      {t:'detail',  label:'Taxas e Emolumentos',             v:[-2025,0,0,0,0,0,0,-511,0]},
+      {t:'detail',  label:'Serv. Informática / Mat. Gráfico', v:[0,0,0,0,0,-7381,0,0,-279]},
+      {t:'subtotal',label:'Total de Custos Operacionais',     v:[-22958195,-68549590,-39917605,-71272966,-26218788,-8339550,-11733350,-6508894,-5689876]},
+      {t:'section', label:'REPASSES FINANCEIROS'},
+      {t:'detail',  label:'Cotas / Dir. Transmissão (repasse)',v:[0,0,-33752000,-43852000,-450032750,-46609326,-9900000,-3030030,-1942000]},
+      {t:'detail',  label:'Subsídios',                        v:[0,0,0,0,0,-6480000,0,0,0]},
+      {t:'detail',  label:'Antecipações a Clubes',            v:[0,-40000000,0,0,0,0,0,0,0]},
+      {t:'subtotal',label:'Total de Repasses',                v:[0,-40000000,-33752000,-43852000,-450032750,-53089326,-9900000,-3030030,-1942000]},
+      {t:'section', label:'OUTROS'},
+      {t:'detail',  label:'Reembolso Custo Logístico',        v:[7225595,0,0,0,0,0,0,0,0]},
+      {t:'result',  label:'RESULTADO LÍQUIDO',                v:[64467400,-64549590,-58863730,-114124966,251348821,14552096,1266650,-9538924,-7631876]}
+    ];
+
+    function fmt(n, tipo) {
+      if (n === 0) return '<span style="color:rgba(255,255,255,.3);">\u2013</span>';
+      var scaled = n / 1000;
+      var abs = Math.abs(scaled).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+      if (tipo === 'result') return n < 0 ? '(' + abs + ')' : abs;
+      if (n < 0) return '<span style="color:#C0392B;">(' + abs + ')</span>';
+      return '<span style="color:#1A7A4A;">' + abs + '</span>';
+    }
+
+    function sum(v) { return v.reduce(function(a,b){return a+b;}, 0); }
+
+    var tbody = document.getElementById('comp-body');
+    var html = '';
+
+    rows.forEach(function(row) {
+      var total = row.v ? sum(row.v) : 0;
+      if (row.t === 'section') {
+        html += '<tr style="background:#2E4057;">';
+        html += '<td colspan="11" style="padding:9px 14px;font-size:12px;font-weight:500;color:#fff;letter-spacing:1px;text-transform:uppercase;position:sticky;left:0;background:#2E4057;z-index:2;border-bottom:0.5px solid #3a5068;">' + row.label + '</td>';
+        html += '</tr>';
+      } else if (row.t === 'subtotal') {
+        html += '<tr style="background:rgba(255,255,255,.08);">';
+        html += '<td style="padding:9px 14px;font-size:12px;font-weight:600;color:#fff;position:sticky;left:0;background:#222d3a;z-index:2;border-top:1px solid rgba(255,255,255,.15);border-bottom:1px solid rgba(255,255,255,.15);">' + row.label + '</td>';
+        row.v.forEach(function(val) {
+          html += '<td style="text-align:right;padding:8px 10px;font-weight:600;border-top:1px solid rgba(255,255,255,.15);border-bottom:1px solid rgba(255,255,255,.15);border-left:0.5px solid rgba(255,255,255,.06);">' + fmt(val,'subtotal') + '</td>';
+        });
+        html += '<td style="text-align:right;padding:8px 10px;font-weight:600;border-top:1px solid rgba(255,255,255,.15);border-bottom:1px solid rgba(255,255,255,.15);border-left:1px solid rgba(255,255,255,.2);">' + fmt(total,'subtotal') + '</td>';
+        html += '</tr>';
+      } else if (row.t === 'result') {
+        html += '<tr style="background:#1A5276;">';
+        html += '<td style="padding:11px 14px;font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;text-transform:uppercase;position:sticky;left:0;background:#1A5276;z-index:2;">' + row.label + '</td>';
+        row.v.forEach(function(val) {
+          html += '<td style="text-align:right;padding:10px 10px;font-size:13px;font-weight:700;color:#fff;border-left:0.5px solid rgba(255,255,255,.15);">' + fmt(val,'result') + '</td>';
+        });
+        html += '<td style="text-align:right;padding:10px 10px;font-size:13px;font-weight:700;color:#fff;border-left:1px solid rgba(255,255,255,.3);">' + fmt(total,'result') + '</td>';
+        html += '</tr>';
+      } else {
+        html += '<tr style="border-bottom:0.5px solid rgba(255,255,255,.06);" onmouseover="this.style.background=\'rgba(255,255,255,.04)\'" onmouseout="this.style.background=\'\'\'">';
+        html += '<td style="padding:8px 14px 8px 26px;font-size:12px;color:rgba(255,255,255,.8);position:sticky;left:0;background:#0D1117;z-index:2;border-bottom:0.5px solid rgba(255,255,255,.06);">' + row.label + '</td>';
+        row.v.forEach(function(val) {
+          html += '<td style="text-align:right;padding:7px 10px;border-left:0.5px solid rgba(255,255,255,.06);">' + fmt(val,'detail') + '</td>';
+        });
+        html += '<td style="text-align:right;padding:7px 10px;border-left:1px solid rgba(255,255,255,.12);">' + fmt(total,'detail') + '</td>';
+        html += '</tr>';
+      }
+    });
+
+    tbody.innerHTML = html;
+
+    // ── Cabeçalho fixo via clone JS (sticky não funciona dentro de overflow-x:auto) ──
+    var origTr  = document.getElementById('comp-head');
+    var wrapper = document.querySelector('#competicoes .ccard > div');
+
+    function navH() {
+      var c = document.querySelector('.sticky-chrome');
+      return c ? c.offsetHeight : 0;
+    }
+
+    function syncHScroll() {
+      var fc = document.getElementById('comp-fixed-hdr');
+      if (fc) fc.querySelector('table').style.transform = 'translateX(-' + wrapper.scrollLeft + 'px)';
+    }
+
+    function updateFixedHeader() {
+      var nh  = navH();
+      var tr  = origTr.getBoundingClientRect();
+      var wr  = wrapper.getBoundingClientRect();
+      var fc  = document.getElementById('comp-fixed-hdr');
+
+      if (tr.top < nh && wr.bottom > nh + 30) {
+        if (!fc) {
+          fc = document.createElement('div');
+          fc.id = 'comp-fixed-hdr';
+          fc.style.cssText = 'position:fixed;overflow:hidden;z-index:200;pointer-events:none;';
+          var tbl = document.createElement('table');
+          tbl.style.cssText = 'border-collapse:collapse;font-size:12px;min-width:1100px;';
+          var thead = document.createElement('thead');
+          thead.appendChild(origTr.cloneNode(true));
+          tbl.appendChild(thead);
+          fc.appendChild(tbl);
+          document.body.appendChild(fc);
+          wrapper.addEventListener('scroll', syncHScroll, {passive:true});
+        }
+        fc.style.top   = nh + 'px';
+        fc.style.left  = wr.left + 'px';
+        fc.style.width = wr.width + 'px';
+        syncHScroll();
+      } else {
+        if (fc) fc.remove();
+      }
+    }
+
+    window.addEventListener('scroll', updateFixedHeader, {passive:true});
+    window.addEventListener('resize', updateFixedHeader, {passive:true});
+  })();
+  </script>
+</div>
+
+
 <!-- ═ BALANÇO PATRIMONIAL ═ -->
 <div id="bp" class="page landscape">
   <div class="stitle">Composição Patrimonial</div>
@@ -619,7 +780,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <tr><td>Outros Circulantes</td><td class="num">71.753</td><td class="num">50.606</td></tr>
             <tr class="dre-row-total"><td>Total Circulante</td><td class="num">610.750</td><td class="num">531.588</td></tr>
             <tr class="dre-header"><td colspan="3">Não Circulante</td></tr>
-            <tr><td>Receitas Diferidas LP</td><td class="num">849.270</td><td class="num">1.067.009</td></tr>
+            <tr><td>Receitas Diferidas Lnos Estados e Competições49.270</td><td class="num">1.067.009</td></tr>
             <tr><td>Provisão Contingências</td><td class="num">671.631</td><td class="num">576.539</td></tr>
             <tr class="dre-header"><td colspan="3">Patrimônio Líquido</td></tr>
             <tr><td>Patrimônio Social</td><td class="num">1.442.301</td><td class="num">1.335.643</td></tr>
@@ -818,9 +979,9 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Invest. Futebol: +70,6% (2021→2025)</span><span class="pv">R$690→R$1.177 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:65%;background:#009C3B"></div></div></div>
       <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Despesas: +157,6% (2021→2025)</span><span class="pv">R$170→R$438 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:80%;background:#003DA5"></div></div></div>
       <div class="pi"><div class="ph"><span class="pl">Resultado: −364% (2021→2025)</span><span class="pv">R$69→R$−182 Mi</span></div><div class="pb" style="height:9px;"><div class="pf" style="width:90%;background:#ffffff"></div></div></div>
-    </div>
+    </div>nos Estados e Competições
   </div>
-</div>
+</div>Déficit
 
 
 
@@ -840,7 +1001,7 @@ function sp(id) {
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.add('active');
-  const ids = ['overview','receitas','despesas','balanco','bp','indicadores','historico'];
+  const ids = ['bp','balanco','receitas','despesas','competicoes','indicadores','historico','overview'];
   const tabIdx = ids.indexOf(id);
   if (tabIdx >= 0) document.querySelectorAll('.ntab')[tabIdx].classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
@@ -910,7 +1071,7 @@ function safeChart(id, cfg) {
 }
 
 
-  // Force white text on all chart elements
+  // Force white text on achart elements
   Chart.defaults.color = '#ffffff';
   Chart.defaults.borderColor = 'rgba(255,255,255,.08)';
 
@@ -920,13 +1081,13 @@ function safeChart(id, cfg) {
 // Quando window.__CBF_DADOS__ existe, usa esses dados.
 // Caso contrário, usa os valores hardcoded abaixo (fallback).
 // ══════════════════════════════════════════════════════
-
+ontas
 const _D = window.__CBF_DADOS__ || null;
 
 // ── Helpers ──
 function _bi(v, fb) { return v != null ? v : fb; }
 function _fmtBi(v) {
-  if (v == null) return '—';
+  if (v == null) return '—';Antecipadas
   const n = Math.abs(v);
   // v em R$ milhares
   if (n >= 1000000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000000).toFixed(2).replace('.',',') + ' Bi';
@@ -1049,7 +1210,7 @@ function _atualizarKPIs() {
   if (el('kv-ativo'))       el('kv-ativo').textContent       = _fmtBi(_D.ativo_total);
   if (el('kv-rec-fin'))     el('kv-rec-fin').textContent     = _fmtMi(_D.rec_financeiras);
   if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} · ${periodo}`;
-
+Variação em Ativos
   // Atualizar título do header
   const hTitle = document.querySelector('.htitles p');
   if (hTitle && _D.source_file) {
