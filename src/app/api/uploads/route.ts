@@ -8,6 +8,14 @@ const supabase = createClient(
 )
 
 export async function GET() {
+  // Auto-cleanup: marcar como erro qualquer upload travado em 'processing' há mais de 10 minutos
+  const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+  await supabase
+    .from(tbl('uploads'))
+    .update({ status: 'error', error_msg: 'Timeout: processamento excedeu 10 minutos' })
+    .eq('status', 'processing')
+    .lt('uploaded_at', cutoff)
+
   const { data, error } = await supabase
     .from(tbl('uploads'))
     .select('id, filename, file_type, periodo, tipo_documento, status, error_msg, uploaded_at, processed_at')

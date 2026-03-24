@@ -303,10 +303,22 @@ serve(async (req) => {
       throw new Error(`Erro ao salvar dados: ${upsertError.message}`)
     }
 
+    // ── 6. Atualizar período atual na config ──
+    await supabase
+      .from(t("configuracao"))
+      .upsert({ chave: "periodo_atual", valor: periodo, updated_at: new Date().toISOString() })
+
+    // ── 7. Marcar upload como concluído (antes dos insights — insights são não-críticos) ──
+    // Fazer isso ANTES dos insights para que timeouts no Claude não deixem upload travado
+    await supabase
+      .from(t("uploads"))
+      .update({ status: "done", processed_at: new Date().toISOString() })
+      .eq("id", upload_id)
+
     // ── 5.5. Gerar insights analíticos com IA ──
-    // Aguardar 65s para reset do rate limit (30k tokens/min compartilhado com extração)
+    // Aguardar 15s para aliviar rate limit (insights usam JSON pequeno, não xlsx completo)
     console.log("Aguardando reset do rate limit antes de gerar insights...")
-    await new Promise(r => setTimeout(r, 65000))
+    await new Promise(r => setTimeout(r, 15000))
 
     // Verificar se o OUTRO arquivo também já foi processado para este período
     const sources = mergedRaw._sources || {}
@@ -336,9 +348,9 @@ serve(async (req) => {
       filename, bothFilesAvailable
     )
 
-    let insightErrorMsg: string | null = null
-
     try {
+      const insightsCtrl = new AbortController()
+      const insightsTimeout = setTimeout(() => insightsCtrl.abort(), 50_000)
       const insightsResponse = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -346,6 +358,7 @@ serve(async (req) => {
           "x-api-key": ANTHROPIC_API_KEY,
           "anthropic-version": "2023-06-01"
         },
+        signal: insightsCtrl.signal,
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 8000,
@@ -357,6 +370,7 @@ serve(async (req) => {
           }]
         })
       })
+      clearTimeout(insightsTimeout)
 
       if (insightsResponse.ok) {
         const insightsData = await insightsResponse.json()
@@ -378,35 +392,20 @@ serve(async (req) => {
             }, { onConflict: "periodo" })
 
           if (insightError) {
-            insightErrorMsg = `Insights save error: ${insightError.message}`
             console.error("Erro ao salvar insights:", insightError.message)
           } else {
             console.log("✅ Insights gerados e salvos com sucesso")
           }
         } else {
-          insightErrorMsg = "Claude não retornou JSON válido para insights"
-          console.warn(insightErrorMsg)
+          console.warn("Claude não retornou JSON válido para insights")
         }
       } else {
         const errBody = await insightsResponse.text()
-        insightErrorMsg = `Insights API error: ${errBody.substring(0, 400)}`
         console.error("Erro na API Claude (insights):", errBody)
       }
     } catch (insightErr: any) {
-      insightErrorMsg = `Insights exception: ${insightErr.message?.substring(0, 400)}`
       console.error("Erro ao gerar insights (não bloqueante):", insightErr.message)
     }
-
-    // ── 6. Atualizar período atual na config ──
-    await supabase
-      .from(t("configuracao"))
-      .upsert({ chave: "periodo_atual", valor: periodo, updated_at: new Date().toISOString() })
-
-    // ── 7. Marcar upload como concluído ──
-    await supabase
-      .from(t("uploads"))
-      .update({ status: "done", processed_at: new Date().toISOString(), error_msg: insightErrorMsg })
-      .eq("id", upload_id)
 
     // ── 8. Disparar rebuild no Vercel ──
     const vercelHook = Deno.env.get("VERCEL_DEPLOY_HOOK")
