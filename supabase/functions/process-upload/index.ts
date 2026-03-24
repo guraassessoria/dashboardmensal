@@ -36,6 +36,8 @@ serve(async (req) => {
     console.log(`[${env}] Processando upload: ${filename} | Período: ${periodo} | Tipo: ${tipo_documento}`)
 
     // ── 1. Atualizar status para 'processing' ──
+    // Rastrear tempo total para não estourar o limite de ~150s do Supabase Edge Function
+    const _startTime = Date.now()
     await supabase
       .from(t("uploads"))
       .update({ status: "processing" })
@@ -77,7 +79,7 @@ serve(async (req) => {
       : buildPrompt(periodo, filename)
 
     const claudeCtrl = new AbortController()
-    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 120_000)
+    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 80_000)
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -123,12 +125,19 @@ serve(async (req) => {
     if (validacao1.missing.length > 0) {
       console.log(`⚠️ Validação: ${validacao1.missing.length} campos faltando: ${validacao1.missing.join(', ')}`)
 
+      // Só fazer chamada de correção se ainda tivermos orçamento de tempo
+      // Budget total do Edge Function: ~150s | main_call usa até 80s | precisamos de 25s para correção + margem
+      const _elapsed = Date.now() - _startTime
+      if (_elapsed > 95_000) {
+        console.warn(`⏱ Sem orçamento para correção (${Math.round(_elapsed/1000)}s decorridos). Prosseguindo sem correção.`)
+      } else {
+
       // Re-prompt Claude para extrair campos faltantes
       const correctionPrompt = buildCorrectionPrompt(validacao1.missing, periodo, tipo_documento)
 
       try {
         const corrCtrl = new AbortController()
-        const corrTimeout = setTimeout(() => corrCtrl.abort(), 60_000)
+        const corrTimeout = setTimeout(() => corrCtrl.abort(), 25_000)
         const correctionResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -178,6 +187,7 @@ serve(async (req) => {
       } catch (corrErr: any) {
         console.warn(`Erro na correção (não bloqueante): ${corrErr.message}`)
       }
+      } // fim do else (tem orçamento para correção)
     } else {
       console.log(`✅ Validação OK: todos os campos críticos extraídos`)
       if (validacao1.warnings.length > 0) {
