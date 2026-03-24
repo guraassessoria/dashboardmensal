@@ -400,10 +400,12 @@ export default function AdminPage() {
             style={activeTab === 'upload' ? styles.tabActive : styles.tab}
             onClick={() => setActiveTab('upload')}
           >📤 Upload de Dados</button>
+          {authRole === 'admin' && (
           <button
             style={activeTab === 'users' ? styles.tabActive : styles.tab}
             onClick={() => { setActiveTab('users'); loadUsers() }}
           >👥 Gerenciar Usuários</button>
+          )}
           <button
             style={activeTab === 'insights' ? styles.tabActive : styles.tab}
             onClick={() => { setActiveTab('insights'); loadInsPeriodos() }}
@@ -662,7 +664,7 @@ export default function AdminPage() {
         </div>
         </>)}
 
-        {activeTab === 'users' && (
+        {activeTab === 'users' && authRole === 'admin' && (
         <div style={styles.card}>
           <h2 style={styles.cardTitle}>👥 Gerenciamento de Usuários</h2>
           <p style={styles.cardSub}>
