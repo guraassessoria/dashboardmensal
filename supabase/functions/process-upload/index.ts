@@ -71,8 +71,7 @@ serve(async (req) => {
       : ABAS_ALVO
 
     const sheetText = xlsxToText(workbook, prioritySheets)
-
-    // ── 3. Enviar para Claude API com prompt adequado ao tipo ──
+    console.log(`📄 sheetText gerado: ${sheetText.length} chars | balancete embutido: ${hasEmbeddedBalancete}`)
     // Se DFS tem balancete embutido, usar prompt híbrido que extrai ambos
     const prompt = hasEmbeddedBalancete
       ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
@@ -478,7 +477,7 @@ function deepMerge(existing: any, incoming: any, sourcePriority: 'incoming' | 'e
 }
 
 // ── Converter workbook xlsx para texto legível (otimizado para limites de token) ──
-const MAX_CHARS = 80000 // ~20k tokens
+const MAX_CHARS = 40000 // ~10k tokens — reduzido para manter Claude abaixo de 30s de resposta
 function xlsxToText(workbook: XLSX.WorkBook, prioritySheets?: string[]): string {
   const parts: string[] = []
   let totalChars = 0
