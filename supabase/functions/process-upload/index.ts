@@ -81,7 +81,6 @@ serve(async (req) => {
       : hasEmbeddedBalancete
         ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
         : buildPrompt(periodo, filename)
-      : buildPrompt(periodo, filename)
 
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
