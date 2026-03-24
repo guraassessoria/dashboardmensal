@@ -13,9 +13,11 @@ interface DashUser {
 }
 
 export default function AdminPage() {
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
   const [authError, setAuthError] = useState('')
+  const [authRole, setAuthRole] = useState('')
   const [activeTab, setActiveTab] = useState<'upload' | 'tabelas' | 'users' | 'insights'>('upload')
 
   const [file, setFile] = useState<File | null>(null)
@@ -260,20 +262,24 @@ export default function AdminPage() {
     }
   }
 
-  // ── Autenticação simples ──
+  // ── Autenticação por usuário ──
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    setAuthError('')
     const res = await fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
+      body: JSON.stringify({ username, password })
     })
     if (res.ok) {
+      const data = await res.json()
       setAuthed(true)
+      setAuthRole(data.role || 'editor')
       loadHistory()
       loadUsers()
     } else {
-      setAuthError('Senha incorreta')
+      const err = await res.json()
+      setAuthError(err.error || 'Usuário ou senha incorretos')
     }
   }
 
@@ -352,12 +358,21 @@ export default function AdminPage() {
           <p style={styles.loginSub}>Acesso restrito à equipe autorizada</p>
           <form onSubmit={handleLogin} style={styles.form}>
             <input
+              type="text"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              placeholder="Usuário"
+              style={styles.input}
+              autoFocus
+              autoComplete="username"
+            />
+            <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Senha de acesso"
+              placeholder="Senha"
               style={styles.input}
-              autoFocus
+              autoComplete="current-password"
             />
             {authError && <p style={styles.error}>{authError}</p>}
             <button type="submit" style={styles.btn}>Entrar</button>

@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const ADMIN_PWD = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'cbf2025'
+const AUTH_TOKEN = process.env.AUTH_TOKEN || 'cbf_admin_token_2025'
 
 // Páginas válidas do dashboard
 const PAGINAS_VALIDAS = new Set([
@@ -17,7 +17,7 @@ const PAGINAS_VALIDAS = new Set([
 
 export async function POST(req: NextRequest) {
   const authCookie = req.cookies.get('admin_auth')
-  if (!authCookie || authCookie.value !== ADMIN_PWD) {
+  if (!authCookie || authCookie.value !== AUTH_TOKEN) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
 // DELETE: remover tabela complementar por id
 export async function DELETE(req: NextRequest) {
   const authCookie = req.cookies.get('admin_auth')
-  if (!authCookie || authCookie.value !== ADMIN_PWD) {
+  if (!authCookie || authCookie.value !== AUTH_TOKEN) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 

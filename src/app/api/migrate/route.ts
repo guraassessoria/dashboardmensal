@@ -7,11 +7,11 @@ const supabase = createClient(
 )
 
 // POST /api/migrate — executa migrações pendentes
-const ADMIN_PWD = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASS || 'cbf2025'
+const AUTH_TOKEN = process.env.AUTH_TOKEN || 'cbf_admin_token_2025'
 
 export async function POST(req: NextRequest) {
   const authCookie = req.cookies.get('admin_auth')
-  if (!authCookie || authCookie.value !== ADMIN_PWD) {
+  if (!authCookie || authCookie.value !== AUTH_TOKEN) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
