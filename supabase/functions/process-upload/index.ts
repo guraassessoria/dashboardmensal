@@ -43,6 +43,22 @@ serve(async (req) => {
       .update({ status: "processing" })
       .eq("id", upload_id)
 
+    // ── Dead man's switch ──
+    // Se a função for morta pelo runtime (wall-clock 150s) sem executar o catch,
+    // este timer garante que o status seja atualizado para 'error' antes disso.
+    // Usa Supabase SDK direto (não depende de AbortController)
+    let _deadManFired = false
+    const _deadMan = setTimeout(async () => {
+      _deadManFired = true
+      console.warn('⏱️ Dead man: 120s atingido — marcando como error proativamente')
+      try {
+        await supabase
+          .from(t("uploads"))
+          .update({ status: 'error', error_msg: 'Timeout: processamento excedeu 120s (dead man)' })
+          .eq('id', upload_id)
+      } catch (_e) { /* ignora falha no guard */ }
+    }, 120_000)
+
     // ── 2. Baixar o arquivo do Storage ──
     const { data: fileData, error: downloadError } = await supabase.storage
       .from("uploads-cbf")
@@ -319,6 +335,7 @@ serve(async (req) => {
 
     // ── 7. Marcar upload como concluído (antes dos insights — insights são não-críticos) ──
     // Fazer isso ANTES dos insights para que timeouts no Claude não deixem upload travado
+    clearTimeout(_deadMan) // cancelar dead man switch — tudo correu bem
     await supabase
       .from(t("uploads"))
       .update({ status: "done", processed_at: new Date().toISOString() })
@@ -430,6 +447,7 @@ serve(async (req) => {
 
   } catch (err: any) {
     console.error("Erro no processamento:", err)
+    clearTimeout(_deadMan)
 
     // Marcar upload como erro
     if (_uploadId) {
@@ -685,9 +703,7 @@ Este arquivo contém TANTO as Demonstrações Financeiras (BP, DRE, DFC, Notas) 
 
 ### Da aba de Balancete ("${balanceteSheetName}"):
 - O balancete contém contas contábeis com saldos acumulados
-- Os valores do balancete estão em R$ (reais) — DIVIDA por 1000 para padronizar em R$ milhares
-- Extraia as 20 maiores contas de cada categoria para "contas_detalhadas"
-- Mapeie: 4.x = receitas, 5.x/6.x = custos/despesas, 1.x = ativo, 2.x = passivo, 3.x = PL
+- Use os valores do balancete para COMPLEMENTAR e VALIDAR os totais das DFs
 
 ### Prioridade de dados:
 - Para campos consolidados (DRE, balanço, DFC): use os valores das DFs (são mais confiáveis)
@@ -745,18 +761,12 @@ Retorne APENAS um JSON válido:
   },
   "competicoes": [
     { "nome": "Brasileiro Série A", "valor_2025": 0, "valor_2024": 0 }
-  ],
-  "contas_detalhadas": {
-    "receitas_por_conta": [ { "conta": "4.1.01.01", "descricao": "descricao", "saldo": 0 } ],
-    "custos_por_conta": [ { "conta": "5.1.01.01", "descricao": "descricao", "saldo": 0 } ],
-    "despesas_por_conta": [ { "conta": "6.1.01.01", "descricao": "descricao", "saldo": 0 } ]
-  }
+  ]
 }
 \`\`\`
 
 Use os valores exatos do arquivo. Se um campo não existir, use null.
-Para "competicoes", liste todas as competições da Nota 13.
-Para "contas_detalhadas", extraia do Balancete as 20 maiores contas de cada categoria com saldos convertidos para R$ milhares (dividido por 1000).`
+Para "competicoes", liste todas as competições da Nota 13.`
 }
 
 // ── Prompt para gerar insights analíticos ──
