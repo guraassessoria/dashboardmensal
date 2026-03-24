@@ -989,9 +989,7 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
 </main>
 
-<footer>
-  <p>Confederação Brasileira de Futebol · Demonstrações Financeiras 2025 </p>
-</footer>
+
 </div><!-- /dashboard-content -->
 
 <script>
@@ -1211,9 +1209,7 @@ function _atualizarKPIs() {
   if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} · ${periodo}`;
   // Atualizar título do header
   const hTitle = document.querySelector('.htitles p');
-  if (hTitle && _D.source_file) {
-    hTitle.textContent = `Demonstrações Financeiras · ${periodo} · ${_D.source_file}`;
-  }
+  if (hTitle) hTitle.textContent = 'Demonstrações Financeiras';
 
   // Atualizar ano no header
   const yr = document.querySelector('.yr');
