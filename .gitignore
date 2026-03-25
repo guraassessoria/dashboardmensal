@@ -3,3 +3,8 @@
 node_modules/
 supabase/.temp/
 .next/
+
+.vercel_key_tmp
+tmp_*.js
+DFS*.xlsx
+*.xlsx
