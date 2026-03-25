@@ -335,8 +335,23 @@ export default function AdminPage() {
 
       if (data.status === 'done') {
         clearInterval(interval)
+        setStatus('processing')
+        setMessage('⚙️ Gerando insights analíticos...')
+        try {
+          const insRes = await fetch('/api/generate-insights', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ periodo, upload_id: uploadId })
+          })
+          if (insRes.ok) {
+            setMessage('✅ Dashboard atualizado com sucesso! O Vercel irá redesployer automaticamente.')
+          } else {
+            setMessage('✅ Dashboard atualizado! (insights não gerados — edite manualmente)')
+          }
+        } catch {
+          setMessage('✅ Dashboard atualizado! (insights pendentes — edite manualmente)')
+        }
         setStatus('done')
-        setMessage('✅ Dashboard atualizado com sucesso! O Vercel irá redesployer automaticamente.')
         setFile(null)
         if (fileRef.current) fileRef.current.value = ''
         loadHistory()

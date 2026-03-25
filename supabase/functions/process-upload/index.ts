@@ -1,4 +1,4 @@
-// supabase/functions/process-upload/index.ts
+﻿// supabase/functions/process-upload/index.ts
 // Edge Function: ativada via webhook quando arquivo chega no Storage
 // Lê o xlsx → parseia localmente → envia texto para Claude API → salva JSON no banco
 
@@ -109,7 +109,7 @@ serve(async (req) => {
       : buildPrompt(periodo, filename)
 
     const claudeCtrl = new AbortController()
-    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 65_000)
+    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 55_000)
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -156,9 +156,9 @@ serve(async (req) => {
       console.log(`⚠️ Validação: ${validacao1.missing.length} campos faltando: ${validacao1.missing.join(', ')}`)
 
       // Só fazer chamada de correção se ainda tivermos orçamento de tempo
-      // Budget total do Edge Function: ~150s | main_call usa até 65s | precisamos de 20s para correção + margem
+      // Budget total do Edge Function: ~150s | main_call usa até 55s | precisamos de 15s para correção + margem
       const _elapsed = Date.now() - _startTime
-      if (_elapsed > 75_000) {
+      if (_elapsed > 65_000) {
         console.warn(`⏱ Sem orçamento para correção (${Math.round(_elapsed/1000)}s decorridos). Prosseguindo sem correção.`)
       } else {
 
@@ -167,7 +167,7 @@ serve(async (req) => {
 
       try {
         const corrCtrl = new AbortController()
-        const corrTimeout = setTimeout(() => corrCtrl.abort(), 20_000)
+        const corrTimeout = setTimeout(() => corrCtrl.abort(), 15_000)
         const correctionResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -348,105 +348,12 @@ serve(async (req) => {
       .from(t("configuracao"))
       .upsert({ chave: "periodo_atual", valor: periodo, updated_at: new Date().toISOString() })
 
-    // ── 7. Marcar upload como concluído (antes dos insights — insights são não-críticos) ──
-    // Fazer isso ANTES dos insights para que timeouts no Claude não deixem upload travado
-    clearTimeout(_deadMan) // cancelar dead man switch — tudo correu bem
+    // ── 7. Marcar upload como concluído ──
+    clearTimeout(_deadMan)
     await supabase
       .from(t("uploads"))
       .update({ status: "done", processed_at: new Date().toISOString() })
       .eq("id", upload_id)
-
-    // ── 5.5. Gerar insights analíticos com IA ──
-    // Aguardar 15s para aliviar rate limit (insights usam JSON pequeno, não xlsx completo)
-    console.log("Aguardando reset do rate limit antes de gerar insights...")
-    await new Promise(r => setTimeout(r, 15000))
-
-    // Verificar se o OUTRO arquivo também já foi processado para este período
-    const sources = mergedRaw._sources || {}
-    const hasDfs = !!sources.dfs
-    const hasBalancete = !!sources.balancete
-    const bothFilesAvailable = hasDfs && hasBalancete
-
-    console.log(`Gerando insights analíticos... (DFS: ${hasDfs}, Balancete: ${hasBalancete})`)
-
-    // Buscar dados do período anterior para comparações
-    const { data: dadosAnteriores } = await supabase
-      .from(t("dados_financeiros"))
-      .select("*")
-      .neq("periodo", periodo)
-      .order("periodo", { ascending: false })
-      .limit(1)
-
-    // Usar dados extraídos estruturados (JSON) em vez do xlsx raw para economizar tokens
-    // Remover campos volumosos que não são necessários para insights narrativos
-    const insightData = { ...mergedRaw }
-    delete insightData.contas_detalhadas
-    delete insightData.competicoes
-    const insightDataText = `## DADOS FINANCEIROS EXTRAÍDOS: ${filename}\nPeríodo: ${periodo}\n\n\`\`\`json\n${JSON.stringify(insightData, null, 2)}\n\`\`\``
-
-    const insightsPrompt = buildInsightsPrompt(
-      mergedRaw, dadosAnteriores?.[0] || null, periodo,
-      filename, bothFilesAvailable
-    )
-
-    try {
-      const insightsCtrl = new AbortController()
-      const insightsTimeout = setTimeout(() => insightsCtrl.abort(), 50_000)
-      const insightsResponse = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01"
-        },
-        signal: insightsCtrl.signal,
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 8000,
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: `${insightDataText}\n\n---\n\n${insightsPrompt}` }
-            ]
-          }]
-        })
-      })
-      clearTimeout(insightsTimeout)
-
-      if (insightsResponse.ok) {
-        const insightsData = await insightsResponse.json()
-        const insightsText = insightsData.content?.[0]?.text || ""
-
-        const insightsMatch = insightsText.match(/```json\n?([\s\S]*?)\n?```/) ||
-                              insightsText.match(/\{[\s\S]*\}/)
-
-        if (insightsMatch) {
-          const insightsJSON = JSON.parse(insightsMatch[1] || insightsMatch[0])
-
-          const { error: insightError } = await supabase
-            .from(t("insights_gerados"))
-            .upsert({
-              periodo,
-              upload_id,
-              conteudo: insightsJSON,
-              updated_at: new Date().toISOString()
-            }, { onConflict: "periodo" })
-
-          if (insightError) {
-            console.error("Erro ao salvar insights:", insightError.message)
-          } else {
-            console.log("✅ Insights gerados e salvos com sucesso")
-          }
-        } else {
-          console.warn("Claude não retornou JSON válido para insights")
-        }
-      } else {
-        const errBody = await insightsResponse.text()
-        console.error("Erro na API Claude (insights):", errBody)
-      }
-    } catch (insightErr: any) {
-      console.error("Erro ao gerar insights (não bloqueante):", insightErr.message)
-    }
 
     // ── 8. Disparar rebuild no Vercel ──
     const vercelHook = Deno.env.get("VERCEL_DEPLOY_HOOK")
@@ -818,114 +725,6 @@ Retorne APENAS um JSON válido:
 
 Use os valores exatos do arquivo. Se um campo não existir, use null.
 Para "competicoes", liste todas as competições da Nota 13.`
-}
-
-// ── Prompt para gerar insights analíticos ──
-function buildInsightsPrompt(dadosExtraidos: any, dadosAnteriores: any, periodo: string, filename: string, bothFiles: boolean): string {
-  const anoAtual = periodo.split('-')[0]
-  const anoAnterior = dadosAnteriores ? dadosAnteriores.periodo?.split('-')[0] || String(+anoAtual - 1) : String(+anoAtual - 1)
-
-  const filesNote = bothFiles
-    ? `\n## FONTES DISPONÍVEIS\nVocê recebeu AMBOS os documentos: Demonstrações Financeiras (DFs) e Balancete. Use os dois para cruzar dados, detalhar subcategorias e gerar insights mais ricos. O Balancete possui dados mais granulares por conta contábil; as DFs possuem demonstrações consolidadas com Notas Explicativas.\n`
-    : `\n## FONTE DISPONÍVEL\nApenas um documento disponível (${filename}). Análise baseada nos dados disponíveis.\n`
-
-  return `Você é um analista financeiro sênior especializado em demonstrações financeiras de entidades esportivas brasileiras.
-Analise os dados das planilhas xlsx fornecidos acima, das Demonstrações Financeiras da CBF (período: ${periodo}), e os dados extraídos abaixo para gerar insights analíticos detalhados.
-${filesNote}
-
-## DADOS EXTRAÍDOS DO PERÍODO ATUAL (${periodo})
-${JSON.stringify(dadosExtraidos, null, 2)}
-
-${dadosAnteriores ? `## DADOS DO PERÍODO ANTERIOR (${dadosAnteriores.periodo})
-${JSON.stringify(dadosAnteriores.dados_raw || dadosAnteriores, null, 2)}` : '## DADOS DO PERÍODO ANTERIOR\nNão disponível — use apenas os dados do período atual e do arquivo xlsx.'}
-
-## INSTRUÇÕES
-Gere insights analíticos para um dashboard financeiro executivo da CBF. Os textos devem ser:
-- Profissionais, concisos e objetivos
-- Em português brasileiro
-- Com valores numéricos formatados (R$ X milhões, R$ X,XX bilhões)  
-- Use tags HTML inline: <strong> para valores e destaques
-- Baseados nos dados reais do arquivo xlsx e dos dados extraídos
-- Comparem período atual vs anterior quando houver dados disponíveis
-
-## REGRAS DE CONVENÇÃO CONTÁBIL
-- Receita aumenta = BOM | Receita diminui = RUIM
-- Custo/Despesa aumenta = RUIM | Custo/Despesa diminui = BOM
-- Setas: ▲ para valor que subiu, ▼ para valor que desceu
-
-## SEÇÕES DO DASHBOARD — Consulte as Notas Explicativas do xlsx para detalhar subcategorias
-
-Retorne APENAS um JSON válido:
-
-\`\`\`json
-{
-  "resumo_deficit": "Parágrafo analítico sobre o resultado do exercício (superávit ou déficit). Explicar as causas, o contexto operacional e a posição de caixa. Incluir valores de receita bruta, custos, caixa e receitas financeiras. Máximo 3-4 frases.",
-
-  "receitas_destaque": "Parágrafo curto (2-3 frases) destacando as principais variações de receita entre períodos. Mencionar as maiores quedas e crescimentos por categoria.",
-
-  "custos_selecao_principal": {
-    "titulo": "SELEÇÃO PRINCIPAL +/−R$ XMi (variação total)",
-    "texto": "Detalhamento por subcategoria extraído da Nota 13/14: ex. Serviços Contratados +R$ XMi, Pessoal +R$ XMi, Gerais −R$ XMi, etc."
-  },
-  "custos_selecao_base": {
-    "titulo": "SELEÇÕES DE BASE +/−R$ XMi",
-    "texto": "Detalhamento por subcategoria."
-  },
-  "custos_selecao_femininas": {
-    "titulo": "SELEÇÕES FEMININAS +/−R$ XMi",
-    "texto": "Detalhamento por subcategoria."
-  },
-  "custos_fomento": {
-    "titulo": "CONTRIBUIÇÃO AO FOMENTO DO FUTEBOL +/−R$ XMi",
-    "texto": "Detalhamento por subcategoria."
-  },
-
-  "custos_admin_alerta": "Parágrafo analítico sobre despesas administrativas: variação percentual, principais drivers (jurídico, PCLD, serviços, viagens), valores. 2-3 frases.",
-
-  "balanco_ativo": "Composição do ativo: principais itens com valores e percentuais do ativo total. 2-3 frases.",
-  "balanco_passivo": "Nota sobre passivo e PL: receitas diferidas, contingências, patrimônio. Variações relevantes. 2-3 frases.",
-  "balanco_evolucao": "Evolução patrimonial: comparar ativo total entre períodos, destacar marcos (ex. adiantamento Nike). 2-3 frases.",
-
-  "indicadores_ebitda": "Cálculo e análise do EBITDA/Margem EBITDA. Fórmula usada e interpretação. 2-3 frases.",
-  "indicadores_kanitz": "Análise do Índice de Kanitz (solvência). Valor calculado e interpretação. 1-2 frases.",
-  "indicadores_liquidez_corrente": "Liquidez Corrente: valor, comparação com anterior, interpretação. 1-2 frases.",
-  "indicadores_liquidez_geral": "Liquidez Geral: valor, comparação com anterior, interpretação. 1-2 frases.",
-  "indicadores_liquidez_imediata": "Liquidez Imediata: valor, comparação com anterior, interpretação. 1-2 frases.",
-  "indicadores_dfc": "Análise da DFC: variação total do caixa, principais componentes operacional e investimento. 2-3 frases.",
-  "indicadores_tendencia": "Tendência das disponibilidades ao longo dos anos. Principais marcos. 2-3 frases.",
-
-  "historico_perspectiva": "Perspectiva para os próximos 1-2 anos considerando ciclo de competições (Copa do Mundo, novos contratos). 2-3 frases.",
-
-  "nike_banner": "Texto curto sobre o contrato Nike: valor de antecipação, receita anual registrada no período, vigência. 1-2 frases.",
-
-  "kpis": {
-    "receita_bruta": { "delta": "▼/▲ +/−X% vs ${anoAnterior} (R$X bilhões/milhões)", "sub": "texto complementar curto" },
-    "resultado": { "delta": "▼/▲ descrição da variação do resultado", "sub": "" },
-    "custos_futebol": { "delta": "▲/▼ +/−X% vs ${anoAnterior} (R$X bilhões)", "sub": "" },
-    "caixa": { "delta": "▼/▲ +/−X% vs ${anoAnterior} (R$X bilhões)", "sub": "texto complementar" },
-    "ativo_total": { "delta": "▼/▲ +/−X% vs ${anoAnterior} (R$X bilhões)", "sub": "PL: R$ X bilhões" },
-    "rec_financeiras": { "delta": "▲/▼ +/−X% vs ${anoAnterior} (R$X milhões)", "sub": "" },
-    "transmissao": { "delta": "▼/▲ variação vs anterior", "sub": "% da receita bruta" },
-    "patrocinio": { "delta": "▼/▲ variação vs anterior", "sub": "" },
-    "bilheteria": { "delta": "▼/▲ variação vs anterior", "sub": "descrição" },
-    "registros": { "delta": "▼/▲ variação vs anterior", "sub": "descrição" },
-    "desenvolvimento": { "delta": "▼/▲ variação vs anterior", "sub": "descrição" },
-    "fomento": { "delta": "▲/▼ variação vs anterior", "sub": "% dos custos" },
-    "selecao_principal": { "delta": "▲/▼ variação vs anterior", "sub": "" },
-    "selecao_femininas": { "delta": "▲/▼ variação vs anterior", "sub": "" },
-    "selecao_base": { "delta": "▲/▼ variação vs anterior", "sub": "" },
-    "desp_administrativas": { "delta": "▲/▼ variação vs anterior", "sub": "descrição" },
-    "desp_pessoal": { "delta": "▲/▼ variação vs anterior", "sub": "" }
-  }
-}
-\`\`\`
-
-IMPORTANTE:
-- Use os dados REAIS do arquivo xlsx e dos dados extraídos. Não invente valores.
-- Para os detalhamentos de custos (custos_selecao_principal, etc.), consulte as Notas Explicativas 13 e 14 do xlsx para extrair as subcategorias.
-- Todos os valores no xlsx estão em R$ milhares. Converta para milhões (divida por 1000) na apresentação.
-- Se não houver dados do período anterior, faça análise apenas do período atual.
-- Retorne APENAS o JSON, sem texto antes ou depois.`
 }
 
 // ── Validação pós-extração: verifica se todos os campos esperados foram extraídos ──

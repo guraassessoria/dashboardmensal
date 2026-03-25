@@ -19,16 +19,16 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Auto-timeout: se está em processing por mais de 10 minutos, marcar como erro
+  // Auto-timeout: se está em processing por mais de 3 minutos, marcar como erro
   if (data.status === 'processing' && data.uploaded_at) {
     const elapsed = Date.now() - new Date(data.uploaded_at).getTime()
-    if (elapsed > 10 * 60 * 1000) {
+    if (elapsed > 3 * 60 * 1000) {
       await supabase
         .from(tbl('uploads'))
-        .update({ status: 'error', error_msg: 'Timeout: processamento excedeu 10 minutos' })
+        .update({ status: 'error', error_msg: 'Timeout: processamento excedeu 3 minutos' })
         .eq('id', id)
       data.status = 'error'
-      data.error_msg = 'Timeout: processamento excedeu 10 minutos'
+      data.error_msg = 'Timeout: processamento excedeu 3 minutos'
     }
   }
 
