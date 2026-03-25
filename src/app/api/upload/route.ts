@@ -252,7 +252,7 @@ export async function POST(req: NextRequest) {
         .from(tbl('uploads'))
         .update({ status: 'error', error_msg: err.message?.slice(0, 500) })
         .eq('id', uploadId)
-        .catch(() => {})
+        .then(() => {}, () => {})
     }
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
