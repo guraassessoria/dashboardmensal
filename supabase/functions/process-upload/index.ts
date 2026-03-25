@@ -44,20 +44,26 @@ serve(async (req) => {
       .eq("id", upload_id)
 
     // ── Dead man's switch ──
-    // Se a função for morta pelo runtime (wall-clock 150s) sem executar o catch,
+    // Se a função for morta pelo runtime (wall-clock ~150s) sem executar o catch,
     // este timer garante que o status seja atualizado para 'error' antes disso.
-    // Usa Supabase SDK direto (não depende de AbortController)
+    // Usa fetch() direto (mais rápido que SDK, sem overhead de cliente)
+    // Margem: dispara em 95s → update completa em ~97s → hard kill em ~150s (53s de folga)
     let _deadManFired = false
-    const _deadMan = setTimeout(async () => {
+    const _deadMan = setTimeout(() => {
       _deadManFired = true
-      console.warn('⏱️ Dead man: 120s atingido — marcando como error proativamente')
-      try {
-        await supabase
-          .from(t("uploads"))
-          .update({ status: 'error', error_msg: 'Timeout: processamento excedeu 120s (dead man)' })
-          .eq('id', upload_id)
-      } catch (_e) { /* ignora falha no guard */ }
-    }, 120_000)
+      console.warn('⏱️ Dead man: 95s atingido — marcando como error via fetch direto')
+      const table = t('uploads')
+      fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${upload_id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ status: 'error', error_msg: 'Timeout: processamento excedeu 95s (dead man)' })
+      }).catch(_e => console.error('Dead man fetch falhou:', _e))
+    }, 95_000)
 
     // ── 2. Baixar o arquivo do Storage ──
     const { data: fileData, error: downloadError } = await supabase.storage
@@ -103,7 +109,7 @@ serve(async (req) => {
       : buildPrompt(periodo, filename)
 
     const claudeCtrl = new AbortController()
-    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 80_000)
+    const claudeTimeout = setTimeout(() => claudeCtrl.abort(), 65_000)
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -150,9 +156,9 @@ serve(async (req) => {
       console.log(`⚠️ Validação: ${validacao1.missing.length} campos faltando: ${validacao1.missing.join(', ')}`)
 
       // Só fazer chamada de correção se ainda tivermos orçamento de tempo
-      // Budget total do Edge Function: ~150s | main_call usa até 80s | precisamos de 25s para correção + margem
+      // Budget total do Edge Function: ~150s | main_call usa até 65s | precisamos de 20s para correção + margem
       const _elapsed = Date.now() - _startTime
-      if (_elapsed > 95_000) {
+      if (_elapsed > 75_000) {
         console.warn(`⏱ Sem orçamento para correção (${Math.round(_elapsed/1000)}s decorridos). Prosseguindo sem correção.`)
       } else {
 
@@ -161,7 +167,7 @@ serve(async (req) => {
 
       try {
         const corrCtrl = new AbortController()
-        const corrTimeout = setTimeout(() => corrCtrl.abort(), 25_000)
+        const corrTimeout = setTimeout(() => corrCtrl.abort(), 20_000)
         const correctionResponse = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
