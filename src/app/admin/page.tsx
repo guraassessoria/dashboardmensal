@@ -305,62 +305,46 @@ export default function AdminPage() {
     formData.append('tipo_documento', 'dfs')
 
     try {
+      setStatus('processing')
+      setMessage('⏳ Enviando e processando com IA... (pode levar até 60s)')
+
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       })
 
+      const data = await res.json()
+
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Erro no upload')
+        throw new Error(data.error || 'Erro no processamento')
       }
 
-      const data = await res.json()
+      // Upload processado com sucesso — disparar insights em segundo plano
       setStatus('processing')
-      setMessage(`Arquivo enviado! Processando com IA... (ID: ${data.upload_id})`)
-
-      // Polling do status
-      pollStatus(data.upload_id)
+      setMessage('⚙️ Gerando insights analíticos...')
+      try {
+        const insRes = await fetch('/api/generate-insights', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ periodo: data.periodo || periodo, upload_id: data.upload_id })
+        })
+        if (insRes.ok) {
+          setMessage('✅ Dashboard atualizado com sucesso! O Vercel irá redesployer automaticamente.')
+        } else {
+          setMessage('✅ Dashboard atualizado! (insights não gerados — edite manualmente)')
+        }
+      } catch {
+        setMessage('✅ Dashboard atualizado! (insights pendentes — edite manualmente)')
+      }
+      setStatus('done')
+      setFile(null)
+      if (fileRef.current) fileRef.current.value = ''
+      loadHistory()
 
     } catch (err: any) {
       setStatus('error')
-      setMessage(`Erro: ${err.message}`)
+      setMessage(`❌ Erro: ${err.message}`)
     }
-  }
-
-  async function pollStatus(uploadId: string) {
-    const interval = setInterval(async () => {
-      const res = await fetch(`/api/upload-status?id=${uploadId}`)
-      const data = await res.json()
-
-      if (data.status === 'done') {
-        clearInterval(interval)
-        setStatus('processing')
-        setMessage('⚙️ Gerando insights analíticos...')
-        try {
-          const insRes = await fetch('/api/generate-insights', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ periodo, upload_id: uploadId })
-          })
-          if (insRes.ok) {
-            setMessage('✅ Dashboard atualizado com sucesso! O Vercel irá redesployer automaticamente.')
-          } else {
-            setMessage('✅ Dashboard atualizado! (insights não gerados — edite manualmente)')
-          }
-        } catch {
-          setMessage('✅ Dashboard atualizado! (insights pendentes — edite manualmente)')
-        }
-        setStatus('done')
-        setFile(null)
-        if (fileRef.current) fileRef.current.value = ''
-        loadHistory()
-      } else if (data.status === 'error') {
-        clearInterval(interval)
-        setStatus('error')
-        setMessage(`❌ Erro no processamento: ${data.error_msg}`)
-      }
-    }, 3000) // Check a cada 3s
   }
 
   if (!authed) {
