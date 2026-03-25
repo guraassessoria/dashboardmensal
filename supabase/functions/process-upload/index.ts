@@ -80,16 +80,25 @@ serve(async (req) => {
       console.log(`📋 Balancete embutido detectado na aba: "${balanceteSheetName}"`)
     }
 
-    // Priorizar abas relevantes (BP, DRE, DFC, notas) para não estourar o limite de chars
-    // Se tem balancete embutido, incluir também a aba de balancete nas prioritárias
-    const prioritySheets = hasEmbeddedBalancete
-      ? [...ABAS_ALVO, balanceteSheetName!]
-      : ABAS_ALVO
+    // Processar abas principais (BP, DRE, DFC, notas) excluindo o balancete do fluxo normal
+    const sheetText = xlsxToText(workbook, ABAS_ALVO)
 
-    const sheetText = xlsxToText(workbook, prioritySheets)
-    console.log(`📄 sheetText gerado: ${sheetText.length} chars | balancete embutido: ${hasEmbeddedBalancete}`)
-    // Se DFS tem balancete embutido, usar prompt híbrido que extrai ambos
-    const prompt = hasEmbeddedBalancete
+    // Processar balancete separadamente com filtro inteligente (só período corrente + sintéticas)
+    let balanceteText = ''
+    let balanceteEfetivo = false
+    if (hasEmbeddedBalancete) {
+      balanceteText = balanceteToText(workbook, balanceteSheetName!, periodo)
+      balanceteEfetivo = balanceteText.length > 200
+      console.log(`📊 Balancete filtrado: ${balanceteText.length} chars | incluído: ${balanceteEfetivo}`)
+    }
+
+    const textoCompleto = balanceteEfetivo
+      ? sheetText + '\n\n' + balanceteText
+      : sheetText
+    console.log(`📄 Texto total ao Claude: ${textoCompleto.length} chars`)
+
+    // Usar prompt híbrido apenas se o balancete efetivamente foi incluído
+    const prompt = balanceteEfetivo
       ? buildHybridPrompt(periodo, filename, balanceteSheetName!)
       : buildPrompt(periodo, filename)
 
@@ -109,7 +118,7 @@ serve(async (req) => {
         messages: [{
           role: "user",
           content: [
-            { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX: ${filename}\n\n${sheetText}\n\n---\n\n${prompt}` }
+            { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX: ${filename}\n\n${textoCompleto}\n\n---\n\n${prompt}` }
           ]
         }]
       })
@@ -167,7 +176,7 @@ serve(async (req) => {
             messages: [{
               role: "user",
               content: [
-                { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX\n\n${sheetText}\n\n---\n\n${correctionPrompt}` }
+                { type: "text", text: `## CONTEÚDO DO ARQUIVO XLSX\n\n${textoCompleto}\n\n---\n\n${correctionPrompt}` }
               ]
             }]
           })
@@ -492,6 +501,42 @@ function deepMerge(existing: any, incoming: any, sourcePriority: 'incoming' | 'e
     result[key] = deepMerge(existing[key], val, sourcePriority)
   }
   return result
+}
+
+// ── Extrair balancete de forma inteligente: só período corrente + contas sintéticas ──
+// Reduz de ~2.4M chars para ~20K chars mantendo apenas os totais por grupo de conta
+function balanceteToText(workbook: XLSX.WorkBook, sheetName: string, periodo: string): string {
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return ''
+
+  // Converter período "2025-01" → "1/31/25" (formato M/DD/YY usado no balancete)
+  const [ano, mes] = periodo.split('-')
+  const month = parseInt(mes)
+  const year = parseInt(ano)
+  // Último dia do mês
+  const lastDay = new Date(year, month, 0).getDate()
+  const periodoBalancete = `${month}/${lastDay}/${String(year).slice(2)}`
+
+  const csv = XLSX.utils.sheet_to_csv(sheet, { FS: "|", blankrows: false })
+  const lines = csv.split("\n")
+
+  // Linha de cabeçalho (contém 'Período' ou 'Conta')
+  const headerLine = lines.find(l => l.includes('Período') || l.includes('Conta'))
+
+  // Filtrar: só período corrente E só linhas sintéticas (|S|)
+  const filtradas = lines.filter(l => {
+    const cols = l.split('|')
+    return cols[1] === periodoBalancete && /\|S\|/.test(l)
+  })
+
+  if (filtradas.length === 0) {
+    console.warn(`⚠️ Balancete: nenhuma linha encontrada para período ${periodoBalancete}`)
+    return ''
+  }
+
+  console.log(`📊 Balancete: ${filtradas.length} contas sintéticas para ${periodoBalancete}`)
+  const header = headerLine ? headerLine + '\n' : ''
+  return `### Aba: ${sheetName} (período ${periodoBalancete}, contas sintéticas)\n${header}${filtradas.join('\n')}`
 }
 
 // ── Converter workbook xlsx para texto legível (otimizado para limites de token) ──
