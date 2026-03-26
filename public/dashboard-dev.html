@@ -2753,16 +2753,17 @@ async function loadPeriodo(periodo) {
   console.log('[CBF] Carregando período:', periodo);
 
   // Montar mapa de anos do Supabase para série histórica
+  // Valores no DB já em R$ milhares — sem /1000
   const supaMap = {};
   _allDados.forEach(row => {
     const ano = row.periodo.split('-')[0];
     supaMap[ano] = {
       label: ano,
-      receita:   Math.round(+row.receita_bruta / 1000),
-      resultado: Math.round(+row.resultado_exercicio / 1000),
-      custos:    Math.round(Math.abs(+row.custos_futebol) / 1000),
-      caixa:     Math.round(+row.caixa_equivalentes / 1000),
-      ativo:     Math.round(+row.ativo_total / 1000),
+      receita:   Math.round(+row.receita_bruta || 0),
+      resultado: Math.round(+row.resultado_exercicio || 0),
+      custos:    Math.round(Math.abs(+row.custos_futebol) || 0),
+      caixa:     Math.round(+row.caixa_equivalentes || 0),
+      ativo:     Math.round(+row.ativo_total || 0),
     };
   });
 
@@ -2811,27 +2812,28 @@ async function loadPeriodo(periodo) {
     custos_serie:    cus_serie,
     caixa_serie,
 
+    // Valores DB em R$ milhares — sem /1000
     receitas_composicao: [
-      Math.round(Math.abs(+d.rec_transmissao) / 1000),
-      Math.round(Math.abs(+d.rec_patrocinio) / 1000),
-      Math.round(Math.abs(+d.rec_bilheteria) / 1000),
-      Math.round(Math.abs(+d.rec_registros) / 1000),
-      Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000),
+      Math.round(Math.abs(+d.rec_transmissao) || 0),
+      Math.round(Math.abs(+d.rec_patrocinio) || 0),
+      Math.round(Math.abs(+d.rec_bilheteria) || 0),
+      Math.round(Math.abs(+d.rec_registros) || 0),
+      Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) || 0),
     ],
     custos_composicao: [
-      Math.round(Math.abs(+d.custo_fomento) / 1000),
-      Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
-      Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
-      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
+      Math.round(Math.abs(+d.custo_fomento) || 0),
+      Math.round(Math.abs(+d.custo_selecao_principal) || 0),
+      Math.round(Math.abs(+d.custo_selecao_femininas) || 0),
+      Math.round(Math.abs(+d.custo_selecao_base) || 0),
     ],
 
-    custo_selecao_principal: Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
-    custo_selecao_base:      Math.round(Math.abs(+d.custo_selecao_base) / 1000),
-    custo_selecao_femininas: Math.round(Math.abs(+d.custo_selecao_femininas) / 1000),
-    custo_fomento:           Math.round(Math.abs(+d.custo_fomento) / 1000),
-    desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) / 1000),
-    desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) / 1000),
-    desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) / 1000),
+    custo_selecao_principal: Math.round(Math.abs(+d.custo_selecao_principal) || 0),
+    custo_selecao_base:      Math.round(Math.abs(+d.custo_selecao_base) || 0),
+    custo_selecao_femininas: Math.round(Math.abs(+d.custo_selecao_femininas) || 0),
+    custo_fomento:           Math.round(Math.abs(+d.custo_fomento) || 0),
+    desp_pessoal:            Math.round(Math.abs(+d.desp_pessoal) || 0),
+    desp_administrativas:    Math.round(Math.abs(+d.desp_administrativas) || 0),
+    desp_impostos_taxas:     Math.round(Math.abs(+d.desp_impostos_taxas) || 0),
   };
 
   // Atualizar GD
@@ -2860,22 +2862,22 @@ async function loadPeriodo(periodo) {
     const elSel = document.getElementById('ctitle-selecoes-comp');
     if (elSel) elSel.textContent = 'Custos das Seleções ' + yy + ' vs ' + GD.anoAnterior;
     GD.comp_2025 = [
-      Math.round(Math.abs(+d.rec_transmissao) / 1000),
-      Math.round(Math.abs(+d.rec_patrocinio) / 1000),
-      Math.round(Math.abs(+d.rec_bilheteria) / 1000),
-      Math.round(Math.abs(+d.rec_registros) / 1000)
+      Math.round(Math.abs(+d.rec_transmissao) || 0),
+      Math.round(Math.abs(+d.rec_patrocinio) || 0),
+      Math.round(Math.abs(+d.rec_bilheteria) || 0),
+      Math.round(Math.abs(+d.rec_registros) || 0)
     ];
     if (dP) {
       GD.sel_2024 = [
-        Math.round(Math.abs(+dP.custo_selecao_principal) / 1000),
-        Math.round(Math.abs(+dP.custo_selecao_base) / 1000),
-        Math.round(Math.abs(+dP.custo_selecao_femininas) / 1000)
+        Math.round(Math.abs(+dP.custo_selecao_principal) || 0),
+        Math.round(Math.abs(+dP.custo_selecao_base) || 0),
+        Math.round(Math.abs(+dP.custo_selecao_femininas) || 0)
       ];
       GD.comp_2024 = [
-        Math.round(Math.abs(+dP.rec_transmissao) / 1000),
-        Math.round(Math.abs(+dP.rec_patrocinio) / 1000),
-        Math.round(Math.abs(+dP.rec_bilheteria) / 1000),
-        Math.round(Math.abs(+dP.rec_registros) / 1000)
+        Math.round(Math.abs(+dP.rec_transmissao) || 0),
+        Math.round(Math.abs(+dP.rec_patrocinio) || 0),
+        Math.round(Math.abs(+dP.rec_bilheteria) || 0),
+        Math.round(Math.abs(+dP.rec_registros) || 0)
       ];
       const lcP = dP.passivo_circulante ? (dP.ativo_circulante / dP.passivo_circulante) : 0;
       const liP = dP.passivo_circulante ? (dP.caixa_equivalentes / dP.passivo_circulante) : 0;
