@@ -1935,15 +1935,59 @@ function _rebuildDRE(d, dPrev) {
   const hdr = label => '<tr class="dre-header"><td colspan="' + cols + '">' + label + '</td></tr>';
   const p = dPrev || {};
 
-  // Sub-objetos detalhados de dados_raw
-  const rRec = d.dados_raw?.receitas || {};
-  const pRec = p.dados_raw?.receitas || {};
-  const rCus = d.dados_raw?.custos_futebol || {};
-  const pCus = p.dados_raw?.custos_futebol || {};
-  const rDesp = d.dados_raw?.despesas || {};
-  const pDesp = p.dados_raw?.despesas || {};
-  const rFin = d.dados_raw?.resultado_financeiro || {};
-  const pFin = p.dados_raw?.resultado_financeiro || {};
+  // Sub-objetos de detalhe — lidos das colunas top-level (extração direta do balancete/DRE)
+  // com fallback para dados_raw (extração legada via Claude)
+  const _tv = (obj, col, rawObj, rawKey) => obj[col] != null ? obj[col] : (rawObj?.[rawKey] ?? null);
+  const rRec = {
+    patrocinio:    _tv(d, 'rec_patrocinio',   d.dados_raw?.receitas, 'patrocinio'),
+    transmissao:   _tv(d, 'rec_transmissao',  d.dados_raw?.receitas, 'transmissao'),
+    bilheteria:    _tv(d, 'rec_bilheteria',   d.dados_raw?.receitas, 'bilheteria'),
+    registros:     _tv(d, 'rec_registros',    d.dados_raw?.receitas, 'registros'),
+    desenvolvimento: _tv(d, 'rec_desenvolvimento', d.dados_raw?.receitas, 'desenvolvimento'),
+    academy:       _tv(d, 'rec_academy',      d.dados_raw?.receitas, 'academy'),
+    legado:        _tv(d, 'rec_legado',       d.dados_raw?.receitas, 'legado'),
+  };
+  const pRec = {
+    patrocinio:    _tv(p, 'rec_patrocinio',   p.dados_raw?.receitas, 'patrocinio'),
+    transmissao:   _tv(p, 'rec_transmissao',  p.dados_raw?.receitas, 'transmissao'),
+    bilheteria:    _tv(p, 'rec_bilheteria',   p.dados_raw?.receitas, 'bilheteria'),
+    registros:     _tv(p, 'rec_registros',    p.dados_raw?.receitas, 'registros'),
+    desenvolvimento: _tv(p, 'rec_desenvolvimento', p.dados_raw?.receitas, 'desenvolvimento'),
+    academy:       _tv(p, 'rec_academy',      p.dados_raw?.receitas, 'academy'),
+    legado:        _tv(p, 'rec_legado',       p.dados_raw?.receitas, 'legado'),
+  };
+  const rCus = {
+    selecao_principal:  _tv(d, 'custo_selecao_principal',  d.dados_raw?.custos_futebol, 'selecao_principal'),
+    selecoes_base:      _tv(d, 'custo_selecao_base',       d.dados_raw?.custos_futebol, 'selecoes_base'),
+    selecoes_femininas: _tv(d, 'custo_selecao_femininas',  d.dados_raw?.custos_futebol, 'selecoes_femininas'),
+    fomento:            _tv(d, 'custo_fomento',            d.dados_raw?.custos_futebol, 'fomento'),
+  };
+  const pCus = {
+    selecao_principal:  _tv(p, 'custo_selecao_principal',  p.dados_raw?.custos_futebol, 'selecao_principal'),
+    selecoes_base:      _tv(p, 'custo_selecao_base',       p.dados_raw?.custos_futebol, 'selecoes_base'),
+    selecoes_femininas: _tv(p, 'custo_selecao_femininas',  p.dados_raw?.custos_futebol, 'selecoes_femininas'),
+    fomento:            _tv(p, 'custo_fomento',            p.dados_raw?.custos_futebol, 'fomento'),
+  };
+  const rDesp = {
+    pessoal:         _tv(d, 'desp_pessoal',         d.dados_raw?.despesas, 'pessoal'),
+    administrativas: _tv(d, 'desp_administrativas', d.dados_raw?.despesas, 'administrativas'),
+    impostos_taxas:  _tv(d, 'desp_impostos_taxas',  d.dados_raw?.despesas, 'impostos_taxas'),
+  };
+  const pDesp = {
+    pessoal:         _tv(p, 'desp_pessoal',         p.dados_raw?.despesas, 'pessoal'),
+    administrativas: _tv(p, 'desp_administrativas', p.dados_raw?.despesas, 'administrativas'),
+    impostos_taxas:  _tv(p, 'desp_impostos_taxas',  p.dados_raw?.despesas, 'impostos_taxas'),
+  };
+  const rFin = {
+    receitas_financeiras: _tv(d, 'res_fin_receitas', d.dados_raw?.resultado_financeiro, 'receitas_financeiras'),
+    despesas_financeiras: _tv(d, 'res_fin_despesas', d.dados_raw?.resultado_financeiro, 'despesas_financeiras'),
+    variacao_cambial:     _tv(d, 'res_fin_cambial',  d.dados_raw?.resultado_financeiro, 'variacao_cambial'),
+  };
+  const pFin = {
+    receitas_financeiras: _tv(p, 'res_fin_receitas', p.dados_raw?.resultado_financeiro, 'receitas_financeiras'),
+    despesas_financeiras: _tv(p, 'res_fin_despesas', p.dados_raw?.resultado_financeiro, 'despesas_financeiras'),
+    variacao_cambial:     _tv(p, 'res_fin_cambial',  p.dados_raw?.resultado_financeiro, 'variacao_cambial'),
+  };
   const dr = d.dados_raw?.dre || {};
   const drP = p.dados_raw?.dre || {};
 
