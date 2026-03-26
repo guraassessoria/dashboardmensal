@@ -217,21 +217,12 @@ function extractBalanceteByDfs(workbook, sheetName, periodo) {
 
   if (Object.keys(sums).length === 0) return null
 
-  // ── Detecção automática de escala ────────────────────────────────────────────
-  // Balancetes normalmente têm valores em R$ reais (ex: 159.161.291) → dividir por 1000.
-  // Se max < 1.000.000, os valores já estão em R$ milhares → não dividir.
-  const maxAbsSum = Math.max(...Object.values(sums).map(Math.abs))
-  const balScale = maxAbsSum > 1_000_000 ? 1000 : 1
-  if (balScale === 1) {
-    console.log(`      ℹ️  Balancete — valores em R$ milhares detectados (max=${maxAbsSum.toFixed(0)}), sem ÷1000`)
-  }
-
-  // Aplicar sinal e converter para milhares (ou manter se já em milhares)
+  // VALOR_SF já está em R$ milhares — usar diretamente, sem divisão
   const bal = {}
   for (const [field, sum] of Object.entries(sums)) {
     const dfsKey = Object.keys(DFS_TO_FIELD).find(k => DFS_TO_FIELD[k] === field)
     const negate = dfsKey && DFS_NEGATE.some(p => dfsKey.startsWith(p))
-    bal[field] = parseFloat(((negate ? -sum : sum) / balScale).toFixed(3))
+    bal[field] = parseFloat((negate ? -sum : sum).toFixed(3))
   }
 
   // Calcular campos totais derivados

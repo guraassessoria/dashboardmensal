@@ -1110,18 +1110,18 @@ function _pct(a, b) {
 // ── Dados para os gráficos (com fallback hardcoded) ──
 const GD = {
   // Receitas doughnut (c1)
-  rec_composicao: _D?.receitas_composicao || [638, 438, 55, 51, 12],
+  rec_composicao: _D?.receitas_composicao || [638000, 438000, 55000, 51000, 12000],
   
   // Custos doughnut (c2)
-  cus_composicao: _D?.custos_composicao || [757, 281, 94, 45],
+  cus_composicao: _D?.custos_composicao || [757000, 281000, 94000, 45000],
   
   // Resultado histórico (c3, c11, c12)
   hist_labels:    _D?.labels || ['2021','2022','2023','2024','2025'],
-  hist_resultado: _D?.resultado_serie || [69, 143, 238, 107, -182],
-  hist_receita:   _D?.receita_serie   || [971, 1072, 1172, 1302, 1193],
-  hist_custos:    _D?.custos_serie    || [690, 702, 701, 1079, 1177],
-  hist_caixa:     _D?.caixa_serie     || [1040, 1040, 1041, 2433, 1997],
-  hist_despesas:  _D?.despesas_serie  || [170, 199, 162, 208, 438],
+  hist_resultado: _D?.resultado_serie || [69000, 143000, 238000, 107000, -182000],
+  hist_receita:   _D?.receita_serie   || [971000, 1072000, 1172000, 1302000, 1193000],
+  hist_custos:    _D?.custos_serie    || [690000, 702000, 701000, 1079000, 1177000],
+  hist_caixa:     _D?.caixa_serie     || [1040000, 1040000, 1041000, 2433000, 1997000],
+  hist_despesas:  _D?.despesas_serie  || [170000, 199000, 162000, 208000, 438000],
   
   // Labels dinâmicos para ano atual/anterior
   anoAtual: '2026',
@@ -1131,7 +1131,7 @@ const GD = {
   comp_2025: _D?.receitas_composicao
     ? [_D.receitas_composicao[0], _D.receitas_composicao[1],
        _D.receitas_composicao[2], _D.receitas_composicao[3]]
-    : [638, 438, 55, 51],
+    : [638000, 438000, 55000, 51000],
   comp_2024: [],
   
   // Seleções (c8)
@@ -1139,7 +1139,7 @@ const GD = {
     Math.round((_D.custo_selecao_principal||0)),
     Math.round((_D.custo_selecao_base||0)),
     Math.round((_D.custo_selecao_femininas||0))
-  ] : [281, 45, 94],
+  ] : [281000, 45000, 94000],
   sel_2024: [],
   
   // Estrutura custos (c7)
@@ -1150,7 +1150,7 @@ const GD = {
     Math.round((_D.custo_selecao_femininas||0)),
     Math.round((_D.desp_pessoal||0)),
     Math.round((_D.custo_selecao_base||0))
-  ] : [757, 281, 369, 94, 58, 45],
+  ] : [757000, 281000, 369000, 94000, 58000, 45000],
   
   // Balanço (cbp1, cbp2, cbp3)
   ativo_composicao: _D ? [
@@ -1159,17 +1159,17 @@ const GD = {
     Math.round(((_D.tributos_recuperar||0)+76)),
     Math.round((_D.depositos_judiciais||0)),
     Math.round(((_D.imobilizado||0)+61))
-  ] : [1997, 292, 125, 607, 370],
+  ] : [1997000, 292000, 125000, 607000, 370000],
   
   passivo_composicao: _D ? [
     Math.round(_D.passivo_circulante||0),
     Math.round(_D.receitas_diferidas_lp||0),
     Math.round(_D.prov_contingencias||0),
     Math.round(_D.patrimonio_liquido||0)
-  ] : [611, 849, 672, 1260],
+  ] : [611000, 849000, 672000, 1260000],
   
-  ativo_hist:  _D?.caixa_serie ? _D.caixa_serie.map(v => Math.round(v * 3.4 / 2)) : [1620,1872,2161,3617,3391],
-  caixa_hist:  _D?.caixa_serie || [724,888,1041,2433,1997],
+  ativo_hist:  _D?.caixa_serie ? _D.caixa_serie.map(v => Math.round(v * 3.4 / 2)) : [1620000,1872000,2161000,3617000,3391000],
+  caixa_hist:  _D?.caixa_serie || [724000,888000,1041000,2433000,1997000],
 
   // Balanço Patrimonial 10 anos (cbp3) — dinâmico via loadPeriodo
   bp_labels_10yr: [],
@@ -1857,18 +1857,18 @@ const _supaHeaders = {
 
 // Dados históricos hardcoded (2016-2024) — fonte: DFS auditadas
 const HIST = {
-  '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040, ativo:1620 },
-  '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040, ativo:1872 },
-  '2023': { label:'2023', receita:1172, resultado:238, custos:701,  caixa:1041, ativo:2161 },
-  '2024': { label:'2024', receita:1302, resultado:107, custos:1079, caixa:2433, ativo:3617 },
+  '2021': { label:'2021', receita:971000,  resultado:69000,  custos:690000,  caixa:1040000, ativo:1620000 },
+  '2022': { label:'2022', receita:1072000, resultado:143000, custos:702000,  caixa:1040000, ativo:1872000 },
+  '2023': { label:'2023', receita:1172000, resultado:238000, custos:701000,  caixa:1041000, ativo:2161000 },
+  '2024': { label:'2024', receita:1302000, resultado:107000, custos:1079000, caixa:2433000, ativo:3617000 },
 };
 // Dados 10 anos pré-2021 (só ativo e caixa) — fonte: relatórios anuais
 const HIST_10YR = {
-  '2016': { label:'2016', caixa:245, ativo:800 },
-  '2017': { label:'2017', caixa:361, ativo:960 },
-  '2018': { label:'2018', caixa:517, ativo:1200 },
-  '2019': { label:'2019', caixa:697, ativo:1400 },
-  '2020': { label:'2020', caixa:873, ativo:1500 },
+  '2016': { label:'2016', caixa:245000, ativo:800000 },
+  '2017': { label:'2017', caixa:361000, ativo:960000 },
+  '2018': { label:'2018', caixa:517000, ativo:1200000 },
+  '2019': { label:'2019', caixa:697000, ativo:1400000 },
+  '2020': { label:'2020', caixa:873000, ativo:1500000 },
 };
 
 // Cache de todos os registros de dados_financeiros
