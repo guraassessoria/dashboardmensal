@@ -59,6 +59,9 @@ if (!isBulkMode && (!ARG || !existsSync(ARG))) {
 
 const TABLE_PREFIX = 'dev_'  // mudar para '' em produção
 const tbl = (t) => TABLE_PREFIX + t
+const FORCE = process.argv.includes('--force')
+const FROM_IDX = process.argv.indexOf('--from')
+const FROM_PERIODO = FROM_IDX !== -1 ? process.argv[FROM_IDX + 1] : null
 
 const ABAS_ALVO = ['BP', 'DRE', 'DFC', 'DMPL', 'DRA',
   '12.Receita Bruta', '13.Custos com futebol',
@@ -246,7 +249,7 @@ function buildBalanceteOnlyPrompt(periodo) {
   return `Você é especialista em demonstrações financeiras brasileiras.
 Analise o balancete contábil da CBF para o período ${dataRef}.
 Os dados são contas sintéticas. Use a coluna VALOR SF (Saldo Final) ou Saldo Atual.
-Valores em reais. Divida todos os valores numéricos por 1000 antes de retornar no JSON (retorne em milhares de reais, R$ mil).
+Valores em reais (não converter para milhares).
 
 Retorne APENAS um JSON válido:
 \`\`\`json
@@ -281,7 +284,7 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     .maybeSingle()
 
   const storedHash = existingRow?.dados_raw?._balancete_hash ?? null
-  if (storedHash && storedHash === balanceteHash) {
+  if (!FORCE && storedHash && storedHash === balanceteHash) {
     console.log(`   ⏭️  ${periodo} — balancete inalterado, pulando`)
     return { ok: true, periodo, skipped: true }
   }
@@ -330,7 +333,11 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
   if (!jsonMatch) throw new Error('Claude não retornou JSON válido')
 
   const dados = JSON.parse(jsonMatch[1] || jsonMatch[0])
-  const balanco = dados.balanco || {}
+  // Claude retorna valores em reais; converter para milhares (÷1000) no JS
+  const rawBalanco = dados.balanco || {}
+  const balanco = Object.fromEntries(
+    Object.entries(rawBalanco).map(([k, v]) => [k, typeof v === 'number' ? v / 1000 : v])
+  )
   const existingRaw = existingRow?.dados_raw || {}
   const pick = (inc, ex) => (inc !== null && inc !== undefined) ? inc : ex
 
@@ -398,7 +405,11 @@ async function mainFromBalancete(filePath) {
   console.log(`   Aba: ${balanceteSheetName}`)
 
   const rawPeriodos = getAllBalancetePeriods(workbook, balanceteSheetName)
-  const periodos = [...new Set(rawPeriodos.map(s => periodStringToYearMonth(s)).filter(Boolean))].sort()
+  let periodos = [...new Set(rawPeriodos.map(s => periodStringToYearMonth(s)).filter(Boolean))].sort()
+  if (FROM_PERIODO) {
+    periodos = periodos.filter(p => p >= FROM_PERIODO)
+    console.log(`   Filtrando a partir de: ${FROM_PERIODO}`)
+  }
   console.log(`   Períodos (${periodos.length}): ${periodos.join(', ')}\n`)
 
   const results = { ok: [], skip: [], error: [] }

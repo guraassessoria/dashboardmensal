@@ -2148,13 +2148,20 @@ function _rebuildBP(d, dPrev) {
   hp += hdr('Não Circulante');
   passNCircFields.forEach(k => { hp += maybeRow(k); });
   hp += hdr('Patrimônio Líquido');
-  hp += maybeRow('patrimonio_social');
-  // Resultado do Exercício = superávit/déficit do período corrente (DRE), não acumulado
-  const _reVal = d.resultado_exercicio != null ? +d.resultado_exercicio : bv(d,'resultado_acumulado');
-  const _rePrev = p.resultado_exercicio != null ? +p.resultado_exercicio : bv(p,'resultado_acumulado');
-  if (_reVal != null) {
-    const stlRe = _reVal < 0 ? 'color:var(--neg);' : '';
-    hp += row('Resultado do Exercício', _reVal, Object.keys(p).length ? _rePrev : null, false, stlRe);
+  // Patrimônio Social = equity acumulada trazida (PL total - resultado corrente)
+  // Resultado do Exercício = YTD result do período (resultado_acumulado do balancete)
+  const _plTot  = bv(d, 'patrimonio_liquido');
+  const _resAcum = bv(d, 'resultado_acumulado');
+  const _plTotPrev  = bv(p, 'patrimonio_liquido');
+  const _resAcumPrev = bv(p, 'resultado_acumulado');
+  if (_plTot != null && _resAcum != null) {
+    const _patAcum = _plTot - _resAcum;
+    const _patAcumPrev = (_plTotPrev != null && _resAcumPrev != null) ? _plTotPrev - _resAcumPrev : null;
+    hp += row('Patrimônio Social', _patAcum, _patAcumPrev, false);
+    const stlRe = _resAcum < 0 ? 'color:var(--neg);' : '';
+    hp += row('Resultado do Exercício', _resAcum, _resAcumPrev, false, stlRe);
+  } else {
+    plFields.forEach(k => { hp += maybeRow(k); });
   }
   const _plVal = bv(d,'patrimonio_liquido'); const _plPrev = bv(p,'patrimonio_liquido');
   if (_plVal != null) hp += row('Total do Patrimônio Líquido', _plVal, _plPrev, true);
