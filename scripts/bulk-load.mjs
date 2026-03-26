@@ -217,12 +217,21 @@ function extractBalanceteByDfs(workbook, sheetName, periodo) {
 
   if (Object.keys(sums).length === 0) return null
 
-  // Aplicar sinal e converter para milhares
+  // ── Detecção automática de escala ────────────────────────────────────────────
+  // Balancetes normalmente têm valores em R$ reais (ex: 159.161.291) → dividir por 1000.
+  // Se max < 1.000.000, os valores já estão em R$ milhares → não dividir.
+  const maxAbsSum = Math.max(...Object.values(sums).map(Math.abs))
+  const balScale = maxAbsSum > 1_000_000 ? 1000 : 1
+  if (balScale === 1) {
+    console.log(`      ℹ️  Balancete — valores em R$ milhares detectados (max=${maxAbsSum.toFixed(0)}), sem ÷1000`)
+  }
+
+  // Aplicar sinal e converter para milhares (ou manter se já em milhares)
   const bal = {}
   for (const [field, sum] of Object.entries(sums)) {
     const dfsKey = Object.keys(DFS_TO_FIELD).find(k => DFS_TO_FIELD[k] === field)
     const negate = dfsKey && DFS_NEGATE.some(p => dfsKey.startsWith(p))
-    bal[field] = parseFloat(((negate ? -sum : sum) / 1000).toFixed(3))
+    bal[field] = parseFloat(((negate ? -sum : sum) / balScale).toFixed(3))
   }
 
   // Calcular campos totais derivados
@@ -286,7 +295,7 @@ function extractDREFromSheet(workbook, periodo) {
   if (valCol < 0) return null  // período não existe nesta aba
 
   // Ler valores por label — col[0] tem o prefixo "DRE -"; Seleções Femininas usa col[0]='' e col[1] como label
-  // Valores na aba DRE já estão em R$ milhares (não dividir por 1000)
+  // Nota: quando a célula da esquerda é mesclada, r[0] fica '' e o texto vai para r[1]
   const raw = {}
   for (const r of data) {
     const label = (String(r[0] || '').trim() || String(r[1] || '').trim())
@@ -296,8 +305,17 @@ function extractDREFromSheet(workbook, periodo) {
     if (typeof val === 'number') raw[field] = val
   }
 
-  // Valores já em R$ milhares — apenas arredondar para 3 casas
-  const g = (k) => raw[k] != null ? parseFloat((+raw[k]).toFixed(3)) : null
+  // ── Detecção automática de escala ────────────────────────────────────────────
+  // Se os maiores valores superam 1.000.000 os dados estão em R$ reais → dividir por 1000.
+  // Se estão abaixo disso, já estão em R$ milhares → manter como estão.
+  // Isso garante que arquivos futuros com escalas diferentes sejam tratados corretamente.
+  const maxAbsVal = Math.max(...Object.values(raw).map(Math.abs))
+  const scale = maxAbsVal > 1_000_000 ? 1000 : 1
+  if (scale === 1000) {
+    console.log(`      ℹ️  DRE — valores em R$ reais detectados (max=${maxAbsVal.toFixed(0)}), aplicando ÷1000`)
+  }
+
+  const g = (k) => raw[k] != null ? parseFloat((raw[k] / scale).toFixed(3)) : null
 
   // Itens de receita (positivos na DRE = crédito)
   const rec_patrocinio    = g('rec_patrocinio')
