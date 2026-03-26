@@ -153,6 +153,199 @@ function deepMerge(existing, incoming, sourcePriority = 'incoming') {
   return result
 }
 
+// ── Extração direta pelo campo dfs do balancete ───────────────────────────────
+// Mapeamento: valor da coluna dfs → campo do banco de dados
+const DFS_TO_FIELD = {
+  // Ativo Circulante
+  'AC - Caixa e equivalentes de caixa':     'caixa_equivalentes',
+  'AC - Contas a receber de clientes':      'contas_receber',
+  'AC - Adiantamentos A Fornecedores':      'adiantamentos',
+  'AC - Despesas Antecipadas':              'despesas_antecipadas',
+  'AC - Tributos a recuperar':              'tributos_recuperar',
+  // Ativo Não Circulante
+  'ANC - Contas a Receber':                 'contas_receber_lp',
+  'ANC - Depósitos Judiciais':              'depositos_judiciais',
+  'ANC - Investimentos':                    'investimentos',
+  'ANC - Imobilizado':                      'imobilizado',
+  'ANC - Intangível':                       'intangivel',
+  // Passivo Circulante (saldo normal credor = valor negativo no SF → negar)
+  'PC - Fornecedores e contas a pagar':     'fornecedores',
+  'PC - Obrigações sociais e trabalhistas': 'obrig_trabalhistas',
+  'PC - Provisão para férias e encargos':   'provisao_ferias',
+  'PC - Receitas diferidas':                'receitas_diferidas_cp',
+  'PC - IR e CSLL a pagar':                 '_ir_csll_cp',  // incluído no passivo_circulante
+  // Passivo Não Circulante (negar)
+  'PNC - Receitas Diferidas':               'receitas_diferidas_lp',
+  'PNC - Fornecedores LP':                  'fornecedores_lp',
+  'PNC - Provisão para contingências':      'prov_contingencias',
+  // Patrimônio Líquido (negar — inclui capital + lucros/prejuízos acumulados)
+  'PL - Patrimônio Social':                 'patrimonio_social',
+}
+// Prefixos cujo VALOR SF é credor (negativo) → negar para obter valor positivo
+const DFS_NEGATE = ['PC -', 'PNC -', 'PL -']
+
+// Colunas fixas do balancete (verificadas empiricamente)
+const BAL_COL = { PERIODO: 1, DFS: 13, VALOR_SF: 16, MOV_PERIODO: 8 }
+
+// Converte "YYYY-MM" para serial Excel (último dia do mês)
+function periodoToSerial(periodo) {
+  const [ano, mes] = periodo.split('-').map(Number)
+  const dtUltimoDia = new Date(ano, mes, 0) // último dia do mês
+  const excelEpoch  = new Date(1899, 11, 30)
+  return Math.round((dtUltimoDia - excelEpoch) / 86_400_000)
+}
+
+function extractBalanceteByDfs(workbook, sheetName, periodo) {
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return null
+
+  const serial = periodoToSerial(periodo)
+  const data = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' })
+  const hdrIdx = data.findIndex(r => r.some(c => String(c).includes('Período')))
+  if (hdrIdx < 0) return null
+
+  // Somar VALOR SF agrupado por campo
+  const sums = {}
+  for (const r of data.slice(hdrIdx + 1)) {
+    if (r[BAL_COL.PERIODO] !== serial) continue
+    const dfs = String(r[BAL_COL.DFS] || '').trim()
+    const field = DFS_TO_FIELD[dfs]
+    if (!field) continue
+    const v = typeof r[BAL_COL.VALOR_SF] === 'number' ? r[BAL_COL.VALOR_SF] : 0
+    sums[field] = (sums[field] || 0) + v
+  }
+
+  if (Object.keys(sums).length === 0) return null
+
+  // Aplicar sinal e converter para milhares
+  const bal = {}
+  for (const [field, sum] of Object.entries(sums)) {
+    const dfsKey = Object.keys(DFS_TO_FIELD).find(k => DFS_TO_FIELD[k] === field)
+    const negate = dfsKey && DFS_NEGATE.some(p => dfsKey.startsWith(p))
+    bal[field] = parseFloat(((negate ? -sum : sum) / 1000).toFixed(3))
+  }
+
+  // Calcular campos totais derivados
+  const acKeys  = ['caixa_equivalentes','contas_receber','adiantamentos','despesas_antecipadas','tributos_recuperar']
+  const ancKeys = ['contas_receber_lp','depositos_judiciais','investimentos','imobilizado','intangivel']
+  const pcKeys  = ['fornecedores','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','_ir_csll_cp']
+  const pncKeys = ['receitas_diferidas_lp','fornecedores_lp','prov_contingencias']
+  const sum = (keys) => keys.reduce((s, k) => s + (bal[k] ?? 0), 0)
+
+  bal.ativo_circulante   = parseFloat(sum(acKeys).toFixed(3))
+  bal.ativo_total        = parseFloat((sum(acKeys) + sum(ancKeys)).toFixed(3))
+  bal.passivo_circulante = parseFloat(sum(pcKeys).toFixed(3))
+  bal.patrimonio_liquido = parseFloat((bal.patrimonio_social ?? 0).toFixed(3))
+
+  // Remover campo interno temporário
+  delete bal._ir_csll_cp
+
+  return bal
+}
+
+// ── Extração direta da aba DRE ────────────────────────────────────────────────
+const DRE_LABEL_MAP = {
+  'DRE -  Patrocínio':                           'rec_patrocinio',
+  'DRE - Direito de Transmissão':                'rec_transmissao',
+  'DRE - Bilheteria e Premiações':               'rec_bilheteria',
+  'DRE - Registros e Transferências':            'rec_registros',
+  'DRE - Legado':                                'rec_legado',
+  'DRE - Programa de desenvolvimento':           'rec_desenvolvimento',
+  'DRE - CBF Academy':                           'rec_academy',
+  'DRE - Deduções da Receita':                   '_deducoes',
+  'DRE - Seleção Principal':                     'custo_selecao_principal',
+  'DRE - Seleções de base e femininas':          'custo_selecao_base',
+  'Seleções Femininas':                          'custo_selecao_femininas',
+  'DRE - Contribuição ao Fomento do futebol':    'custo_fomento',
+  'DRE - Pessoal':                               'desp_pessoal',
+  'DRE - Administrativas':                       'desp_administrativas',
+  'DRE - Impostos e taxas':                      'desp_impostos_taxas',
+  'DRE - Receitas financeiras':                  'res_fin_receitas',
+  'DRE - Despesas financeiras':                  'res_fin_despesas',
+  'DRE - Variação Cambial':                      'res_fin_cambial',
+  'DRE - Outras Receitas Operacionais':          '_outras_rec',
+  'DRE - Outras Despesas Operacionais':          '_outras_desp',
+  'DRE - Imposto de renda e contribuição social':'_ir_csll',
+}
+
+function extractDREFromSheet(workbook, periodo) {
+  const sheetName = workbook.SheetNames.find(n => n.toUpperCase() === 'DRE')
+  if (!sheetName) return null
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return null
+
+  const serial = periodoToSerial(periodo)
+  const data = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' })
+
+  // Descobrir coluna do período alvo
+  let valCol = -1
+  for (const r of data) {
+    const i = r.indexOf(serial)
+    if (i >= 0) { valCol = i; break }
+  }
+  if (valCol < 0) return null  // período não existe nesta aba
+
+  // Ler valores por label (col[0])
+  const raw = {}
+  for (const r of data) {
+    const label = String(r[0] || '').trim()
+    const field = DRE_LABEL_MAP[label]
+    if (!field) continue
+    const val = r[valCol]
+    if (typeof val === 'number') raw[field] = val
+  }
+
+  const mil = (v) => v != null ? parseFloat((v / 1000).toFixed(3)) : null
+  const g   = (k) => raw[k] != null ? mil(raw[k]) : null
+
+  // Itens de receita (positivos na DRE = crédito)
+  const rec_patrocinio    = g('rec_patrocinio')
+  const rec_transmissao   = g('rec_transmissao')
+  const rec_bilheteria    = g('rec_bilheteria')
+  const rec_registros     = g('rec_registros')
+  const rec_desenvolvimento = g('rec_desenvolvimento')
+  const rec_academy       = g('rec_academy')
+  const deducoes          = g('_deducoes')
+  const custo_principal   = g('custo_selecao_principal')
+  const custo_base        = g('custo_selecao_base')
+  const custo_femininas   = g('custo_selecao_femininas')
+  const custo_fomento     = g('custo_fomento')
+  const desp_pessoal      = g('desp_pessoal')
+  const desp_admin        = g('desp_administrativas')
+  const desp_impostos     = g('desp_impostos_taxas')
+  const res_fin_rec       = g('res_fin_receitas')
+  const res_fin_desp      = g('res_fin_despesas')
+  const res_fin_camb      = g('res_fin_cambial')
+  const outras_rec        = g('_outras_rec')
+  const outras_desp       = g('_outras_desp')
+  const ir_csll           = g('_ir_csll')
+
+  const s = (...args) => parseFloat(args.reduce((acc, v) => acc + (v ?? 0), 0).toFixed(3))
+
+  const receita_bruta        = s(rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros, rec_desenvolvimento, rec_academy)
+  const receita_liquida      = s(receita_bruta, deducoes)
+  const custos_futebol       = s(custo_principal, custo_base, custo_femininas, custo_fomento)
+  const superavit_bruto      = s(receita_liquida, custos_futebol)
+  const despesas_operacionais = s(desp_pessoal, desp_admin, desp_impostos)
+  const resultado_financeiro = s(res_fin_rec, res_fin_desp, res_fin_camb)
+  const resultado_exercicio  = s(superavit_bruto, despesas_operacionais, resultado_financeiro, outras_rec, outras_desp, ir_csll)
+
+  return {
+    receita_bruta, receita_liquida, custos_futebol, superavit_bruto,
+    despesas_operacionais, resultado_financeiro, resultado_exercicio,
+    rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros,
+    rec_desenvolvimento, rec_academy,
+    rec_financeiras: res_fin_rec,
+    custo_selecao_principal: custo_principal,
+    custo_selecao_base: custo_base,
+    custo_selecao_femininas: custo_femininas,
+    custo_fomento,
+    desp_pessoal, desp_administrativas: desp_admin, desp_impostos_taxas: desp_impostos,
+    res_fin_receitas: res_fin_rec, res_fin_despesas: res_fin_desp, res_fin_cambial: res_fin_camb,
+    resultado_acumulado: resultado_exercicio,  // YTD = resultado do exercício
+  }
+}
+
 // ── Prompts ────────────────────────────────────────────────────────────────────
 function buildPrompt(periodo, filename) {
   const [ano, mes] = periodo.split('-')
@@ -291,58 +484,24 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
 
   console.log(`   🔄 ${periodo} — ${balanceteText.split('\n').length} linhas | hash ${balanceteHash}`)
 
-  const callClaude = async () => {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 90_000)
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
-        messages: [{
-          role: 'user',
-          content: [{ type: 'text', text: `## BALANCETE: ${filename} — Período ${periodo}\n\n${balanceteText}\n\n---\n\n${buildBalanceteOnlyPrompt(periodo)}` }]
-        }]
-      })
-    })
-    clearTimeout(timer)
-    return r
+  // Extração direta pelo campo dfs (sem Claude — determinístico)
+  const balanco = extractBalanceteByDfs(workbook, balanceteSheetName, periodo)
+  if (!balanco || Object.keys(balanco).length === 0) {
+    throw new Error(`Não foi possível extrair dados pelo campo dfs para ${periodo}`)
   }
 
-  let resp = await callClaude()
-  if (resp.status === 429) {
-    console.log(`   ⏱️  Rate limit — aguardando 35s e tentando novamente...`)
-    await new Promise(r => setTimeout(r, 35_000))
-    resp = await callClaude()
-  }
-
-  if (!resp.ok) {
-    const err = await resp.text()
-    throw new Error(`Claude ${resp.status}: ${err.slice(0, 300)}`)
-  }
-
-  const claudeData = await resp.json()
-  const rawText = claudeData.content?.[0]?.text || ''
-  const jsonMatch = rawText.match(/```json\n?([\s\S]*?)\n?```/) || rawText.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('Claude não retornou JSON válido')
-
-  const dados = JSON.parse(jsonMatch[1] || jsonMatch[0])
-  // Claude retorna valores em reais; converter para milhares (÷1000) no JS
-  const rawBalanco = dados.balanco || {}
-  const balanco = Object.fromEntries(
-    Object.entries(rawBalanco).map(([k, v]) => [k, typeof v === 'number' ? v / 1000 : v])
-  )
   const existingRaw = existingRow?.dados_raw || {}
-  const pick = (inc, ex) => (inc !== null && inc !== undefined) ? inc : ex
+  // Com --force, não usa fallback do existingRow para campos do balancete (evita dados stale)
+  const pick = (inc, ex) => (inc !== null && inc !== undefined) ? inc : (FORCE ? null : ex)
+  const keep = (v) => v ?? null  // preserva existente se não extraído
+
+  // Extração DRE direta da aba DRE (só funciona para períodos presentes na aba)
+  const dre = extractDREFromSheet(workbook, periodo)
+  const pickDRE = (dreVal, existingVal) => dreVal != null ? dreVal : keep(existingVal)
 
   const row = {
     periodo,
+    // BP — balancete via dfs
     ativo_total:               pick(balanco.ativo_total,               existingRow?.ativo_total),
     ativo_circulante:          pick(balanco.ativo_circulante,          existingRow?.ativo_circulante),
     caixa_equivalentes:        pick(balanco.caixa_equivalentes,        existingRow?.caixa_equivalentes),
@@ -360,18 +519,47 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     obrig_trabalhistas:        pick(balanco.obrig_trabalhistas,        existingRow?.obrig_trabalhistas),
     adiantamentos:             pick(balanco.adiantamentos,             existingRow?.adiantamentos),
     intangivel:                pick(balanco.intangivel,                existingRow?.intangivel),
-    resultado_acumulado:       pick(balanco.resultado_acumulado,       existingRow?.resultado_acumulado),
     despesas_antecipadas:      pick(balanco.despesas_antecipadas,      existingRow?.despesas_antecipadas),
     contas_receber_lp:         pick(balanco.contas_receber_lp,         existingRow?.contas_receber_lp),
     investimentos:             pick(balanco.investimentos,             existingRow?.investimentos),
-    programas_desenvolvimento: pick(balanco.programas_desenvolvimento, existingRow?.programas_desenvolvimento),
     provisao_ferias:           pick(balanco.provisao_ferias,           existingRow?.provisao_ferias),
     fornecedores_lp:           pick(balanco.fornecedores_lp,           existingRow?.fornecedores_lp),
+    // DRE — aba DRE (quando disponível para o período); caso contrário preserva existente
+    receita_bruta:             pickDRE(dre?.receita_bruta,             existingRow?.receita_bruta),
+    receita_liquida:           pickDRE(dre?.receita_liquida,           existingRow?.receita_liquida),
+    custos_futebol:            pickDRE(dre?.custos_futebol,            existingRow?.custos_futebol),
+    superavit_bruto:           pickDRE(dre?.superavit_bruto,           existingRow?.superavit_bruto),
+    despesas_operacionais:     pickDRE(dre?.despesas_operacionais,     existingRow?.despesas_operacionais),
+    resultado_financeiro:      pickDRE(dre?.resultado_financeiro,      existingRow?.resultado_financeiro),
+    resultado_exercicio:       pickDRE(dre?.resultado_exercicio,       existingRow?.resultado_exercicio),
+    resultado_acumulado:       pickDRE(dre?.resultado_acumulado,       existingRow?.resultado_acumulado),
+    rec_patrocinio:            pickDRE(dre?.rec_patrocinio,            existingRow?.rec_patrocinio),
+    rec_transmissao:           pickDRE(dre?.rec_transmissao,           existingRow?.rec_transmissao),
+    rec_bilheteria:            pickDRE(dre?.rec_bilheteria,            existingRow?.rec_bilheteria),
+    rec_registros:             pickDRE(dre?.rec_registros,             existingRow?.rec_registros),
+    rec_desenvolvimento:       pickDRE(dre?.rec_desenvolvimento,       existingRow?.rec_desenvolvimento),
+    rec_academy:               pickDRE(dre?.rec_academy,               existingRow?.rec_academy),
+    rec_financeiras:           pickDRE(dre?.rec_financeiras,           existingRow?.rec_financeiras),
+    custo_selecao_principal:   pickDRE(dre?.custo_selecao_principal,   existingRow?.custo_selecao_principal),
+    custo_selecao_base:        pickDRE(dre?.custo_selecao_base,        existingRow?.custo_selecao_base),
+    custo_selecao_femininas:   pickDRE(dre?.custo_selecao_femininas,   existingRow?.custo_selecao_femininas),
+    custo_fomento:             pickDRE(dre?.custo_fomento,             existingRow?.custo_fomento),
+    desp_pessoal:              pickDRE(dre?.desp_pessoal,              existingRow?.desp_pessoal),
+    desp_administrativas:      pickDRE(dre?.desp_administrativas,      existingRow?.desp_administrativas),
+    desp_impostos_taxas:       pickDRE(dre?.desp_impostos_taxas,       existingRow?.desp_impostos_taxas),
+    res_fin_receitas:          pickDRE(dre?.res_fin_receitas,          existingRow?.res_fin_receitas),
+    res_fin_despesas:          pickDRE(dre?.res_fin_despesas,          existingRow?.res_fin_despesas),
+    res_fin_cambial:           pickDRE(dre?.res_fin_cambial,           existingRow?.res_fin_cambial),
+    programas_desenvolvimento: keep(existingRow?.programas_desenvolvimento),
     dados_raw: {
       ...existingRaw,
       _balancete_hash: balanceteHash,
       _balancete_extracted: new Date().toISOString(),
-      _sources: { ...(existingRaw._sources || {}), balancete: { filename, processed_at: new Date().toISOString() } }
+      _sources: {
+        ...(existingRaw._sources || {}),
+        balancete: { filename, processed_at: new Date().toISOString(), method: 'dfs_direct' },
+        ...(dre ? { dre_aba: { filename, processed_at: new Date().toISOString(), method: 'direct' } } : {})
+      }
     },
     updated_at: new Date().toISOString()
   }
@@ -381,7 +569,8 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     .upsert(row, { onConflict: 'periodo' })
   if (error) throw new Error(`Supabase upsert: ${error.message}`)
 
-  console.log(`   ✅ ${periodo} — ativo_total: ${row.ativo_total?.toLocaleString('pt-BR')}, PL: ${row.patrimonio_liquido?.toLocaleString('pt-BR')}`)
+  const dreStatus = dre ? `DRE ✓ resultado: ${row.resultado_exercicio?.toLocaleString('pt-BR')}` : 'DRE — período ausente na aba'
+  console.log(`   ✅ ${periodo} — ativo_total: ${row.ativo_total?.toLocaleString('pt-BR')}, PL: ${row.patrimonio_liquido?.toLocaleString('pt-BR')} | ${dreStatus}`)
   return { ok: true, periodo }
 }
 
