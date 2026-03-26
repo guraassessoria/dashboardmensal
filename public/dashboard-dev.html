@@ -2064,8 +2064,15 @@ function _rebuildBP(d, dPrev) {
   const hdr = label => '<tr class="dre-header"><td colspan="' + (dPrev ? 3 : 2) + '">' + label + '</td></tr>';
   const row = (label, val, pv, isTotal, style) => '<tr' + (isTotal ? ' class="dre-row-total"' : '') + '><td>' + label + '</td><td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(val) + '</td>' + (dPrev ? '<td class="num"' + (style ? ' style="' + style + '"' : '') + '>' + f(pv) + '</td>' : '') + '</tr>';
 
-  // Helper: ler campo do direct col ou fallback para dados_raw.balanco
-  const bv = (obj, key) => obj[key] != null ? +obj[key] : (obj.dados_raw?.balanco?.[key] != null ? +obj.dados_raw.balanco[key] : null);
+  // Helper: ler campo do direct col.
+  // Quando extração foi via dfs_direct, NÃO usar dados_raw.balanco como fallback —
+  // esses valores são de extrações Claude antigas com escala errada (reais, não milhares).
+  const _isDirect = (obj) => obj.dados_raw?._sources?.balancete?.method === 'dfs_direct'
+  const bv = (obj, key) => {
+    if (obj[key] != null) return +obj[key];
+    if (!_isDirect(obj) && obj.dados_raw?.balanco?.[key] != null) return +obj.dados_raw.balanco[key];
+    return null;
+  };
 
   // Mapa de labels para campos conhecidos — novos campos extraídos pela IA aparecem automaticamente
   const _labelMap = {
