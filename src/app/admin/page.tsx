@@ -49,7 +49,12 @@ export default function AdminPage() {
   const [tcTabelas, setTcTabelas] = useState<any[]>([])
   const tcFileRef = useRef<HTMLInputElement>(null)
 
-  // ── Insights Editor State ──
+  // ── Balancete Avulso State ──
+  const [balFile, setBalFile] = useState<File | null>(null)
+  const [balPeriodo, setBalPeriodo] = useState('2024-01')
+  const [balStatus, setBalStatus] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
+  const [balMsg, setBalMsg] = useState('')
+  const balFileRef = useRef<HTMLInputElement>(null)
   const [insPeriodos, setInsPeriodos] = useState<{periodo:string,updated_at:string}[]>([])
   const [insPeriodo, setInsPeriodo] = useState('')
   const [insConteudo, setInsConteudo] = useState<Record<string,any>>({})
@@ -282,6 +287,38 @@ export default function AdminPage() {
     }
   }
 
+  // ── Balancete Avulso Upload ──
+  async function handleBalanceteUpload(e: React.FormEvent) {
+    e.preventDefault()
+    if (!balFile) return
+    setBalStatus('uploading')
+    setBalMsg('⏳ Enviando e processando balancete...')
+    const formData = new FormData()
+    formData.append('file', balFile)
+    formData.append('periodo', balPeriodo)
+    formData.append('tipo_documento', 'balancete')
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Erro no processamento')
+      setBalFile(null)
+      if (balFileRef.current) balFileRef.current.value = ''
+      loadHistory()
+      // Auto-avançar período até dez/2025
+      const [ano, mes] = balPeriodo.split('-').map(Number)
+      const nextMes = mes === 12 ? 1 : mes + 1
+      const nextAno = mes === 12 ? ano + 1 : ano
+      const next = `${nextAno}-${String(nextMes).padStart(2, '0')}`
+      const msg = data.msg ? `✅ ${data.msg}` : `✅ Balancete ${balPeriodo} processado!`
+      setBalMsg(next <= '2025-12' ? msg + ` — próximo: ${next}` : msg + ' — todos os períodos carregados!')
+      setBalStatus(next <= '2025-12' ? 'idle' : 'done')
+      if (next <= '2025-12') setBalPeriodo(next)
+    } catch (err: any) {
+      setBalStatus('error')
+      setBalMsg(`❌ ${err.message}`)
+    }
+  }
+
   // ── Carregar histórico de uploads ──
   async function loadHistory() {
     const res = await fetch('/api/uploads')
@@ -488,8 +525,60 @@ export default function AdminPage() {
           )}
         </div>
 
+        {/* Balancete Avulso */}
+        <div style={styles.card}>
+          <h2 style={styles.cardTitle}>📊 Upload de Balancete Avulso</h2>
+          <p style={styles.cardSub}>
+            Para carregar o histórico de balancetes (jan/24 a dez/25). O período avança automaticamente após cada upload.
+            Se o balancete do período já existir e não houver alterações, nenhum reprocessamento é feito.
+          </p>
+          <form onSubmit={handleBalanceteUpload} style={styles.uploadForm}>
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Período</label>
+              <input
+                type="month"
+                value={balPeriodo}
+                onChange={e => { setBalPeriodo(e.target.value); setBalStatus('idle'); setBalMsg('') }}
+                style={styles.input}
+                min="2024-01"
+                max="2025-12"
+                required
+              />
+            </div>
+            <div style={styles.fieldGroup}>
+              <label style={styles.label}>Arquivo Balancete (xlsx)</label>
+              <input
+                ref={balFileRef}
+                type="file"
+                accept=".xlsx"
+                onChange={e => setBalFile(e.target.files?.[0] || null)}
+                style={styles.fileInput}
+                required
+              />
+              {balFile && <p style={styles.fileName}>📎 {balFile.name} ({(balFile.size / 1024).toFixed(0)} KB)</p>}
+            </div>
+            <button
+              type="submit"
+              disabled={!balFile || balStatus === 'uploading'}
+              style={{ ...styles.btn, background: balStatus === 'uploading' ? '#555' : '#238636', opacity: balStatus === 'uploading' ? 0.6 : 1 }}
+            >
+              {balStatus === 'uploading' ? '⏳ Processando...' : '📊 Enviar Balancete'}
+            </button>
+          </form>
+          {balMsg && (
+            <div style={{
+              ...styles.statusBox,
+              borderColor: balStatus === 'error' ? '#F85149' : '#3FB950',
+              background: balStatus === 'error' ? 'rgba(248,81,73,.08)' : 'rgba(63,185,80,.08)'
+            }}>
+              <p style={{ color: '#fff', margin: 0, fontSize: 14 }}>{balMsg}</p>
+            </div>
+          )}
+        </div>
+
         {/* Histórico */}
         <div style={styles.card}>
+
           <h2 style={styles.cardTitle}>📋 Histórico de Uploads</h2>
           {uploads.length === 0 ? (
             <p style={{ color: '#8B949E', fontSize: 13 }}>Nenhum upload registrado ainda.</p>

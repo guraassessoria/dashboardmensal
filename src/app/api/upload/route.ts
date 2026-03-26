@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { tbl } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
+import { createHash } from 'crypto'
 
 // Vercel: Pro permite até 300s; Hobby é limitado a 60s (Vercel fará o cap automaticamente)
 export const maxDuration = 300
@@ -82,6 +83,80 @@ export async function POST(req: NextRequest) {
     )
     const hasBalancete = !!balanceteSheetName
 
+    // ── Balancete avulso (tipo_documento === 'balancete') ────────────────────────
+    if (tipoDocumento === 'balancete') {
+      if (!hasBalancete) {
+        await supabase.from(tbl('uploads')).update({ status: 'error', error_msg: 'Nenhuma aba de Balancete encontrada' }).eq('id', uploadId)
+        return NextResponse.json({ error: 'Nenhuma aba de Balancete encontrada no arquivo' }, { status: 400 })
+      }
+      const bText = balanceteToText(workbook, balanceteSheetName!, periodo)
+      if (bText.length < 100) {
+        await supabase.from(tbl('uploads')).update({ status: 'error', error_msg: `Balancete vazio para período ${periodo}` }).eq('id', uploadId)
+        return NextResponse.json({ error: `Balancete vazio ou sem dados para período ${periodo}` }, { status: 400 })
+      }
+      const bHash = hashText(bText)
+
+      // Verificar se o balancete já existe e é idêntico
+      const { data: existingBalRow } = await supabase.from(tbl('dados_financeiros')).select('*').eq('periodo', periodo).single()
+      if (existingBalRow?.dados_raw?._balancete_hash === bHash) {
+        await supabase.from(tbl('uploads')).update({ status: 'done', processed_at: new Date().toISOString() }).eq('id', uploadId)
+        return NextResponse.json({ ok: true, upload_id: uploadId, periodo, status: 'done', msg: 'Balancete idêntico ao armazenado — nenhuma alteração necessária' })
+      }
+
+      // Chamar Claude apenas para o balancete
+      const bCtrl = new AbortController()
+      const bTimer = setTimeout(() => bCtrl.abort(), 50_000)
+      const bResp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+        signal: bCtrl.signal,
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2048,
+          messages: [{ role: 'user', content: [{ type: 'text', text: `## BALANCETE: ${file.name}\n\n${bText}\n\n---\n\n${buildBalancetePrompt(periodo, file.name)}` }] }]
+        })
+      })
+      clearTimeout(bTimer)
+      if (!bResp.ok) throw new Error(`Claude API ${bResp.status}: ${(await bResp.text()).slice(0, 200)}`)
+      const bData = await bResp.json()
+      const bRaw = bData.content?.[0]?.text || ''
+      const bMatch = bRaw.match(/```json\n?([\s\S]*?)\n?```/) || bRaw.match(/\{[\s\S]*\}/)
+      if (!bMatch) throw new Error('Claude não retornou JSON válido para balancete')
+      const bExtracted = JSON.parse(bMatch[1] || bMatch[0])
+      const bFields = bExtracted.balanco || {}
+
+      // Merge: preservar dados existentes, atualizar apenas campos de balanço
+      const bExistingRaw = existingBalRow?.dados_raw || {}
+      const bMergedRaw = deepMerge(bExistingRaw, { balanco: bFields }, 'incoming')
+      bMergedRaw._balancete_hash = bHash
+      bMergedRaw._balancete_extracted = bFields
+      bMergedRaw._sources = { ...(bExistingRaw._sources || {}), balancete: { filename: file.name, processed_at: new Date().toISOString() } }
+
+      const bPick = (inc: any, ex: any) => (inc !== null && inc !== undefined) ? inc : ex
+      const bPatch: any = { periodo, upload_id: uploadId, dados_raw: bMergedRaw, updated_at: new Date().toISOString() }
+      const balFieldMap: Record<string, string> = {
+        ativo_total: 'ativo_total', ativo_circulante: 'ativo_circulante', caixa_equivalentes: 'caixa_equivalentes',
+        contas_receber: 'contas_receber', tributos_recuperar: 'tributos_recuperar', adiantamentos: 'adiantamentos',
+        despesas_antecipadas: 'despesas_antecipadas', contas_receber_lp: 'contas_receber_lp',
+        depositos_judiciais: 'depositos_judiciais', investimentos: 'investimentos', imobilizado: 'imobilizado',
+        intangivel: 'intangivel', passivo_circulante: 'passivo_circulante', fornecedores: 'fornecedores',
+        programas_desenvolvimento: 'programas_desenvolvimento', obrig_trabalhistas: 'obrig_trabalhistas',
+        provisao_ferias: 'provisao_ferias', receitas_diferidas_cp: 'receitas_diferidas_cp',
+        receitas_diferidas_lp: 'receitas_diferidas_lp', fornecedores_lp: 'fornecedores_lp',
+        prov_contingencias: 'prov_contingencias', patrimonio_social: 'patrimonio_social',
+        resultado_acumulado: 'resultado_acumulado', patrimonio_liquido: 'patrimonio_liquido'
+      }
+      for (const [src, dst] of Object.entries(balFieldMap)) {
+        bPatch[dst] = bPick(bFields[src], existingBalRow?.[dst as keyof typeof existingBalRow])
+      }
+      const { error: bUpsertErr } = await supabase.from(tbl('dados_financeiros')).upsert(bPatch, { onConflict: 'periodo' })
+      if (bUpsertErr) throw new Error(`Erro ao salvar balancete: ${bUpsertErr.message}`)
+      await supabase.from(tbl('uploads')).update({ status: 'done', processed_at: new Date().toISOString() }).eq('id', uploadId)
+      console.log(`[upload] ✅ Balancete avulso processado — ${periodo}`)
+      return NextResponse.json({ ok: true, upload_id: uploadId, periodo, status: 'done' })
+    }
+    // ── Fim balancete avulso ─────────────────────────────────────────────────
+
     const sheetText = xlsxToText(workbook, ABAS_ALVO)
     let balanceteText = ''
     if (hasBalancete) {
@@ -89,12 +164,29 @@ export async function POST(req: NextRequest) {
     }
     const balanceteEfetivo = balanceteText.length > 200
 
-    const textoCompleto = balanceteEfetivo ? sheetText + '\n\n' + balanceteText : sheetText
-    console.log(`[upload] Texto ao Claude: ${textoCompleto.length} chars | balancete: ${balanceteEfetivo}`)
+    // ── Diff de balancete: detectar se mudou desde o último upload ────────────
+    const balanceteHash = balanceteEfetivo ? hashText(balanceteText) : null
+    const { data: existingRow } = await supabase
+      .from(tbl('dados_financeiros'))
+      .select('*')
+      .eq('periodo', periodo)
+      .single()
+    const storedBalHash = existingRow?.dados_raw?._balancete_hash ?? null
+    const balanceteUnchanged = balanceteHash !== null && storedBalHash !== null && balanceteHash === storedBalHash
 
-    const prompt = balanceteEfetivo
-      ? buildHybridPrompt(periodo, file.name, balanceteSheetName!)
-      : buildPrompt(periodo, file.name)
+    let textoCompleto: string
+    let prompt: string
+    if (balanceteUnchanged) {
+      console.log(`[upload] Balancete sem alterações (hash ${balanceteHash}) — processando apenas DFs`)
+      textoCompleto = sheetText
+      prompt = buildPrompt(periodo, file.name)
+    } else {
+      textoCompleto = balanceteEfetivo ? sheetText + '\n\n' + balanceteText : sheetText
+      prompt = balanceteEfetivo
+        ? buildHybridPrompt(periodo, file.name, balanceteSheetName!)
+        : buildPrompt(periodo, file.name)
+    }
+    console.log(`[upload] Texto ao Claude: ${textoCompleto.length} chars | balancete: ${balanceteEfetivo} | unchanged: ${balanceteUnchanged}`)
 
     // ── Chamar Claude ──
     const claudeCtrl = new AbortController()
@@ -131,18 +223,16 @@ export async function POST(req: NextRequest) {
     const dadosExtraidos = JSON.parse(jsonMatch[1] || jsonMatch[0])
 
     // ── Merge com dados existentes ──
-    const { data: existingRow } = await supabase
-      .from(tbl('dados_financeiros'))
-      .select('*')
-      .eq('periodo', periodo)
-      .single()
-
     const existingRaw = existingRow?.dados_raw || {}
     const mergedRaw = deepMerge(existingRaw, dadosExtraidos, 'incoming')
+    mergedRaw._balancete_hash = balanceteHash ?? (existingRaw._balancete_hash ?? null)
+    if (!balanceteUnchanged && balanceteEfetivo && dadosExtraidos.balanco) {
+      mergedRaw._balancete_extracted = dadosExtraidos.balanco
+    }
     mergedRaw._sources = {
       ...(existingRaw._sources || {}),
       dfs: { filename: file.name, processed_at: new Date().toISOString() },
-      ...(hasBalancete ? { balancete: { filename: file.name, processed_at: new Date().toISOString(), embedded: true } } : {})
+      ...(!balanceteUnchanged && hasBalancete ? { balancete: { filename: file.name, processed_at: new Date().toISOString(), embedded: true } } : {})
     }
 
     const pick = (incoming: any, existing: any) =>
@@ -312,6 +402,36 @@ function balanceteToText(workbook: XLSX.WorkBook, sheetName: string, periodo: st
   if (filtradas.length === 0) return ''
   const header = headerLine ? headerLine + '\n' : ''
   return `### Aba: ${sheetName} (período ${periodoBalancete}, contas sintéticas)\n${header}${filtradas.join('\n')}`
+}
+
+function hashText(text: string): string {
+  return createHash('sha256').update(text).digest('hex').slice(0, 16)
+}
+
+function buildBalancetePrompt(periodo: string, filename: string): string {
+  const [ano, mes] = periodo.split('-')
+  const dataRef = `${mes}/${ano}`
+  return `Você é especialista em Balanço Patrimonial e demonstrações financeiras brasileiras.
+Analise o Balancete acima (período ${dataRef}, apenas contas sintéticas marcadas com "S").
+Extraia os saldos das contas principais. Os valores estão em R$ (reais).
+Contas negativas representam passivos/deduções.
+Retorne APENAS um JSON válido (sem explicações):
+\`\`\`json
+{
+  "periodo": "${periodo}",
+  "balanco": {
+    "ativo_total": null, "ativo_circulante": null, "caixa_equivalentes": null,
+    "contas_receber": null, "tributos_recuperar": null, "adiantamentos": null,
+    "despesas_antecipadas": null, "contas_receber_lp": null, "depositos_judiciais": null,
+    "investimentos": null, "imobilizado": null, "intangivel": null,
+    "passivo_circulante": null, "fornecedores": null, "programas_desenvolvimento": null,
+    "obrig_trabalhistas": null, "provisao_ferias": null, "receitas_diferidas_cp": null,
+    "receitas_diferidas_lp": null, "fornecedores_lp": null, "prov_contingencias": null,
+    "patrimonio_social": null, "resultado_acumulado": null, "patrimonio_liquido": null
+  }
+}
+\`\`\`
+Use null para contas não encontradas no Balancete.`
 }
 
 function deepMerge(existing: any, incoming: any, sourcePriority: 'incoming' | 'existing' = 'incoming'): any {
