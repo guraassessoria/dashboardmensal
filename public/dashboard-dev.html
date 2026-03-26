@@ -757,14 +757,15 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
             <tr><td>Caixa e Equivalentes</td><td class="num">1.996.870</td><td class="num">2.433.286</td></tr>
             <tr><td>Contas a Receber</td><td class="num">291.645</td><td class="num">263.638</td></tr>
             <tr><td>Tributos a Recuperar</td><td class="num">111.378</td><td class="num">52.625</td></tr>
-            <tr><td>Outros Circulantes</td><td class="num">13.798</td><td class="num">17.432</td></tr>
+            <tr><td>Adiantamentos</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr><td>Despesas Antecipadas</td><td class="num">—</td><td class="num">—</td></tr>
             <tr class="dre-row-total"><td>Total Circulante</td><td class="num">2.413.690</td><td class="num">2.766.981</td></tr>
             <tr class="dre-header"><td colspan="3">Não Circulante</td></tr>
+            <tr><td>Contas a Receber LP</td><td class="num">—</td><td class="num">—</td></tr>
             <tr><td>Depósitos Judiciais</td><td class="num">607.482</td><td class="num">520.585</td></tr>
+            <tr><td>Investimentos</td><td class="num">—</td><td class="num">—</td></tr>
             <tr><td>Imobilizado</td><td class="num">308.714</td><td class="num">267.801</td></tr>
-            <tr><td>Outros NC</td><td class="num">61.587</td><td class="num">62.069</td></tr>
-            <tr class="dre-header"><td colspan="3">&nbsp;</td></tr>
-            <tr><td>&nbsp;</td><td></td><td></td></tr>
+            <tr><td>Intangível</td><td class="num">—</td><td class="num">—</td></tr>
             <tr class="dre-row-total"><td>Total do Ativo</td><td class="num">3.391.473</td><td class="num">3.617.436</td></tr>
           </tbody>
         </table>
@@ -775,16 +776,18 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
           <tbody id="bp-passivo-tbody">
             <tr class="dre-header"><td colspan="3">Circulante</td></tr>
             <tr><td>Fornecedores e Contas a Pagar</td><td class="num">141.366</td><td class="num">154.114</td></tr>
-            <tr><td>Receitas Antecipadas</td><td class="num">364.074</td><td class="num">307.379</td></tr>
-            <tr><td>Obrig. Trabalhistas/Fiscais</td><td class="num">33.558</td><td class="num">19.489</td></tr>
-            <tr><td>Outros</td><td class="num">71.753</td><td class="num">50.606</td></tr>
+            <tr><td>Programas de Desenvolvimento</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr><td>Obrigações Trabalhistas</td><td class="num">33.558</td><td class="num">19.489</td></tr>
+            <tr><td>Provisão Férias e Encargos</td><td class="num">—</td><td class="num">—</td></tr>
+            <tr><td>Receitas Antecipadas CP</td><td class="num">364.074</td><td class="num">307.379</td></tr>
             <tr class="dre-row-total"><td>Total Circulante</td><td class="num">610.750</td><td class="num">531.588</td></tr>
             <tr class="dre-header"><td colspan="3">Não Circulante</td></tr>
-            <tr><td>Receitas Antecipadas</td><td class="num">849.270</td><td class="num">1.067.009</td></tr>
+            <tr><td>Receitas Antecipadas LP</td><td class="num">849.270</td><td class="num">1.067.009</td></tr>
             <tr><td>Provisão Contingências</td><td class="num">671.631</td><td class="num">576.539</td></tr>
             <tr class="dre-header"><td colspan="3">Patrimônio Líquido</td></tr>
-            <tr><td>Patrimônio Social</td><td class="num">1.442.301</td><td class="num">1.335.643</td></tr>
+            <tr><td>Patrimônio Social</td><td class="num">—</td><td class="num">—</td></tr>
             <tr><td>Resultado do Exercício</td><td class="num" style="color:var(--neg);">(182.480)</td><td class="num" style="color:var(--pos);">106.657</td></tr>
+            <tr class="dre-row-total"><td>Total do Patrimônio Líquido</td><td class="num">1.259.993</td><td class="num">1.442.300</td></tr>
             <tr class="dre-row-total"><td>Total Passivo + PL</td><td class="num">3.391.473</td><td class="num">3.617.436</td></tr>
           </tbody>
         </table>
@@ -2078,13 +2081,13 @@ function _rebuildBP(d, dPrev) {
     imobilizado: 'Imobilizado',
     intangivel: 'Intangível',
     ativo_total: null,
-    fornecedores: 'Fornecedores',
+    fornecedores: 'Fornecedores e Contas a Pagar',
     programas_desenvolvimento: 'Programas de Desenvolvimento',
     obrig_trabalhistas: 'Obrigações Trabalhistas',
     provisao_ferias: 'Provisão Férias e Encargos',
-    receitas_diferidas_cp: 'Receitas Diferidas CP',
+    receitas_diferidas_cp: 'Receitas Antecipadas CP',
     passivo_circulante: null,
-    receitas_diferidas_lp: 'Receitas Diferidas LP',
+    receitas_diferidas_lp: 'Receitas Antecipadas LP',
     fornecedores_lp: 'Fornecedores LP',
     prov_contingencias: 'Provisão Contingências',
     patrimonio_social: 'Patrimônio Social',
@@ -2145,7 +2148,16 @@ function _rebuildBP(d, dPrev) {
   hp += hdr('Não Circulante');
   passNCircFields.forEach(k => { hp += maybeRow(k); });
   hp += hdr('Patrimônio Líquido');
-  plFields.forEach(k => { hp += maybeRow(k); });
+  hp += maybeRow('patrimonio_social');
+  // Resultado do Exercício = superávit/déficit do período corrente (DRE), não acumulado
+  const _reVal = d.resultado_exercicio != null ? +d.resultado_exercicio : bv(d,'resultado_acumulado');
+  const _rePrev = p.resultado_exercicio != null ? +p.resultado_exercicio : bv(p,'resultado_acumulado');
+  if (_reVal != null) {
+    const stlRe = _reVal < 0 ? 'color:var(--neg);' : '';
+    hp += row('Resultado do Exercício', _reVal, Object.keys(p).length ? _rePrev : null, false, stlRe);
+  }
+  const _plVal = bv(d,'patrimonio_liquido'); const _plPrev = bv(p,'patrimonio_liquido');
+  if (_plVal != null) hp += row('Total do Patrimônio Líquido', _plVal, _plPrev, true);
   hp += row('Total Passivo + PL', bv(d,'ativo_total'), bv(p,'ativo_total'), true);
   passivoTbody.innerHTML = hp;
 }
@@ -2880,7 +2892,7 @@ async function loadPeriodo(periodo) {
     GD.disp_labels    = anos10;
     GD.disp_data      = anos10.map(a => merged10[a].caixa || 0);
     // Atualizar título do gráfico
-    const elBp3 = document.querySelector('#bp .ctitle');
+    const elBp3 = document.querySelector('#cbp3')?.closest('.ccard')?.querySelector('.ctitle');
     if (elBp3) elBp3.textContent = 'Evolução do Ativo Total · ' + anos10[0] + '–' + anos10[anos10.length-1] + ' - em milhares de reais';
   }
 
