@@ -285,18 +285,19 @@ function extractDREFromSheet(workbook, periodo) {
   }
   if (valCol < 0) return null  // período não existe nesta aba
 
-  // Ler valores por label (col[0])
+  // Ler valores por label — col[0] tem o prefixo "DRE -"; Seleções Femininas usa col[0]='' e col[1] como label
+  // Valores na aba DRE já estão em R$ milhares (não dividir por 1000)
   const raw = {}
   for (const r of data) {
-    const label = String(r[0] || '').trim()
+    const label = (String(r[0] || '').trim() || String(r[1] || '').trim())
     const field = DRE_LABEL_MAP[label]
     if (!field) continue
     const val = r[valCol]
     if (typeof val === 'number') raw[field] = val
   }
 
-  const mil = (v) => v != null ? parseFloat((v / 1000).toFixed(3)) : null
-  const g   = (k) => raw[k] != null ? mil(raw[k]) : null
+  // Valores já em R$ milhares — apenas arredondar para 3 casas
+  const g = (k) => raw[k] != null ? parseFloat((+raw[k]).toFixed(3)) : null
 
   // Itens de receita (positivos na DRE = crédito)
   const rec_patrocinio    = g('rec_patrocinio')
@@ -550,7 +551,7 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     res_fin_receitas:          pickDRE(dre?.res_fin_receitas,          existingRow?.res_fin_receitas),
     res_fin_despesas:          pickDRE(dre?.res_fin_despesas,          existingRow?.res_fin_despesas),
     res_fin_cambial:           pickDRE(dre?.res_fin_cambial,           existingRow?.res_fin_cambial),
-    programas_desenvolvimento: keep(existingRow?.programas_desenvolvimento),
+    programas_desenvolvimento: FORCE ? null : (existingRow?.programas_desenvolvimento ?? null),
     dados_raw: {
       ...existingRaw,
       _balancete_hash: balanceteHash,
