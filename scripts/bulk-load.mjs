@@ -361,7 +361,7 @@ function extractDREFromSheet(workbook, periodo) {
     custo_fomento,
     desp_pessoal, desp_administrativas: desp_admin, desp_impostos_taxas: desp_impostos,
     res_fin_receitas: res_fin_rec, res_fin_despesas: res_fin_desp, res_fin_cambial: res_fin_camb,
-    resultado_acumulado: resultado_exercicio,  // YTD = resultado do exercício
+    // Nota: resultado_acumulado NÃO é extraído da DRE — vem do balancete (patrimonio_social - resultado_exercicio)
   }
 }
 
@@ -551,7 +551,9 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     despesas_operacionais:     pickDRE(dre?.despesas_operacionais,     existingRow?.despesas_operacionais),
     resultado_financeiro:      pickDRE(dre?.resultado_financeiro,      existingRow?.resultado_financeiro),
     resultado_exercicio:       pickDRE(dre?.resultado_exercicio,       existingRow?.resultado_exercicio),
-    resultado_acumulado:       pickDRE(dre?.resultado_acumulado,       existingRow?.resultado_acumulado),
+    // resultado_acumulado: campo do BP (lucros/prejuízos acumulados) — não extraído da DRE.
+    // O dashboard computa: patrimonio_social(total PL) - resultado_exercicio = equity acumulada anterior.
+    resultado_acumulado:       null,
     rec_patrocinio:            pickDRE(dre?.rec_patrocinio,            existingRow?.rec_patrocinio),
     rec_transmissao:           pickDRE(dre?.rec_transmissao,           existingRow?.rec_transmissao),
     rec_bilheteria:            pickDRE(dre?.rec_bilheteria,            existingRow?.rec_bilheteria),

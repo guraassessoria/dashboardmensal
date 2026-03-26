@@ -2148,20 +2148,23 @@ function _rebuildBP(d, dPrev) {
   hp += hdr('Não Circulante');
   passNCircFields.forEach(k => { hp += maybeRow(k); });
   hp += hdr('Patrimônio Líquido');
-  // Patrimônio Social = patrimonio_social (capital estaturário) + resultado_acumulado (lucros/prejuízos acumulados)
-  // Resultado do Exercício = resultado apurado na DRE do período
-  const _patStat = bv(d, 'patrimonio_social') ?? 0;
-  const _lucAcum = bv(d, 'resultado_acumulado') ?? 0;
-  const _patStatPrev = bv(p, 'patrimonio_social') ?? 0;
-  const _lucAcumPrev = bv(p, 'resultado_acumulado') ?? 0;
-  const _patSocTotal = _patStat + _lucAcum;
-  const _patSocPrevTotal = Object.keys(p).length ? _patStatPrev + _lucAcumPrev : null;
-  if (_patSocTotal !== 0 || _patSocPrevTotal !== 0) hp += row('Patrimônio Social', _patSocTotal || null, _patSocPrevTotal, false);
-  const _reExerc = d.resultado_exercicio != null ? +d.resultado_exercicio : null;
-  const _reExercPrev = p.resultado_exercicio != null ? +p.resultado_exercicio : null;
+  // patrimonio_social do balancete = PL total (inclui patrimônio acumulado + resultado exercício).
+  // Para separar: Patrimônio Acumulado (anterior) = patrimonio_social − resultado_exercicio
+  // Resultado do Exercício = resultado_exercicio (DRE do período)
+  const _plTotal      = bv(d, 'patrimonio_social') ?? 0;
+  const _plTotalPrev  = bv(p, 'patrimonio_social') ?? 0;
+  const _reExerc      = d.resultado_exercicio != null ? +d.resultado_exercicio : null;
+  const _reExercPrev  = p.resultado_exercicio != null ? +p.resultado_exercicio : null;
+  // Se temos resultado_exercicio da DRE, separamos as componentes do PL
   if (_reExerc != null) {
+    const _patAcum     = _plTotal - _reExerc;
+    const _patAcumPrev = Object.keys(p).length ? _plTotalPrev - (_reExercPrev ?? 0) : null;
+    hp += row('Patrimônio Acumulado', _patAcum || null, _patAcumPrev, false);
     const stlRe = _reExerc < 0 ? 'color:var(--neg);' : '';
     hp += row('Resultado do Exercício', _reExerc, _reExercPrev, false, stlRe);
+  } else {
+    // DRE não disponível: mostra só o total como "Patrimônio Líquido"
+    if (_plTotal !== 0) hp += row('Patrimônio Líquido', _plTotal, _plTotalPrev || null, false);
   }
   hp += row('Total Passivo + PL', bv(d,'ativo_total'), bv(p,'ativo_total'), true);
   passivoTbody.innerHTML = hp;
