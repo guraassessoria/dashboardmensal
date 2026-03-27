@@ -195,6 +195,17 @@ function periodoToSerial(periodo) {
   return Math.round((dtUltimoDia - excelEpoch) / 86_400_000)
 }
 
+// Converte serial Excel → "YYYY-MM" se o dia for o último do mês; caso contrário null
+function serialToPeriodo(serial) {
+  const excelEpoch = new Date(1899, 11, 30)
+  const date = new Date(excelEpoch.getTime() + serial * 86_400_000)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const lastDay = new Date(year, month, 0).getDate()
+  if (date.getDate() !== lastDay) return null
+  return `${year}-${String(month).padStart(2, '0')}`
+}
+
 function extractBalanceteByDfs(workbook, sheetName, periodo) {
   const sheet = workbook.Sheets[sheetName]
   if (!sheet) return null
@@ -355,6 +366,73 @@ function extractDREFromSheet(workbook, periodo) {
     desp_pessoal, desp_administrativas: desp_admin, desp_impostos_taxas: desp_impostos,
     res_fin_receitas: res_fin_rec, res_fin_despesas: res_fin_desp, res_fin_cambial: res_fin_camb,
     // Nota: resultado_acumulado NÃO é extraído da DRE — vem do balancete (patrimonio_social - resultado_exercicio)
+  }
+}
+
+// ── Salvar DRE dos períodos comparativos encontrados na aba DRE ───────────────
+// Toda DFS contém duas colunas na aba DRE: o período atual e o mesmo mês do ano
+// anterior. Esta função detecta esses períodos comparativos e salva seus dados de
+// DRE no banco, preenchendo apenas campos ainda nulos (não sobrescreve dados existentes).
+const DRE_FIELDS_FOR_COMPARATIVE = [
+  'receita_bruta','receita_liquida','custos_futebol','superavit_bruto',
+  'despesas_operacionais','resultado_financeiro','resultado_exercicio',
+  'resultado_antes_ir','outras_receitas_op','outras_despesas_op','ir_csll',
+  'rec_patrocinio','rec_transmissao','rec_bilheteria','rec_registros',
+  'rec_desenvolvimento','rec_academy','rec_financeiras',
+  'custo_selecao_principal','custo_selecao_base','custo_selecao_femininas','custo_fomento',
+  'desp_pessoal','desp_administrativas','desp_impostos_taxas',
+  'res_fin_receitas','res_fin_despesas','res_fin_cambial',
+]
+
+async function saveDREComparativePeriods(workbook, currentPeriodo) {
+  const sheetName = workbook.SheetNames.find(n => n.toUpperCase() === 'DRE')
+  if (!sheetName) return
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return
+  const data = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' })
+
+  // Localizar seriais de data no cabeçalho (primeiras 5 linhas) excluindo período atual
+  const comparativos = []
+  for (const r of data.slice(0, 5)) {
+    for (const cell of r) {
+      if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
+        const p = serialToPeriodo(cell)
+        if (p && p !== currentPeriodo && !comparativos.includes(p)) comparativos.push(p)
+      }
+    }
+  }
+  if (comparativos.length === 0) return
+
+  for (const periodo of comparativos) {
+    const dre = extractDREFromSheet(workbook, periodo)
+    if (!dre) continue
+
+    const { data: existing } = await supabase
+      .from(tbl('dados_financeiros'))
+      .select('periodo,' + DRE_FIELDS_FOR_COMPARATIVE.join(','))
+      .eq('periodo', periodo)
+      .maybeSingle()
+
+    const patch = {}
+    for (const f of DRE_FIELDS_FOR_COMPARATIVE) {
+      if (dre[f] != null && (existing == null || existing[f] == null)) patch[f] = dre[f]
+    }
+
+    if (Object.keys(patch).length === 0) {
+      console.log(`      ↩️  DRE comparativa ${periodo} — já preenchida`)
+      continue
+    }
+
+    patch.updated_at = new Date().toISOString()
+    if (existing) {
+      const { error } = await supabase.from(tbl('dados_financeiros')).update(patch).eq('periodo', periodo)
+      if (error) console.error(`      ❌ DRE comparativa ${periodo}: ${error.message}`)
+      else console.log(`      ✅ DRE comparativa ${periodo} — resultado: ${dre.resultado_exercicio?.toLocaleString('pt-BR') ?? '—'}`)
+    } else {
+      const { error } = await supabase.from(tbl('dados_financeiros')).insert({ periodo, ...patch })
+      if (error) console.error(`      ❌ DRE comparativa ${periodo} (novo): ${error.message}`)
+      else console.log(`      ✅ DRE comparativa ${periodo} (novo) — resultado: ${dre.resultado_exercicio?.toLocaleString('pt-BR') ?? '—'}`)
+    }
   }
 }
 
@@ -588,6 +666,9 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     .upsert(row, { onConflict: 'periodo' })
   if (error) throw new Error(`Supabase upsert: ${error.message}`)
 
+  // Se o período atual tem DRE, também salvar o período comparativo da aba DRE
+  if (dre) await saveDREComparativePeriods(workbook, periodo)
+
   const dreStatus = dre ? `DRE ✓ resultado: ${row.resultado_exercicio?.toLocaleString('pt-BR')}` : 'DRE — período ausente na aba'
   console.log(`   ✅ ${periodo} — ativo_total: ${row.ativo_total?.toLocaleString('pt-BR')}, PL: ${row.patrimonio_liquido?.toLocaleString('pt-BR')} | ${dreStatus}`)
   return { ok: true, periodo }
@@ -790,6 +871,9 @@ async function processFile(filePath, periodo) {
     .from(tbl('dados_financeiros'))
     .upsert(row, { onConflict: 'periodo' })
   if (error) throw new Error(`Supabase upsert: ${error.message}`)
+
+  // Salvar DRE do período comparativo da aba DRE (ex: DFS 2025-02 contém DRE de 2024-02)
+  await saveDREComparativePeriods(workbook, periodo)
 
   console.log(`   ✅ Salvo — receita_bruta: ${row.receita_bruta}, ativo_total: ${row.ativo_total}`)
   return { ok: true, periodo }
