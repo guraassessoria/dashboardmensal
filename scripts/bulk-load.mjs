@@ -173,7 +173,7 @@ const DFS_TO_FIELD = {
   'PC - Obrigações sociais e trabalhistas': 'obrig_trabalhistas',
   'PC - Provisão para férias e encargos':   'provisao_ferias',
   'PC - Receitas diferidas':                'receitas_diferidas_cp',
-  'PC - IR e CSLL a pagar':                 '_ir_csll_cp',  // incluído no passivo_circulante
+  'PC - IR e CSLL a pagar':                 'ir_csll_cp',
   // Passivo Não Circulante (negar)
   'PNC - Receitas Diferidas':               'receitas_diferidas_lp',
   'PNC - Fornecedores LP':                  'fornecedores_lp',
@@ -228,7 +228,7 @@ function extractBalanceteByDfs(workbook, sheetName, periodo) {
   // Calcular campos totais derivados
   const acKeys  = ['caixa_equivalentes','contas_receber','adiantamentos','despesas_antecipadas','tributos_recuperar']
   const ancKeys = ['contas_receber_lp','depositos_judiciais','investimentos','imobilizado','intangivel']
-  const pcKeys  = ['fornecedores','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','_ir_csll_cp']
+  const pcKeys  = ['fornecedores','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','ir_csll_cp']
   const pncKeys = ['receitas_diferidas_lp','fornecedores_lp','prov_contingencias']
   const sum = (keys) => keys.reduce((s, k) => s + (bal[k] ?? 0), 0)
 
@@ -236,9 +236,6 @@ function extractBalanceteByDfs(workbook, sheetName, periodo) {
   bal.ativo_total        = parseFloat((sum(acKeys) + sum(ancKeys)).toFixed(3))
   bal.passivo_circulante = parseFloat(sum(pcKeys).toFixed(3))
   bal.patrimonio_liquido = parseFloat((bal.patrimonio_social ?? 0).toFixed(3))
-
-  // Remover campo interno temporário
-  delete bal._ir_csll_cp
 
   return bal
 }
@@ -482,7 +479,7 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
 
   const { data: existingRow } = await supabase
     .from(tbl('dados_financeiros'))
-    .select('dados_raw, ativo_total, ativo_circulante, caixa_equivalentes, contas_receber, tributos_recuperar, depositos_judiciais, imobilizado, passivo_circulante, receitas_diferidas_cp, receitas_diferidas_lp, prov_contingencias, patrimonio_liquido, patrimonio_social, fornecedores, obrig_trabalhistas, adiantamentos, intangivel, resultado_acumulado, despesas_antecipadas, contas_receber_lp, investimentos, programas_desenvolvimento, provisao_ferias, fornecedores_lp')
+    .select('dados_raw, ativo_total, ativo_circulante, caixa_equivalentes, contas_receber, tributos_recuperar, depositos_judiciais, imobilizado, passivo_circulante, ir_csll_cp, receitas_diferidas_cp, receitas_diferidas_lp, prov_contingencias, patrimonio_liquido, patrimonio_social, fornecedores, obrig_trabalhistas, adiantamentos, intangivel, resultado_acumulado, despesas_antecipadas, contas_receber_lp, investimentos, programas_desenvolvimento, provisao_ferias, fornecedores_lp')
     .eq('periodo', periodo)
     .maybeSingle()
 
@@ -520,6 +517,7 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     depositos_judiciais:       pick(balanco.depositos_judiciais,       existingRow?.depositos_judiciais),
     imobilizado:               pick(balanco.imobilizado,               existingRow?.imobilizado),
     passivo_circulante:        pick(balanco.passivo_circulante,        existingRow?.passivo_circulante),
+    ir_csll_cp:                pick(balanco.ir_csll_cp,                existingRow?.ir_csll_cp),
     receitas_diferidas_cp:     pick(balanco.receitas_diferidas_cp,     existingRow?.receitas_diferidas_cp),
     receitas_diferidas_lp:     pick(balanco.receitas_diferidas_lp,     existingRow?.receitas_diferidas_lp),
     prov_contingencias:        pick(balanco.prov_contingencias,        existingRow?.prov_contingencias),

@@ -2128,6 +2128,7 @@ function _rebuildBP(d, dPrev) {
     obrig_trabalhistas: 'Obrigações Trabalhistas',
     provisao_ferias: 'Provisão Férias e Encargos',
     receitas_diferidas_cp: 'Receitas Antecipadas CP',
+    ir_csll_cp: 'IR e CSLL a Pagar',
     passivo_circulante: null,
     receitas_diferidas_lp: 'Receitas Antecipadas LP',
     fornecedores_lp: 'Fornecedores LP',
@@ -2161,7 +2162,7 @@ function _rebuildBP(d, dPrev) {
   const ativoCircFields = ['caixa_equivalentes','contas_receber','tributos_recuperar','adiantamentos','despesas_antecipadas'];
   const ativoNCircFields = ['contas_receber_lp','depositos_judiciais','investimentos','imobilizado','intangivel'];
   // Adicionar campos extras do balanco que parecem ativo (heurística: valor positivo, não está em passivo/PL)
-  const _passivoKeys = new Set(['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','passivo_circulante','receitas_diferidas_lp','fornecedores_lp','prov_contingencias','patrimonio_social','patrimonio_liquido','resultado_acumulado']);
+  const _passivoKeys = new Set(['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','ir_csll_cp','passivo_circulante','receitas_diferidas_lp','fornecedores_lp','prov_contingencias','patrimonio_social','patrimonio_liquido','resultado_acumulado']);
   Object.keys(_labelMap).forEach(k => {
     if (!_totalsSet.has(k) && !_passivoKeys.has(k) && !ativoCircFields.includes(k) && !ativoNCircFields.includes(k) && _labelMap[k]) {
       const v = bv(d, k);
@@ -2179,7 +2180,7 @@ function _rebuildBP(d, dPrev) {
   ativoTbody.innerHTML = ha;
 
   // === PASSIVO + PL ===
-  const passCircFields = ['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp'];
+  const passCircFields = ['fornecedores','programas_desenvolvimento','obrig_trabalhistas','provisao_ferias','receitas_diferidas_cp','ir_csll_cp'];
   const passNCircFields = ['receitas_diferidas_lp','fornecedores_lp','prov_contingencias'];
   const plFields = ['patrimonio_social','resultado_acumulado'];
 
@@ -2199,9 +2200,8 @@ function _rebuildBP(d, dPrev) {
   const _reExercPrev  = p.resultado_exercicio != null ? +p.resultado_exercicio : null;
   // Se temos resultado_exercicio da DRE, separamos as componentes do PL
   if (_reExerc != null) {
-    const _patAcum     = _plTotal - _reExerc;
-    const _patAcumPrev = Object.keys(p).length ? _plTotalPrev - (_reExercPrev ?? 0) : null;
-    hp += row('Patrimônio Acumulado', _patAcum || null, _patAcumPrev, false);
+    const _patAcumPrev = Object.keys(p).length ? _plTotalPrev : null;
+    hp += row('Patrimônio Acumulado', _plTotal || null, _patAcumPrev, false);
     const stlRe = _reExerc < 0 ? 'color:var(--neg);' : '';
     hp += row('Resultado do Exercício', _reExerc, _reExercPrev, false, stlRe);
   } else {

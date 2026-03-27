@@ -64,7 +64,11 @@ DO $$ BEGIN
   END IF;
 END $$;
 
--- 5. Verificação final
+-- 5. Coluna ir_csll_cp em dados_financeiros (IR e CSLL a pagar — passivo circulante)
+ALTER TABLE dados_financeiros
+  ADD COLUMN IF NOT EXISTS ir_csll_cp NUMERIC;
+
+-- 6. Verificação final
 SELECT 'uploads' as tabela, count(*) as registros FROM uploads
 UNION ALL
 SELECT 'dados_financeiros', count(*) FROM dados_financeiros

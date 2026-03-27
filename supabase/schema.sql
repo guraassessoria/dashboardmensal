@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS dados_financeiros (
   imobilizado           NUMERIC,
   
   passivo_circulante    NUMERIC,
+  ir_csll_cp            NUMERIC,
   receitas_diferidas_cp NUMERIC,
   receitas_diferidas_lp NUMERIC,
   prov_contingencias    NUMERIC,
