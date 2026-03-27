@@ -335,11 +335,16 @@ function extractDREFromSheet(workbook, periodo) {
   const superavit_bruto      = s(receita_liquida, custos_futebol)
   const despesas_operacionais = s(desp_pessoal, desp_admin, desp_impostos)
   const resultado_financeiro = s(res_fin_rec, res_fin_desp, res_fin_camb)
-  const resultado_exercicio  = s(superavit_bruto, despesas_operacionais, resultado_financeiro, outras_rec, outras_desp, ir_csll)
+  const resultado_antes_ir   = s(superavit_bruto, despesas_operacionais, resultado_financeiro, outras_rec, outras_desp)
+  const resultado_exercicio  = s(resultado_antes_ir, ir_csll)
 
   return {
     receita_bruta, receita_liquida, custos_futebol, superavit_bruto,
     despesas_operacionais, resultado_financeiro, resultado_exercicio,
+    resultado_antes_ir,
+    outras_receitas_op: outras_rec,
+    outras_despesas_op: outras_desp,
+    ir_csll,
     rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros,
     rec_desenvolvimento, rec_academy,
     rec_financeiras: res_fin_rec,
@@ -560,6 +565,10 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
     res_fin_receitas:          pickDRE(dre?.res_fin_receitas,          existingRow?.res_fin_receitas),
     res_fin_despesas:          pickDRE(dre?.res_fin_despesas,          existingRow?.res_fin_despesas),
     res_fin_cambial:           pickDRE(dre?.res_fin_cambial,           existingRow?.res_fin_cambial),
+    outras_receitas_op:        pickDRE(dre?.outras_receitas_op,        existingRow?.outras_receitas_op),
+    outras_despesas_op:        pickDRE(dre?.outras_despesas_op,        existingRow?.outras_despesas_op),
+    resultado_antes_ir:        pickDRE(dre?.resultado_antes_ir,        existingRow?.resultado_antes_ir),
+    ir_csll:                   pickDRE(dre?.ir_csll,                   existingRow?.ir_csll),
     programas_desenvolvimento: FORCE ? null : (existingRow?.programas_desenvolvimento ?? null),
     dados_raw: {
       ...existingRaw,

@@ -2068,11 +2068,23 @@ function _rebuildDRE(d, dPrev) {
   if (totalOutros !== 0 || _outRecOp || _outDespOp)
     h += row('Total de Outros Resultados Operacionais', totalOutros, dPrev ? totalOutrosP : null, true);
 
-  // Resultado antes do IR — top-level primeiro, dados_raw.dre como fallback
+  // Resultado antes do IR — top-level primeiro, dados_raw.dre como fallback,
+  // depois derivação a partir dos totais disponíveis (para registros antigos sem estes campos)
   const _resAntesIR  = d.resultado_antes_ir ?? dr.resultado_antes_ir ?? null;
-  const _resAntesIRP = p.resultado_antes_ir ?? drP.resultado_antes_ir ?? null;
   const _irCsll      = d.ir_csll ?? dr.ir_csll ?? null;
-  const _irCsllP     = p.ir_csll ?? drP.ir_csll ?? null;
+
+  // Derivar para período anterior quando os campos diretos estão ausentes
+  let _resAntesIRP = p.resultado_antes_ir ?? drP.resultado_antes_ir ?? null;
+  let _irCsllP     = p.ir_csll ?? drP.ir_csll ?? null;
+  if (_resAntesIRP == null && p.resultado_exercicio != null) {
+    // Aproximação: superavit_bruto + despesas_operacionais + resultado_financeiro + outros
+    const _sumP = (+(_outRecOpP || 0)) + (+(_outDespOpP || 0));
+    const _mainP = (+p.superavit_bruto || 0) + (+p.despesas_operacionais || 0) + (+p.resultado_financeiro || 0) + _sumP;
+    _resAntesIRP = parseFloat(_mainP.toFixed(3)) || null;
+    if (_resAntesIRP != null && _irCsllP == null) {
+      _irCsllP = parseFloat((+p.resultado_exercicio - _resAntesIRP).toFixed(3));
+    }
+  }
   h += maybeRow('Resultado antes do IR/CSLL', _resAntesIR, _resAntesIRP, true);
   h += maybeRow('IR e Contribuição Social', _irCsll, _irCsllP, false, true);
 
