@@ -823,9 +823,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" id="ctitle-bp-evolucao" style="margin-bottom:4px;">Evolução da Liquidez (Caixa)</div>
-    <div class="csub" style="margin-bottom:12px;">em milhares de reais</div>
-    <div class="cwrap" style="height:220px;"><canvas id="cbp3"></canvas></div>
+    <div class="ctitle" id="ctitle-bp-evolucao" style="margin-bottom:12px;">Evolução da Liquidez</div>
+    <div class="cwrap" style="height:300px;"><canvas id="cbp3"></canvas></div>
     <div class="insight" style="margin-top:12px;" id="insight-bp-evolucao">
       <div class="ilabel">📈 Evolução</div>
       <p></p>
@@ -1025,6 +1024,7 @@ const barValuePlugin = {
     chart.data.datasets.forEach((ds, i) => {
       const meta = chart.getDatasetMeta(i);
       if (meta.hidden) return;
+      const _fmt = ds.labelFormatter;
       meta.data.forEach((el, idx) => {
         const val = ds.data[idx];
         if (val == null) return;
@@ -1032,13 +1032,14 @@ const barValuePlugin = {
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 18px DM Sans, sans-serif';
         ctx.textAlign = 'center';
+        const label = _fmt ? _fmt(val) : (val < 0 ? '−'+Math.abs(val) : val);
         if (chart.config.type === 'line') {
           ctx.textBaseline = 'bottom';
-          ctx.fillText(val, el.x, el.y - 8);
+          ctx.fillText(label, el.x, el.y - 8);
         } else {
           ctx.textBaseline = val >= 0 ? 'bottom' : 'top';
           const yPos = val >= 0 ? el.y - 4 : el.y + 20;
-          ctx.fillText(val < 0 ? '−'+Math.abs(val) : val, el.x, yPos);
+          ctx.fillText(label, el.x, yPos);
         }
         ctx.restore();
       });
@@ -1627,9 +1628,10 @@ function initCharts() {
   safeChart('cbp3', {type:'line', data:{
     labels:GD.bp_labels_10yr,
     datasets:[
-      {label:'Liquidez / Caixa (R$Mi)', data:GD.bp_caixa_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5}
+      {label:'Liquidez / Caixa', data:GD.bp_caixa_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5,
+       labelFormatter: v => _fmtBi(v)}
     ]
-  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
+  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>_fmtBi(v)}}}}, plugins:[barValuePlugin]});
 
   // ── INDICADORES ──
   safeChart('cind1', {type:'line', data:{
@@ -2955,7 +2957,18 @@ async function loadPeriodo(periodo) {
     GD.disp_data   = anos10.map(a => merged10[a].caixa || 0);
     // Atualizar título do gráfico cbp3
     const elBp3 = document.getElementById('ctitle-bp-evolucao');
-    if (elBp3 && anosMensal.length) elBp3.textContent = 'Evolução da Liquidez (Caixa) · ' + anosMensal[0] + '–' + anosMensal[anosMensal.length - 1];
+    if (elBp3 && anosMensal.length) elBp3.textContent = 'Evolução da Liquidez · ' + anosMensal[0] + '–' + anosMensal[anosMensal.length - 1];
+    // Insight dinâmico bp-evolucao
+    const elEvIns = document.getElementById('insight-bp-evolucao');
+    if (elEvIns && anosMensal.length >= 2) {
+      const cxFirst = supaMapMensal[anosMensal[0]].caixa;
+      const cxLast  = supaMapMensal[anosMensal[anosMensal.length - 1]].caixa;
+      const varPct  = cxFirst ? ((cxLast - cxFirst) / Math.abs(cxFirst) * 100).toFixed(1).replace('.', ',') : null;
+      const subindo = cxLast >= cxFirst;
+      const dir     = subindo ? '▲ crescimento' : '▼ redução';
+      const pEl = elEvIns.querySelector('p');
+      if (pEl) pEl.innerHTML = 'Liquidez (caixa e equivalentes): ' + dir + ' de <strong>' + _fmtBi(cxFirst) + '</strong> (' + anosMensal[0] + ') para <strong>' + _fmtBi(cxLast) + '</strong> (' + anosMensal[anosMensal.length - 1] + ')' + (varPct ? ', variação de <strong>' + (subindo ? '+' : '') + varPct + '%</strong> no período.' : '.');
+    }
   }
 
   // Atualizar GD de Balanço Patrimonial e Indicadores
