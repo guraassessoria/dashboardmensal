@@ -315,6 +315,9 @@ export async function POST(req: NextRequest) {
       .upsert(novosDados, { onConflict: 'periodo' })
     if (upsertError) throw new Error(`Erro ao salvar dados: ${upsertError.message}`)
 
+    // Extrair e salvar DRE do período comparativo (ex: DFS 2025-02 contém DRE de 2024-02)
+    await saveDREComparativePeriods(workbook, periodo)
+
     // Atualizar configuração de período atual
     await supabase
       .from(tbl('configuracao'))
@@ -532,4 +535,182 @@ Retorne APENAS um JSON válido:
 }
 \`\`\`
 Use os valores exatos. Para "competicoes", liste todas da Nota 13.`
+}
+
+// ─── Extração direta da aba DRE (período comparativo) ───────────────────────
+
+function periodoToSerial(periodo: string): number {
+  const [ano, mes] = periodo.split('-').map(Number)
+  const dtUltimoDia = new Date(ano, mes, 0)
+  const excelEpoch  = new Date(1899, 11, 30)
+  return Math.round((dtUltimoDia.getTime() - excelEpoch.getTime()) / 86_400_000)
+}
+
+function serialToPeriodo(serial: number): string | null {
+  const excelEpoch = new Date(1899, 11, 30)
+  const date = new Date(excelEpoch.getTime() + serial * 86_400_000)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const lastDay = new Date(year, month, 0).getDate()
+  if (date.getDate() !== lastDay) return null
+  return `${year}-${String(month).padStart(2, '0')}`
+}
+
+const DRE_LABEL_MAP: Record<string, string> = {
+  'DRE -  Patrocínio':                           'rec_patrocinio',
+  'DRE - Direito de Transmissão':                'rec_transmissao',
+  'DRE - Bilheteria e Premiações':               'rec_bilheteria',
+  'DRE - Registros e Transferências':            'rec_registros',
+  'DRE - Legado':                                'rec_legado',
+  'DRE - Programa de desenvolvimento':           'rec_desenvolvimento',
+  'DRE - CBF Academy':                           'rec_academy',
+  'DRE - Deduções da Receita':                   '_deducoes',
+  'DRE - Seleção Principal':                     'custo_selecao_principal',
+  'DRE - Seleções de base e femininas':          'custo_selecao_base',
+  'Seleções Femininas':                          'custo_selecao_femininas',
+  'DRE - Contribuição ao Fomento do futebol':    'custo_fomento',
+  'DRE - Pessoal':                               'desp_pessoal',
+  'DRE - Administrativas':                       'desp_administrativas',
+  'DRE - Impostos e taxas':                      'desp_impostos_taxas',
+  'DRE - Receitas financeiras':                  'res_fin_receitas',
+  'DRE - Despesas financeiras':                  'res_fin_despesas',
+  'DRE - Variação Cambial':                      'res_fin_cambial',
+  'DRE - Outras Receitas Operacionais':          '_outras_rec',
+  'DRE - Outras Despesas Operacionais':          '_outras_desp',
+  'DRE - Imposto de renda e contribuição social':'_ir_csll',
+}
+
+function extractDREFromSheet(workbook: XLSX.WorkBook, periodo: string): Record<string, number | null> | null {
+  const sheetName = workbook.SheetNames.find(n => n.toUpperCase() === 'DRE')
+  if (!sheetName) return null
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return null
+
+  const serial = periodoToSerial(periodo)
+  const data: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' })
+
+  let valCol = -1
+  for (const r of data) {
+    const i = (r as any[]).indexOf(serial)
+    if (i >= 0) { valCol = i; break }
+  }
+  if (valCol < 0) return null
+
+  const raw: Record<string, number> = {}
+  for (const r of data) {
+    const label = (String(r[0] || '').trim() || String(r[1] || '').trim())
+    const field = DRE_LABEL_MAP[label]
+    if (!field) continue
+    const val = r[valCol]
+    if (typeof val === 'number') raw[field] = val
+  }
+
+  const maxAbsVal = Math.max(...Object.values(raw).map(Math.abs))
+  const scale = maxAbsVal > 1_000_000 ? 1000 : 1
+  const g = (k: string): number | null => raw[k] != null ? parseFloat((raw[k] / scale).toFixed(3)) : null
+  const s = (...args: (number | null)[]): number => parseFloat(args.reduce((acc, v) => acc + (v ?? 0), 0).toFixed(3))
+
+  const rec_patrocinio    = g('rec_patrocinio')
+  const rec_transmissao   = g('rec_transmissao')
+  const rec_bilheteria    = g('rec_bilheteria')
+  const rec_registros     = g('rec_registros')
+  const rec_desenvolvimento = g('rec_desenvolvimento')
+  const rec_academy       = g('rec_academy')
+  const deducoes          = g('_deducoes')
+  const custo_principal   = g('custo_selecao_principal')
+  const custo_base        = g('custo_selecao_base')
+  const custo_femininas   = g('custo_selecao_femininas')
+  const custo_fomento     = g('custo_fomento')
+  const desp_pessoal      = g('desp_pessoal')
+  const desp_admin        = g('desp_administrativas')
+  const desp_impostos     = g('desp_impostos_taxas')
+  const res_fin_rec       = g('res_fin_receitas')
+  const res_fin_desp      = g('res_fin_despesas')
+  const res_fin_camb      = g('res_fin_cambial')
+  const outras_rec        = g('_outras_rec')
+  const outras_desp       = g('_outras_desp')
+  const ir_csll           = g('_ir_csll')
+
+  const receita_bruta         = s(rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros, rec_desenvolvimento, rec_academy)
+  const receita_liquida       = s(receita_bruta, deducoes)
+  const custos_futebol        = s(custo_principal, custo_base, custo_femininas, custo_fomento)
+  const superavit_bruto       = s(receita_liquida, custos_futebol)
+  const despesas_operacionais = s(desp_pessoal, desp_admin, desp_impostos)
+  const resultado_financeiro  = s(res_fin_rec, res_fin_desp, res_fin_camb)
+  const resultado_antes_ir    = s(superavit_bruto, despesas_operacionais, resultado_financeiro, outras_rec, outras_desp)
+  const resultado_exercicio   = s(resultado_antes_ir, ir_csll)
+
+  return {
+    receita_bruta, receita_liquida, custos_futebol, superavit_bruto,
+    despesas_operacionais, resultado_financeiro, resultado_exercicio,
+    resultado_antes_ir, outras_receitas_op: outras_rec, outras_despesas_op: outras_desp, ir_csll,
+    rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros,
+    rec_desenvolvimento, rec_academy, rec_financeiras: res_fin_rec,
+    custo_selecao_principal: custo_principal, custo_selecao_base: custo_base,
+    custo_selecao_femininas: custo_femininas, custo_fomento,
+    desp_pessoal, desp_administrativas: desp_admin, desp_impostos_taxas: desp_impostos,
+    res_fin_receitas: res_fin_rec, res_fin_despesas: res_fin_desp, res_fin_cambial: res_fin_camb,
+  }
+}
+
+const DRE_FIELDS_FOR_COMPARATIVE = [
+  'receita_bruta','receita_liquida','custos_futebol','superavit_bruto',
+  'despesas_operacionais','resultado_financeiro','resultado_exercicio',
+  'resultado_antes_ir','outras_receitas_op','outras_despesas_op','ir_csll',
+  'rec_patrocinio','rec_transmissao','rec_bilheteria','rec_registros',
+  'rec_desenvolvimento','rec_academy','rec_financeiras',
+  'custo_selecao_principal','custo_selecao_base','custo_selecao_femininas','custo_fomento',
+  'desp_pessoal','desp_administrativas','desp_impostos_taxas',
+  'res_fin_receitas','res_fin_despesas','res_fin_cambial',
+]
+
+async function saveDREComparativePeriods(workbook: XLSX.WorkBook, currentPeriodo: string) {
+  const sheetName = workbook.SheetNames.find(n => n.toUpperCase() === 'DRE')
+  if (!sheetName) return
+  const sheet = workbook.Sheets[sheetName]
+  if (!sheet) return
+  const data: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' })
+
+  const comparativos: string[] = []
+  for (const r of data.slice(0, 5)) {
+    for (const cell of r) {
+      if (typeof cell === 'number' && cell > 40000 && cell < 60000) {
+        const p = serialToPeriodo(cell)
+        if (p && p !== currentPeriodo && !comparativos.includes(p)) comparativos.push(p)
+      }
+    }
+  }
+  if (comparativos.length === 0) return
+
+  for (const periodo of comparativos) {
+    const dre = extractDREFromSheet(workbook, periodo)
+    if (!dre) continue
+
+    const { data: existing } = await supabase
+      .from(tbl('dados_financeiros'))
+      .select('periodo,' + DRE_FIELDS_FOR_COMPARATIVE.join(','))
+      .eq('periodo', periodo)
+      .maybeSingle()
+
+    const patch: Record<string, any> = {}
+    for (const f of DRE_FIELDS_FOR_COMPARATIVE) {
+      if (dre[f] != null && (existing == null || (existing as any)[f] == null)) patch[f] = dre[f]
+    }
+
+    if (Object.keys(patch).length === 0) {
+      console.log(`[upload] DRE comparativa ${periodo} — já preenchida`)
+      continue
+    }
+
+    patch.updated_at = new Date().toISOString()
+    if (existing) {
+      const { error } = await supabase.from(tbl('dados_financeiros')).update(patch).eq('periodo', periodo)
+      if (error) console.error(`[upload] DRE comparativa ${periodo}: ${error.message}`)
+      else console.log(`[upload] ✅ DRE comparativa ${periodo} — resultado: ${dre.resultado_exercicio}`)
+    } else {
+      const { error } = await supabase.from(tbl('dados_financeiros')).insert({ periodo, ...patch })
+      if (error) console.error(`[upload] DRE comparativa ${periodo} (novo): ${error.message}`)
+      else console.log(`[upload] ✅ DRE comparativa ${periodo} (novo) — resultado: ${dre.resultado_exercicio}`)
+    }
+  }
 }
