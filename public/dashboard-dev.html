@@ -2239,20 +2239,20 @@ function _updateBPKPIs(d, dPrev) {
     return { text: (up ? '▲ +' : '▼ ') + pct.replace('.', ',') + '% vs anterior (' + _fmtBi(pv) + ')', cls: up ? 'up' : 'dn' };
   }
 
-  const d1 = _computeDelta(d.ativo_total, p.ativo_total);
-  const d2 = _computeDelta(d.caixa_equivalentes, p.caixa_equivalentes);
-  const d3 = _computeDelta(d.contas_receber, p.contas_receber);
-  const d4 = _computeDelta(d.ativo_circulante, p.ativo_circulante);
-  const d5 = _computeDelta(d.patrimonio_liquido, p.patrimonio_liquido);
-  const d6 = _computeDelta((+d.receitas_diferidas_cp||0)+(+d.receitas_diferidas_lp||0), (+p.receitas_diferidas_cp||0)+(+p.receitas_diferidas_lp||0));
+  const d1 = _computeDelta(d.caixa_equivalentes, p.caixa_equivalentes);
+  const d2 = _computeDelta(d.contas_receber, p.contas_receber);
+  const d3 = _computeDelta(d.tributos_recuperar, p.tributos_recuperar);
+  const d4 = _computeDelta(d.fornecedores, p.fornecedores);
+  const d5 = _computeDelta((+d.receitas_diferidas_cp||0)+(+d.receitas_diferidas_lp||0), (+p.receitas_diferidas_cp||0)+(+p.receitas_diferidas_lp||0));
+  const d6 = _computeDelta(d.prov_contingencias, p.prov_contingencias);
 
   const vals = [
-    { label: 'Ativo Total', val: _fmtBi(_D.ativo_total), delta: d1.text, cls: d1.cls, sub: 'PL: ' + _fmtBi(_D.patrimonio_liquido) },
-    { label: 'Caixa e Equivalentes', val: _fmtBi(_D.caixa_equivalentes), delta: d2.text, cls: d2.cls, sub: '' },
-    { label: 'Contas a Receber', val: _fmtBi(_D.contas_receber), delta: d3.text, cls: d3.cls, sub: '' },
-    { label: 'Ativo Circulante', val: _fmtBi(_D.ativo_circulante), delta: d4.text, cls: d4.cls, sub: _D.ativo_total ? Math.round(_D.ativo_circulante/_D.ativo_total*100) + '% do ativo total' : '' },
-    { label: 'Patrimônio Líquido', val: _fmtBi(_D.patrimonio_liquido), delta: d5.text, cls: d5.cls, sub: '' },
-    { label: 'Receitas Diferidas (CP+LP)', val: _fmtBi((_D.receitas_diferidas_cp||0)+(_D.receitas_diferidas_lp||0)), delta: d6.text, cls: d6.cls, sub: '' },
+    { label: 'Liquidez', val: _fmtBi(_D.caixa_equivalentes), delta: d1.text, cls: d1.cls, sub: '' },
+    { label: 'Contas a Receber', val: _fmtBi(_D.contas_receber), delta: d2.text, cls: d2.cls, sub: '' },
+    { label: 'Tributos a Recuperar', val: _fmtBi(_D.tributos_recuperar), delta: d3.text, cls: d3.cls, sub: '' },
+    { label: 'Fornecedores', val: _fmtBi(_D.fornecedores), delta: d4.text, cls: d4.cls, sub: '' },
+    { label: 'Receitas Antecipadas', val: _fmtBi((_D.receitas_diferidas_cp||0)+(_D.receitas_diferidas_lp||0)), delta: d5.text, cls: d5.cls, sub: '' },
+    { label: 'Contingências', val: _fmtBi(_D.prov_contingencias), delta: d6.text, cls: d6.cls, sub: '' },
   ];
 
   cards.forEach((card, i) => {
