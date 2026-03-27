@@ -484,7 +484,7 @@ async function processBalancetePeriodo(workbook, balanceteSheetName, periodo, fi
 
   const { data: existingRow } = await supabase
     .from(tbl('dados_financeiros'))
-    .select('dados_raw, ativo_total, ativo_circulante, caixa_equivalentes, contas_receber, tributos_recuperar, depositos_judiciais, imobilizado, passivo_circulante, ir_csll_cp, receitas_diferidas_cp, receitas_diferidas_lp, prov_contingencias, patrimonio_liquido, patrimonio_social, fornecedores, obrig_trabalhistas, adiantamentos, intangivel, resultado_acumulado, despesas_antecipadas, contas_receber_lp, investimentos, programas_desenvolvimento, provisao_ferias, fornecedores_lp')
+    .select('dados_raw, ativo_total, ativo_circulante, caixa_equivalentes, contas_receber, tributos_recuperar, depositos_judiciais, imobilizado, passivo_circulante, ir_csll_cp, receitas_diferidas_cp, receitas_diferidas_lp, prov_contingencias, patrimonio_liquido, patrimonio_social, fornecedores, obrig_trabalhistas, adiantamentos, intangivel, resultado_acumulado, despesas_antecipadas, contas_receber_lp, investimentos, programas_desenvolvimento, provisao_ferias, fornecedores_lp, receita_bruta, receita_liquida, custos_futebol, superavit_bruto, despesas_operacionais, resultado_financeiro, resultado_exercicio, rec_patrocinio, rec_transmissao, rec_bilheteria, rec_registros, rec_desenvolvimento, rec_academy, rec_financeiras, custo_selecao_principal, custo_selecao_base, custo_selecao_femininas, custo_fomento, desp_pessoal, desp_administrativas, desp_impostos_taxas, res_fin_receitas, res_fin_despesas, res_fin_cambial, outras_receitas_op, outras_despesas_op, resultado_antes_ir, ir_csll')
     .eq('periodo', periodo)
     .maybeSingle()
 
