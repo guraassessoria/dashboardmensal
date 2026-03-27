@@ -405,36 +405,40 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="kgrid" id="despesas-kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Fomento Estados e Competições</div>
-      <div class="kval">R$ 756,7 Mi</div>
-      <div class="kdelta dn">▲ +3,1% vs 2024 (R$734,1 milhões)</div>
-      <div class="ksub">Maior item · 64% dos custos com futebol</div>
-    </div>
-    <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleção Principal</div>
       <div class="kval">R$ 281,1 Mi</div>
       <div class="kdelta dn">▲ +39,7% vs 2024 (R$201,1 milhões)</div>
+      <div class="ksub"></div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleções Femininas</div>
       <div class="kval">R$ 94,3 Mi</div>
       <div class="kdelta up">▼ −19,1% vs 2024 (R$116,5 milhões)</div>
+      <div class="ksub"></div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
       <div class="klabel">Seleções de Base</div>
       <div class="kval">R$ 44,7 Mi</div>
       <div class="kdelta dn">▲ +65,6% vs 2024 (R$27,0 milhões)</div>
+      <div class="ksub"></div>
+    </div>
+    <div class="kcard" style="background:rgba(160,165,175,0.18);">
+      <div class="klabel">Fomento Estados e Competições</div>
+      <div class="kval">R$ 756,7 Mi</div>
+      <div class="kdelta dn">▲ +3,1% vs 2024 (R$734,1 milhões)</div>
+      <div class="ksub"></div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Desp. Administrativas</div>
       <div class="kval">R$ 369,1 Mi</div>
       <div class="kdelta dn">▲ +153% vs 2024 (R$145,8 milhões)</div>
-      <div class="ksub">Inclui provisões e gastos extraordinários</div>
+      <div class="ksub"></div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Desp. com Pessoal</div>
       <div class="kval">R$ 58,2 Mi</div>
       <div class="kdelta dn">▲ +15,6% vs 2024 (R$50,3 milhões)</div>
+      <div class="ksub"></div>
     </div>
   </div>
 
@@ -2351,10 +2355,10 @@ function _updateDespesasKPIs(d, dPrev) {
   const p = dPrev || {};
 
   const items = [
-    { val: Math.abs(+d.custo_fomento || 0), prev: Math.abs(+p.custo_fomento || 0) },
     { val: Math.abs(+d.custo_selecao_principal || 0), prev: Math.abs(+p.custo_selecao_principal || 0) },
     { val: Math.abs(+d.custo_selecao_femininas || 0), prev: Math.abs(+p.custo_selecao_femininas || 0) },
     { val: Math.abs(+d.custo_selecao_base || 0), prev: Math.abs(+p.custo_selecao_base || 0) },
+    { val: Math.abs(+d.custo_fomento || 0), prev: Math.abs(+p.custo_fomento || 0) },
     { val: Math.abs(+d.desp_administrativas || 0), prev: Math.abs(+p.desp_administrativas || 0) },
     { val: Math.abs(+d.desp_pessoal || 0), prev: Math.abs(+p.desp_pessoal || 0) },
   ];
