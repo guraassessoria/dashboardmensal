@@ -2943,7 +2943,7 @@ async function loadPeriodo(periodo) {
     const supaMapMensal = {};
     _allDados.forEach(row => {
       const [rAno, rMes] = row.periodo.split('-');
-      if (rMes === mmC) {
+      if (rMes === mmC && rAno <= yyC) {
         supaMapMensal[rAno] = {
           label: rAno,
           caixa: Math.round(+row.caixa_equivalentes || 0),
