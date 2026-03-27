@@ -752,7 +752,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
 <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Balanço Patrimonial  - em milhares de reais</div>
+    <div class="ctitle" style="margin-bottom:4px;">Balanço Patrimonial</div>
+    <div class="csub" style="margin-bottom:16px;">em milhares de reais</div>
     <div class="two" style="margin-bottom:0;align-items:start;">
       <div>
         <table>
@@ -822,7 +823,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Evolução do Ativo Total · 2016–2025 - em milhares de reais</div>
+    <div class="ctitle" id="ctitle-bp-evolucao" style="margin-bottom:4px;">Evolução da Liquidez (Caixa)</div>
+    <div class="csub" style="margin-bottom:12px;">em milhares de reais</div>
     <div class="cwrap" style="height:220px;"><canvas id="cbp3"></canvas></div>
     <div class="insight" style="margin-top:12px;" id="insight-bp-evolucao">
       <div class="ilabel">📈 Evolução</div>
@@ -1625,7 +1627,7 @@ function initCharts() {
   safeChart('cbp3', {type:'line', data:{
     labels:GD.bp_labels_10yr,
     datasets:[
-      {label:'Ativo Total (R$Mi)', data:GD.bp_ativo_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5}
+      {label:'Liquidez / Caixa (R$Mi)', data:GD.bp_caixa_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5}
     ]
   }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
 
@@ -2927,18 +2929,33 @@ async function loadPeriodo(periodo) {
     ];
   }
 
-  // Atualizar séries 10 anos (dinâmico: HIST_10YR + HIST + supaMap)
+  // Atualizar séries 10 anos: cbp3 usa apenas dados do BD filtrados pelo mesmo mês do período
   if (typeof GD !== 'undefined') {
+    const [yyC, mmC] = periodo.split('-');
+    // Série cbp3: apenas registros do mesmo mês, por ano
+    const supaMapMensal = {};
+    _allDados.forEach(row => {
+      const [rAno, rMes] = row.periodo.split('-');
+      if (rMes === mmC) {
+        supaMapMensal[rAno] = {
+          label: rAno,
+          caixa: Math.round(+row.caixa_equivalentes || 0),
+          ativo: Math.round(+row.ativo_total || 0),
+        };
+      }
+    });
+    const anosMensal = Object.keys(supaMapMensal).sort();
+    GD.bp_labels_10yr = anosMensal;
+    GD.bp_ativo_10yr  = anosMensal.map(a => supaMapMensal[a].ativo || 0);
+    GD.bp_caixa_10yr  = anosMensal.map(a => supaMapMensal[a].caixa || 0);
+    // Série disp (cind1): usa todos os anos disponíveis (HIST + supaMap)
     const merged10 = { ...HIST_10YR, ...HIST, ...supaMap };
     const anos10 = Object.keys(merged10).sort();
-    GD.bp_labels_10yr = anos10;
-    GD.bp_ativo_10yr  = anos10.map(a => merged10[a].ativo || 0);
-    GD.bp_caixa_10yr  = anos10.map(a => merged10[a].caixa || 0);
-    GD.disp_labels    = anos10;
-    GD.disp_data      = anos10.map(a => merged10[a].caixa || 0);
-    // Atualizar título do gráfico
-    const elBp3 = document.querySelector('#cbp3')?.closest('.ccard')?.querySelector('.ctitle');
-    if (elBp3) elBp3.textContent = 'Evolução do Ativo Total · ' + anos10[0] + '–' + anos10[anos10.length-1] + ' - em milhares de reais';
+    GD.disp_labels = anos10;
+    GD.disp_data   = anos10.map(a => merged10[a].caixa || 0);
+    // Atualizar título do gráfico cbp3
+    const elBp3 = document.getElementById('ctitle-bp-evolucao');
+    if (elBp3 && anosMensal.length) elBp3.textContent = 'Evolução da Liquidez (Caixa) · ' + anosMensal[0] + '–' + anosMensal[anosMensal.length - 1];
   }
 
   // Atualizar GD de Balanço Patrimonial e Indicadores
