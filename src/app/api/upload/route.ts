@@ -608,7 +608,7 @@ function extractDREFromSheet(workbook: XLSX.WorkBook, periodo: string): Record<s
   const maxAbsVal = Math.max(...Object.values(raw).map(Math.abs))
   const scale = maxAbsVal > 1_000_000 ? 1000 : 1
   const g = (k: string): number | null => raw[k] != null ? parseFloat((raw[k] / scale).toFixed(3)) : null
-  const s = (...args: (number | null)[]): number => parseFloat(args.reduce((acc, v) => acc + (v ?? 0), 0).toFixed(3))
+  const s = (...args: (number | null)[]): number => parseFloat(args.reduce((acc: number, v) => acc + (v ?? 0), 0).toFixed(3))
 
   const rec_patrocinio    = g('rec_patrocinio')
   const rec_transmissao   = g('rec_transmissao')
