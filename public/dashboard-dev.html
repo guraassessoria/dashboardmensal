@@ -778,14 +778,14 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
       <div>
         <table>
-          <thead id="bp-passivo-thead"><tr><th>PASSIVO + PL</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
+          <thead id="bp-passivo-thead"><tr><th>PASSIVO</th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th></tr></thead>
           <tbody id="bp-passivo-tbody">
             <tr class="dre-header"><td colspan="3">Circulante</td></tr>
             <tr><td>Fornecedores e Contas a Pagar</td><td class="num">141.366</td><td class="num">154.114</td></tr>
             <tr><td>Programas de Desenvolvimento</td><td class="num">—</td><td class="num">—</td></tr>
             <tr><td>Obrigações Trabalhistas</td><td class="num">33.558</td><td class="num">19.489</td></tr>
             <tr><td>Provisão Férias e Encargos</td><td class="num">—</td><td class="num">—</td></tr>
-            <tr><td>Receitas Antecipadas CP</td><td class="num">364.074</td><td class="num">307.379</td></tr>
+            <tr><td>Receitas Antecipadas</td><td class="num">364.074</td><td class="num">307.379</td></tr>
             <tr class="dre-row-total"><td>Total Circulante</td><td class="num">610.750</td><td class="num">531.588</td></tr>
             <tr class="dre-header"><td colspan="3">Não Circulante</td></tr>
             <tr><td>Receitas Antecipadas LP</td><td class="num">849.270</td><td class="num">1.067.009</td></tr>
@@ -803,8 +803,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="two">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição do Ativo</div>
-      <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Ativo</div>
+      <div class="csub" style="margin-bottom:16px;">Em milhares de reais</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp1"></canvas></div>
       <div class="insight" style="margin-top:12px;" id="insight-bp-ativo">
         <div class="ilabel">📋 Composição</div>
@@ -812,8 +812,8 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
       </div>
     </div>
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Composição do Passivo + PL</div>
-      <div class="csub" style="margin-bottom:16px;">Estrutura em milhares de reais</div>
+      <div class="ctitle" style="margin-bottom:4px;">Passivo + Patrimônio Líquido</div>
+      <div class="csub" style="margin-bottom:16px;">Em milhares de reais</div>
       <div class="cwrap" style="height:260px;"><canvas id="cbp2"></canvas></div>
       <div class="insight" style="margin-top:12px;" id="insight-bp-passivo">
         <div class="ilabel">⚖️ Nota</div>
@@ -2837,6 +2837,7 @@ async function loadPeriodo(periodo) {
     patrimonio_social:   +d.patrimonio_social || 0,
     ativo_circulante:    +d.ativo_circulante || 0,
     passivo_circulante:  +d.passivo_circulante || 0,
+    fornecedores:        +d.fornecedores || 0,
 
     labels,
     receita_serie:   rec_serie,
