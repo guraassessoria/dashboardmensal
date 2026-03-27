@@ -2055,18 +2055,26 @@ function _rebuildDRE(d, dPrev) {
   h += renderSection(rFin, pFin, _finLabels, false);
   h += row('Total do Resultado Financeiro', d.resultado_financeiro, p.resultado_financeiro, true);
 
-  // Outros Resultados Operacionais
+  // Outros Resultados Operacionais — lê top-level primeiro, depois dados_raw.dre fallback
+  const _outRecOp   = d.outras_receitas_op  ?? dr.outras_receitas  ?? null;
+  const _outDespOp  = d.outras_despesas_op  ?? dr.outras_despesas  ?? null;
+  const _outRecOpP  = p.outras_receitas_op  ?? drP.outras_receitas  ?? null;
+  const _outDespOpP = p.outras_despesas_op  ?? drP.outras_despesas  ?? null;
   h += hdr('Outros Resultados Operacionais');
-  h += maybeRow('Outras Receitas Operacionais', dr.outras_receitas, drP.outras_receitas);
-  h += maybeRow('Outras Despesas Operacionais', dr.outras_despesas, drP.outras_despesas, false, true);
-  const totalOutros = (+(dr.outras_receitas || 0)) + (+(dr.outras_despesas || 0));
-  const totalOutrosP = (+(drP.outras_receitas || 0)) + (+(drP.outras_despesas || 0));
-  if (totalOutros !== 0 || dr.outras_receitas || dr.outras_despesas)
+  h += maybeRow('Outras Receitas Operacionais', _outRecOp, _outRecOpP);
+  h += maybeRow('Outras Despesas Operacionais', _outDespOp, _outDespOpP, false, true);
+  const totalOutros  = (+(_outRecOp  || 0)) + (+(_outDespOp  || 0));
+  const totalOutrosP = (+(_outRecOpP || 0)) + (+(_outDespOpP || 0));
+  if (totalOutros !== 0 || _outRecOp || _outDespOp)
     h += row('Total de Outros Resultados Operacionais', totalOutros, dPrev ? totalOutrosP : null, true);
 
-  // Resultado antes do IR
-  h += maybeRow('Resultado antes do IR/CSLL', dr.resultado_antes_ir, drP.resultado_antes_ir, true);
-  h += maybeRow('IR e Contribuição Social', dr.ir_csll, drP.ir_csll, false, true);
+  // Resultado antes do IR — top-level primeiro, dados_raw.dre como fallback
+  const _resAntesIR  = d.resultado_antes_ir ?? dr.resultado_antes_ir ?? null;
+  const _resAntesIRP = p.resultado_antes_ir ?? drP.resultado_antes_ir ?? null;
+  const _irCsll      = d.ir_csll ?? dr.ir_csll ?? null;
+  const _irCsllP     = p.ir_csll ?? drP.ir_csll ?? null;
+  h += maybeRow('Resultado antes do IR/CSLL', _resAntesIR, _resAntesIRP, true);
+  h += maybeRow('IR e Contribuição Social', _irCsll, _irCsllP, false, true);
 
   // Resultado final
   const stl = d.resultado_exercicio < 0 ? 'color:var(--neg);font-size:14px;' : 'color:var(--pos);font-size:14px;';
