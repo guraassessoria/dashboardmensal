@@ -285,11 +285,11 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 <nav>
   <div class="ni">
     <button class="ntab active" onclick="sp('bp')">Balanço Patrimonial</button>
-    <button class="ntab" onclick="sp('balanco')">DRE Completa</button>
+    <button class="ntab" onclick="sp('balanco')">Demonstração do Resultado</button>
     <button class="ntab" onclick="sp('receitas')">Receitas</button>
     <button class="ntab" onclick="sp('despesas')">Custos e Despesas</button>
     <button class="ntab" onclick="sp('competicoes')">Competições</button>
-    <button class="ntab" onclick="sp('indicadores')">Indicadores Financeiros</button>
+    <button class="ntab" onclick="sp('indicadores')">Indicadores</button>
     <button class="ntab" onclick="sp('historico')">Série Histórica</button>
     <button class="ntab" onclick="sp('overview')">Resumo Executivo</button>
   </div>
@@ -839,52 +839,34 @@ footer p{font-size:12px;color:var(--g2);font-weight:300}
 
   <div class="kgrid" id="indicadores-kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
     <div class="kcard">
-      <div class="klabel">Índice Kanitz (Solvência)</div>
-      <div class="kval">17,33</div>
-      <div class="kdelta up">▲ Zona de Solvência</div>
-      <div class="ksub">Posição sólida · baixo risco · boa liquidez</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Redução Caixa 2024→2025</div>
-      <div class="kval">−R$ 436 Mi</div>
-      <div class="kdelta dn">▼ Brax, Fields, Icasa</div>
-      <div class="ksub"></div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Receita Financeira</div>
-      <div class="kval">R$ 318 Mi</div>
-      <div class="kdelta up">▲ +141% vs 2024 (R$132 milhões)</div>
-      <div class="ksub"></div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">EBITDA / Margem EBITDA 2025</div>
-      <div class="kval">−R$ 494 Mi</div>
-      <div class="kdelta dn">▼ −40,4% vs −1,8% em 2024</div>
-      <div class="ksub">LL (−182) − RF (−318) + D&amp;A (+6,7) · Operação consome antes do efeito financeiro</div>
-    </div>
-    <div class="kcard">
-      <div class="klabel">Contratos não recebidos</div>
-      <div class="kval">−R$ 101 Mi</div>
-      <div class="kdelta dn">▼ Brax + Fields</div>
-      <div class="ksub">Série B, Copa do Nordeste, Competições Fem.</div>
-    </div>
-    <div class="kcard">
       <div class="klabel">Liquidez Corrente</div>
       <div class="kval">3,95</div>
-      <div class="kdelta dn">▼ 3,95 (2025) vs 5,21 (2024)</div>
-      <div class="ksub">AC / PC · R$2.414Bi / R$611Mi · Posição confortável</div>
+      <div class="kdelta dn">▼ 3,95 vs 5,21 anterior</div>
+      <div class="ksub">AC / PC</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Geral</div>
       <div class="kval">1,59</div>
-      <div class="kdelta dn">▼ vs 1,66 em 2024</div>
-      <div class="ksub">AT/(PC+PNC) · Leve redução pelo aumento do passivo não circulante</div>
+      <div class="kdelta dn">▼ vs 1,66 anterior</div>
+      <div class="ksub">AT / (PC + PNC)</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Imediata</div>
       <div class="kval">3,27</div>
-      <div class="kdelta dn">▼ 3,27 (2025) vs 4,58 (2024)</div>
-      <div class="ksub">Caixa / PC · R$1.997Bi / R$611Mi · Boa cobertura imediata</div>
+      <div class="kdelta dn">▼ 3,27 vs 4,58 anterior</div>
+      <div class="ksub">Caixa / PC</div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">EBITDA / Margem EBITDA</div>
+      <div class="kval">−R$ 494 Mi</div>
+      <div class="kdelta dn">▼ Margem −40,4%</div>
+      <div class="ksub"></div>
+    </div>
+    <div class="kcard">
+      <div class="klabel">Índice Kanitz (Solvência)</div>
+      <div class="kval">17,33</div>
+      <div class="kdelta up">▲ Zona de Solvência</div>
+      <div class="ksub">Posição sólida · baixo risco</div>
     </div>
   </div>
 
@@ -2427,14 +2409,11 @@ function _updateIndicadoresKPIs(d, dPrev) {
   const kanitz = 0.05 * rp + 1.65 * lg + 3.55 * ls - 1.06 * lc - 0.33 * ge;
 
   const items = [
-    { label: 'Índice Kanitz (Solvência)', val: kanitz.toFixed(2).replace('.', ','), delta: kanitz > 0 ? '▲ Zona de Solvência' : '▼ Risco', cls: kanitz > 0 ? 'up' : 'dn', sub: 'Posição sólida · baixo risco · boa liquidez' },
-    { label: 'Variação Caixa', val: _fmtMi(cxDiff), delta: cxPrev ? (cxDiff >= 0 ? '▲ Aumento' : '▼ Redução') + ' vs anterior' : '', cls: cxDiff >= 0 ? 'up' : 'dn', sub: '' },
-    { label: 'Receita Financeira', val: _fmtMi(rf), delta: (+p.rec_financeiras) ? ((rf > Math.abs(+p.rec_financeiras) ? '▲ +' : '▼ ') + ((rf - Math.abs(+p.rec_financeiras)) / Math.abs(+p.rec_financeiras) * 100).toFixed(1).replace('.', ',') + '% vs anterior') : '', cls: 'up', sub: '' },
-    { label: 'EBITDA / Margem EBITDA', val: _fmtMi(ebitda), delta: 'Margem ' + margemEbitda.toFixed(1).replace('.', ',') + '%', cls: ebitda >= 0 ? 'up' : 'dn', sub: '' },
-    { label: 'Contratos não recebidos', val: '—', delta: '', cls: 'dn', sub: '' },
     { label: 'Liquidez Corrente', val: lc.toFixed(2).replace('.', ','), delta: lcP ? (lc.toFixed(2).replace('.', ',') + ' vs ' + lcP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: lc >= lcP ? 'up' : 'dn', sub: 'AC / PC · ' + _fmtBi(ac) + ' / ' + _fmtBi(pc) },
-    { label: 'Liquidez Geral', val: lg.toFixed(2).replace('.', ','), delta: lgP ? ('vs ' + lgP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: lg >= lgP ? 'up' : 'dn', sub: 'AT/(PC+PNC)' },
+    { label: 'Liquidez Geral', val: lg.toFixed(2).replace('.', ','), delta: lgP ? ('vs ' + lgP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: lg >= lgP ? 'up' : 'dn', sub: 'AT / (PC + PNC)' },
     { label: 'Liquidez Imediata', val: li.toFixed(2).replace('.', ','), delta: liP ? (li.toFixed(2).replace('.', ',') + ' vs ' + liP.toFixed(2).replace('.', ',') + ' anterior') : '', cls: li >= liP ? 'up' : 'dn', sub: 'Caixa / PC · ' + _fmtBi(cx) + ' / ' + _fmtBi(pc) },
+    { label: 'EBITDA / Margem EBITDA', val: _fmtMi(ebitda), delta: 'Margem ' + margemEbitda.toFixed(1).replace('.', ',') + '%', cls: ebitda >= 0 ? 'up' : 'dn', sub: '' },
+    { label: 'Índice Kanitz (Solvência)', val: kanitz.toFixed(2).replace('.', ','), delta: kanitz > 0 ? '▲ Zona de Solvência' : '▼ Risco', cls: kanitz > 0 ? 'up' : 'dn', sub: 'Posição sólida · baixo risco' },
   ];
 
   cards.forEach((card, i) => {
