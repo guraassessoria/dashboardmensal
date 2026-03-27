@@ -1631,7 +1631,7 @@ function initCharts() {
       {label:'Liquidez / Caixa', data:GD.bp_caixa_10yr, borderColor:C.g, backgroundColor:'rgba(0,150,63,.1)', fill:true, tension:.4, pointRadius:5, pointBackgroundColor:C.g, borderWidth:2.5,
        labelFormatter: v => _fmtBi(v)}
     ]
-  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>_fmtBi(v)}}}}, plugins:[barValuePlugin]});
+  }, options:{maintainAspectRatio:false, layout:{padding:{left:80, right:80, top:36}}, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>_fmtBi(v)}}}}, plugins:[barValuePlugin]});
 
   // ── INDICADORES ──
   safeChart('cind1', {type:'line', data:{
@@ -2959,15 +2959,15 @@ async function loadPeriodo(periodo) {
     const elBp3 = document.getElementById('ctitle-bp-evolucao');
     if (elBp3 && anosMensal.length) elBp3.textContent = 'Evolução da Liquidez · ' + anosMensal[0] + '–' + anosMensal[anosMensal.length - 1];
     // Insight dinâmico bp-evolucao
-    const elEvIns = document.getElementById('insight-bp-evolucao');
-    if (elEvIns && anosMensal.length >= 2) {
+    if (anosMensal.length >= 2) {
       const cxFirst = supaMapMensal[anosMensal[0]].caixa;
       const cxLast  = supaMapMensal[anosMensal[anosMensal.length - 1]].caixa;
       const varPct  = cxFirst ? ((cxLast - cxFirst) / Math.abs(cxFirst) * 100).toFixed(1).replace('.', ',') : null;
       const subindo = cxLast >= cxFirst;
       const dir     = subindo ? '▲ crescimento' : '▼ redução';
-      const pEl = elEvIns.querySelector('p');
-      if (pEl) pEl.innerHTML = 'Liquidez (caixa e equivalentes): ' + dir + ' de <strong>' + _fmtBi(cxFirst) + '</strong> (' + anosMensal[0] + ') para <strong>' + _fmtBi(cxLast) + '</strong> (' + anosMensal[anosMensal.length - 1] + ')' + (varPct ? ', variação de <strong>' + (subindo ? '+' : '') + varPct + '%</strong> no período.' : '.');
+      window.__cbfBpEvolucaoInsight__ = 'Liquidez (caixa e equivalentes): ' + dir + ' de <strong>' + _fmtBi(cxFirst) + '</strong> (' + anosMensal[0] + ') para <strong>' + _fmtBi(cxLast) + '</strong> (' + anosMensal[anosMensal.length - 1] + ')' + (varPct ? ', variação de <strong>' + (subindo ? '+' : '') + varPct + '%</strong> no período.' : '.');
+      const elEvIns = document.getElementById('insight-bp-evolucao');
+      if (elEvIns) { const pEl = elEvIns.querySelector('p'); if (pEl) pEl.innerHTML = window.__cbfBpEvolucaoInsight__; }
     }
   }
 
@@ -3028,6 +3028,11 @@ async function loadPeriodo(periodo) {
     const insArr = await insRes.json();
     if (Array.isArray(insArr) && insArr.length > 0) {
       _aplicarInsights(insArr[0].conteudo);
+      // Re-aplicar insight dinâmico de liquidez (sobrescreve o do DB)
+      if (window.__cbfBpEvolucaoInsight__) {
+        const elEvIns = document.getElementById('insight-bp-evolucao');
+        if (elEvIns) { const pEl = elEvIns.querySelector('p'); if (pEl) pEl.innerHTML = window.__cbfBpEvolucaoInsight__; }
+      }
       console.log('[CBF] Insights carregados para período:', periodo);
     } else {
       console.log('[CBF] Sem insights para este período');
