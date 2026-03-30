@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
-<title>?? CBF Dashboard</title>
+<title>⚙️ CBF Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* CBF Official Typefaces � Dalton Maag */
+/* CBF Official Typefaces – Dalton Maag */
 /* Prometo: headings, titles, highlights | Noka: body, captions, labels */
 /* When font files are available, add @font-face declarations here */
 </style>
@@ -31,7 +31,7 @@ header{position:relative;overflow:hidden;background:var(--cbf-amarelo);border-bo
 .hr{text-align:right}
 .yr{font-family:var(--font-heading);font-size:42px;font-weight:900;color:var(--cbf-azul-escuro);line-height:1;text-shadow:none}
 .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,156,59,.15);border:1px solid rgba(0,156,59,.4);border-radius:100px;padding:4px 12px;font-size:9px;color:var(--pos);font-weight:500;margin-top:8px}
-.badge::before{content:'?';font-size:7px}
+.badge::before{content:'●';font-size:7px}
 nav{background:var(--cbf-azul-navy);border-bottom:3px solid var(--cbf-amarelo);position:relative;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding-right:16px;flex-wrap:wrap}
 .ni{flex:1;min-width:0;max-width:1400px;margin:0 auto;padding:0 40px;display:flex;flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
 .ni::-webkit-scrollbar{display:none}
@@ -105,7 +105,7 @@ table tbody td:nth-child(2){color:#0D2257 !important;font-weight:600 !important}
 table tbody td:nth-child(3){color:#5A7AAA !important;font-weight:400 !important}
 table tbody td:nth-child(4){color:#3A5080 !important;font-weight:600 !important}
 
-/* Ajustes apenas da aba Competi��es para encaixe sem scroll horizontal */
+/* Ajustes apenas da aba Competições para encaixe sem scroll horizontal */
 #competicoes .competicoes-table-wrap{overflow:hidden !important;width:100% !important}
 #competicoes .competicoes-table{table-layout:fixed !important;width:100% !important;min-width:0 !important;border-collapse:collapse !important}
 #competicoes .competicoes-table thead th{font-size:10px !important;padding:8px 6px !important;text-align:right !important;line-height:1.2 !important;white-space:normal !important;word-break:break-word !important;overflow:hidden !important}
@@ -208,7 +208,7 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 #balanco table.dre-clean tbody tr:last-child td:nth-child(4){color:#C0392B !important;font-weight:700 !important}
 #balanco table.dre-clean tbody tr:last-child td:last-child{color:#C0392B !important;border-right:8px solid #FFFFFF !important;border-radius:0 6px 6px 0 !important}
 
-/* Resultado do Exerc�cio final styling */
+/* Resultado do Exercício final styling */
 #balanco table.dre-clean tbody tr.resultado-final,
 #balanco table.dre-clean tbody tr:last-child {
   background-color: #0D2257 !important;
@@ -303,10 +303,10 @@ footer p,.mono{color:#5A7AAA !important}
 
 @media(max-width:768px){.main{padding:22px 16px}.hi{padding:12px 16px}.ni{padding:0 16px}.two{grid-template-columns:1fr}footer{padding:18px 16px;flex-direction:column;text-align:center}}
 
-/* -------------------------------------------------------
-   PADR�O DRE � aplicado �s tabelas selecionadas
-   Replica visual da "Demonstra��o de Resultado"
-   ------------------------------------------------------- */
+/* ═══════════════════════════════════════════════════════
+   PADRÃO DRE — aplicado às tabelas selecionadas
+   Replica visual da "Demonstração de Resultado"
+   ═══════════════════════════════════════════════════════ */
 .std-table-wrap{background:#FFFFFF !important;border-radius:10px !important;border:1px solid #D6E4F7 !important;overflow:hidden !important;}
 .std-table{border-collapse:collapse !important;width:100% !important;}
 .std-table thead th{background:#193375 !important;color:#FFFFFF !important;font-size:11px !important;font-weight:700 !important;text-transform:uppercase !important;padding:10px 12px !important;text-align:right !important;width:auto !important;min-width:0 !important;border:none !important;letter-spacing:.5px !important;}
@@ -330,7 +330,7 @@ footer p,.mono{color:#5A7AAA !important}
 .std-table tbody tr.dre-emphasis td.du{color:#19AE47 !important;}
 .std-table tbody tr.dre-emphasis td.dd{color:#C0392B !important;}
 
-/* -- PRINT / PDF STYLES -- */
+/* ── PRINT / PDF STYLES ── */
 @page { size: A4 landscape; margin: 8mm 10mm; }
 @page portrait-only { size: A4 portrait; margin: 8mm 10mm; }
 
@@ -373,7 +373,7 @@ footer p,.mono{color:#5A7AAA !important}
   #indicadores .kgrid { grid-template-columns: repeat(3,1fr) !important; }
   #historico .cgrid { grid-template-columns: repeat(3,1fr) !important; }
   #balanco table { font-size: 8px !important; } #balanco th { padding: 2px 5px !important; font-size: 7.5px !important; } #balanco td { padding: 3px 5px !important; } #balanco .ccard { padding: 5px 8px !important; } #balanco .insight p { font-size: 8px !important; }
-  /* -- CRITICAL: disable backdrop-filter � Chrome/Edge renders it as opaque black in print -- */
+  /* ── CRITICAL: disable backdrop-filter – Chrome/Edge renders it as opaque black in print ── */
   .kcard, .ccard, .aicard, nav, [style*="backdrop-filter"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .kval.g { color: #009C3B !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .kval.r { color: #C0392B !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -395,15 +395,15 @@ footer p,.mono{color:#5A7AAA !important}
 </head>
 <body>
 
-<!-- - LOGIN OVERLAY - -->
+<!-- ═ LOGIN OVERLAY ═ -->
 <div id="login-overlay" style="position:fixed;inset:0;z-index:9999;background:#0D1117;display:flex;align-items:center;justify-content:center;">
   <div style="background:rgba(22,27,34,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;backdrop-filter:blur(12px);">
     <div style="margin-bottom:28px;">
       <div style="font-family:var(--font-heading);font-size:28px;font-weight:700;color:#F5C900;letter-spacing:2px;margin-bottom:6px;">CBF DASHBOARD</div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.5);font-weight:300;">Demonstra��es Financeiras</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.5);font-weight:300;">Demonstrações Financeiras</div>
     </div>
     <form id="login-form" autocomplete="off" style="display:flex;flex-direction:column;gap:14px;">
-      <input id="login-user" type="text" placeholder="Usu�rio" required
+      <input id="login-user" type="text" placeholder="Usuário" required
         style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#fff;font-size:15px;font-family:var(--font-body);outline:none;box-sizing:border-box;transition:border-color .2s;"
         onfocus="this.style.borderColor='rgba(245,201,0,.4)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'">
       <input id="login-pass" type="password" placeholder="Senha" required
@@ -427,8 +427,8 @@ footer p,.mono{color:#5A7AAA !important}
     <div class="logo-a">
       <div class="emblem"><img src="assets/imagens/CBF_Logo_Transparente.png" alt="CBF"></div>
       <div class="htitles">
-        <h1>CONFEDERA��O BRASILEIRA DE FUTEBOL</h1>
-        <p>DEMONSTRA��ES FINANCEIRAS</p>
+        <h1>CONFEDERAÇÃO BRASILEIRA DE FUTEBOL</h1>
+        <p>DEMONSTRAÇÕES FINANCEIRAS</p>
       </div>
     </div>
     <div class="hr">
@@ -439,17 +439,17 @@ footer p,.mono{color:#5A7AAA !important}
 </header>
 <nav>
   <div class="ni">
-    <button class="ntab active" onclick="sp('inicio')">In�cio</button>
-    <button class="ntab" onclick="sp('bp')">Balan�o Patrimonial</button>
-    <button class="ntab" onclick="sp('balanco')">Demonstra��o de Resultado</button>
+    <button class="ntab active" onclick="sp('inicio')">Início</button>
+    <button class="ntab" onclick="sp('bp')">Balanço Patrimonial</button>
+    <button class="ntab" onclick="sp('balanco')">Demonstração de Resultado</button>
     <button class="ntab" onclick="sp('receitas')">Receitas</button>
     <button class="ntab" onclick="sp('despesas')">Custos e Despesas</button>
-    <button class="ntab" onclick="sp('competicoes')">Competi��es</button>
+    <button class="ntab" onclick="sp('competicoes')">Competições</button>
     <button class="ntab" onclick="sp('indicadores')">Indicadores</button>
-    <button class="ntab" onclick="sp('historico')">S�rie Hist�rica</button>
+    <button class="ntab" onclick="sp('historico')">Série Histórica</button>
     <button class="ntab" onclick="sp('overview')">Resumo Executivo</button>
   </div>
-  <button class="pdf-btn" title="Chrome/Edge: no di�logo de impress�o, ative 'Gr�ficos de fundo' para preservar as cores" onclick="exportPDF()" title="No di�logo de impress�o: ative Gr�ficos de fundo � desative Cabe�alhos e rodap�s">
+  <button class="pdf-btn" title="Chrome/Edge: no diálogo de impressão, ative 'Gráficos de fundo' para preservar as cores" onclick="exportPDF()" title="No diálogo de impressão: ative Gráficos de fundo · desative Cabeçalhos e rodapés">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
     Exportar PDF
   </button>
@@ -465,59 +465,59 @@ footer p,.mono{color:#5A7AAA !important}
     <div class="home-hero-bottom-gradient"></div>
 
     <div class="home-hero-content">
-      <span class="home-badge">? EXERC�CIO 2025</span>
-      <h2 class="home-title">Apresenta��o de<br><span class="home-title-highlight">Resultados 2025</span></h2>
-      <p class="home-sub">Demonstra��es Financeiras da Confedera��o Brasileira de Futebol � exerc�cio encerrado em 31 de dezembro de 2025.</p>
+      <span class="home-badge">⚽ EXERCÍCIO 2025</span>
+      <h2 class="home-title">Apresentação de<br><span class="home-title-highlight">Resultados 2025</span></h2>
+      <p class="home-sub">Demonstrações Financeiras da Confederação Brasileira de Futebol — exercício encerrado em 31 de dezembro de 2025.</p>
       <div class="home-line"></div>
       <div class="home-actions">
-        <button class="home-btn-primary" onclick="sp('bp')">? Acessar o Dashboard</button>
-        <button class="home-btn-secondary" onclick="exportPDF()">? Exportar PDF</button>
+        <button class="home-btn-primary" onclick="sp('bp')">→ Acessar o Dashboard</button>
+        <button class="home-btn-secondary" onclick="exportPDF()">↓ Exportar PDF</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- - OVERVIEW - -->
+<!-- ═ OVERVIEW ═ -->
 <div id="overview" class="page landscape">
-  <div class="stitle">Sum�rio Executivo<br></div>
+  <div class="stitle">Sumário Executivo<br></div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel" id="lbl-periodo">Receita Bruta</div>
       <div class="kval" id="kv-receita-bruta">R$ 1,19 Bi</div>
-      <div class="kdelta dn" id="kd-receita-bruta">? -8,4%</div>
+      <div class="kdelta dn" id="kd-receita-bruta">▼ −8,4%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Custo com Futebol</div>
       <div class="kval" id="kv-custos">R$ 1,18 Bi</div>
-      <div class="kdelta dn">? +9,1%</div>
+      <div class="kdelta dn">▲ +9,1%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Despesa</div>
       <div class="kval">R$ 438 Mi</div>
-      <div class="kdelta dn">? +157,6%</div>
+      <div class="kdelta dn">▲ +157,6%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Resultado Financeiro</div>
       <div class="kval" id="kv-rec-fin">R$ 318 Mi</div>
-      <div class="kdelta up">? +141%</div>
+      <div class="kdelta up">▲ +141%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Resultado do Exerc�cio</div>
-      <div class="kval" id="kv-resultado">- R$ 182 Mi</div>
-      <div class="kdelta dn" id="kd-resultado">? D�ficit</div>
+      <div class="klabel">Resultado do Exercício</div>
+      <div class="kval" id="kv-resultado">− R$ 182 Mi</div>
+      <div class="kdelta dn" id="kd-resultado">▼ Déficit</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez</div>
       <div class="kval" id="kv-caixa">R$ 2,0 Bi</div>
-      <div class="kdelta dn">? -18%</div>
+      <div class="kdelta dn">▼ −18%</div>
     </div>
   </div>
 
   <div class="ccard" style="margin-bottom:20px;">
     <div class="insight" style="margin:0;">
       <div class="ilabel">Contexto</div>
-      <p>A receita bruta de <strong>R$ 1,19 bilh�o</strong> em 2025 reflete ciclo operacional com menor volume de jogos e receitas de transmiss�o. Os custos com futebol somaram R$ 1,18 bilh�o, com aumento concentrado em fomento aos estados e competi��es. O resultado financeiro de R$ 318 milh�es, impulsionado pela remunera��o de aplica��es sobre o caixa de R$ 2 bilh�es, contribuiu para atenuar o d�ficit do exerc�cio, de R$ 182 milh�es. A posi��o de liquidez permanece robusta, assegurando capacidade de investimento nos pr�ximos ciclos.</p>
+      <p>A receita bruta de <strong>R$ 1,19 bilhão</strong> em 2025 reflete ciclo operacional com menor volume de jogos e receitas de transmissão. Os custos com futebol somaram R$ 1,18 bilhão, com aumento concentrado em fomento aos estados e competições. O resultado financeiro de R$ 318 milhões, impulsionado pela remuneração de aplicações sobre o caixa de R$ 2 bilhões, contribuiu para atenuar o déficit do exercício, de R$ 182 milhões. A posição de liquidez permanece robusta, assegurando capacidade de investimento nos próximos ciclos.</p>
     </div>
   </div>
 
@@ -533,45 +533,45 @@ footer p,.mono{color:#5A7AAA !important}
   </div>
 
   <div class="ccard" style="margin-bottom:0;">
-    <div class="ctitle" style="margin-bottom:4px;">Resultado Anual � 2021-2025</div>
+    <div class="ctitle" style="margin-bottom:4px;">Resultado Anual – 2021-2025</div>
     <div class="csub" style="margin-bottom:18px;"></div>
     <div class="cwrap" style="height:320px;"><canvas id="c3"></canvas></div>
     <div class="insight warn">
-      <div class="ilabel">D�ficit</div>
-      <p>O d�ficit de <strong>R$ 182 milh�es</strong> em 2025 decorre da compress�o da margem operacional, com os custos do futebol, de R$ 1,18 bilh�o, em patamar pr�ximo � receita bruta, de R$ 1,19 bilh�o, em um contexto de maior n�vel de investimento e retra��o das receitas operacionais. Ainda assim, a CBF preserva s�lida posi��o financeira, sustentada por<strong> caixa de R$ 2 bilh�es</strong> e receitas financeiras de R$ 318 milh�es, impulsionadas principalmente pelo adiantamento contratual da Nike.</p>
+      <div class="ilabel">Déficit</div>
+      <p>O déficit de <strong>R$ 182 milhões</strong> em 2025 decorre da compressão da margem operacional, com os custos do futebol, de R$ 1,18 bilhão, em patamar próximo à receita bruta, de R$ 1,19 bilhão, em um contexto de maior nível de investimento e retração das receitas operacionais. Ainda assim, a CBF preserva sólida posição financeira, sustentada por<strong> caixa de R$ 2 bilhões</strong> e receitas financeiras de R$ 318 milhões, impulsionadas principalmente pelo adiantamento contratual da Nike.</p>
     </div>
   </div>
 </div>
 
-<!-- - RECEITAS - -->
+<!-- ═ RECEITAS ═ -->
 <div id="receitas" class="page landscape">
   <div class="stitle">Receitas</div>
 
   <div class="kgrid" style="grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
     <div class="kcard">
-      <div class="klabel">Direitos de Transmiss�o e Comerciais</div>
+      <div class="klabel">Direitos de Transmissão e Comerciais</div>
       <div class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
-      <div class="kdelta dn">? -11,9%</div>
+      <div class="kdelta dn">▼ −11,9%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Patroc�nios</div>
+      <div class="klabel">Patrocínios</div>
       <div class="kval" style="font-size:28px;">R$ 437,9 Mi</div>
-      <div class="kdelta dn">? -3,0%</div>
+      <div class="kdelta dn">▼ −3,0%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Bilheteria e Premia��es</div>
+      <div class="klabel">Bilheteria e Premiações</div>
       <div class="kval" style="font-size:28px;">R$ 54,8 Mi</div>
-      <div class="kdelta dn">? -18,1%</div>
+      <div class="kdelta dn">▼ −18,1%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Registros e Transfer�ncias</div>
+      <div class="klabel">Registros e Transferências</div>
       <div class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
-      <div class="kdelta up">? +32,9%</div>
+      <div class="kdelta up">▲ +32,9%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Prog. Desenvolvimento + Academy</div>
       <div class="kval" style="font-size:28px;">R$ 11,6 Mi</div>
-      <div class="kdelta dn">? -46%</div>
+      <div class="kdelta dn">▼ −46%</div>
     </div>
   </div>
 
@@ -580,30 +580,30 @@ footer p,.mono{color:#5A7AAA !important}
       <div class="ctitle" style="margin-bottom:4px;">Receitas 2025-2024</div>
       <div class="cwrap" style="height:300px;"><canvas id="c4"></canvas></div>
       <div class="insight" style="margin-top:12px;">
-        <div class="ilabel">?? Destaque</div>
-        <p>Queda concentrada em transmiss�o (-R$86 milh�es) e bilheteria (-R$12 milh�es). <strong>Registros e Transfer�ncias crescem +32,9%</strong>, com crescimento significativo em 2025. Patroc�nios recuam levemente (-3%).</p>
+        <div class="ilabel">💡 Destaque</div>
+        <p>Queda concentrada em transmissão (−R$86 milhões) e bilheteria (−R$12 milhões). <strong>Registros e Transferências crescem +32,9%</strong>, com crescimento significativo em 2025. Patrocínios recuam levemente (−3%).</p>
       </div>
     </div>
   </div>
 
   <div class="ccard receitas-dre-font">
-    <div class="ctitle" style="margin-bottom:14px;">?? Direitos de Transmiss�o e Comerciais</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:20px;">A receita de direitos de transmiss�o e comerciais totalizou <strong style="color:var(--yellow);">R$ 637,9 milh�es</strong> em 2025, registrando redu��o de <strong style="color:var(--neg);">R$ 86,0 milh�es (12%)</strong> em rela��o ao exerc�cio anterior.</div>
+    <div class="ctitle" style="margin-bottom:14px;">📡 Direitos de Transmissão e Comerciais</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.8;margin-bottom:20px;">A receita de direitos de transmissão e comerciais totalizou <strong style="color:var(--yellow);">R$ 637,9 milhões</strong> em 2025, registrando redução de <strong style="color:var(--neg);">R$ 86,0 milhões (12%)</strong> em relação ao exercício anterior.</div>
 
     <div class="two" style="gap:32px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;">
       <div style="min-width:0;">
-        <div style="font-size:13px;font-weight:900;color:#C0392B;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">REDU��ES</div>
+        <div style="font-size:13px;font-weight:900;color:#C0392B;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">REDUÇÕES</div>
         <div class="std-table-wrap">
           <table class="std-table">
             <thead><tr><th>Item</th><th>Valor</th></tr></thead>
             <tbody>
-              <tr><td>Sele��o Principal</td><td class="num dd">-R$ 59,6 milh�es</td></tr>
-              <tr><td>Campeonato Brasileiro S�rie B</td><td class="num dd">-R$ 39,7 milh�es</td></tr>
-              <tr><td>Campeonato Brasileiro S�rie A</td><td class="num dd">-R$ 18,7 milh�es</td></tr>
-              <tr><td>Categoria de Base</td><td class="num dd">-R$ 4,1 milh�es</td></tr>
-              <tr><td>Outras Competi��es</td><td class="num dd">-R$ 3,1 milh�es</td></tr>
-              <tr><td>Copa do Nordeste</td><td class="num dd">-R$ 0,8 milh�es</td></tr>
-              <tr><td>E-Brasileir�o</td><td class="num dd">-R$ 0,4 milh�es</td></tr>
+              <tr><td>Seleção Principal</td><td class="num dd">−R$ 59,6 milhões</td></tr>
+              <tr><td>Campeonato Brasileiro Série B</td><td class="num dd">−R$ 39,7 milhões</td></tr>
+              <tr><td>Campeonato Brasileiro Série A</td><td class="num dd">−R$ 18,7 milhões</td></tr>
+              <tr><td>Categoria de Base</td><td class="num dd">−R$ 4,1 milhões</td></tr>
+              <tr><td>Outras Competições</td><td class="num dd">−R$ 3,1 milhões</td></tr>
+              <tr><td>Copa do Nordeste</td><td class="num dd">−R$ 0,8 milhões</td></tr>
+              <tr><td>E-Brasileirão</td><td class="num dd">−R$ 0,4 milhões</td></tr>
             </tbody>
           </table>
         </div>
@@ -615,13 +615,13 @@ footer p,.mono{color:#5A7AAA !important}
           <table class="std-table">
             <thead><tr><th>Item</th><th>Valor</th></tr></thead>
             <tbody>
-              <tr><td>Sele��es de Base e Feminina</td><td class="num du">+R$ 17,6 milh�es</td></tr>
-              <tr><td>Copa do Brasil � Masculina</td><td class="num du">+R$ 9,8 milh�es</td></tr>
-              <tr><td>Brasileiro Feminino</td><td class="num du">+R$ 4,9 milh�es</td></tr>
-              <tr><td>Copa do Brasil � Feminina</td><td class="num du">+R$ 3,9 milh�es</td></tr>
-              <tr><td>Super Copa do Brasil</td><td class="num du">+R$ 2,7 milh�es</td></tr>
-              <tr><td>Campeonato Brasileiro S�rie D</td><td class="num du">+R$ 1,0 milh�es</td></tr>
-              <tr><td>Campeonato Brasileiro S�rie C</td><td class="num du">+R$ 0,7 milh�es</td></tr>
+              <tr><td>Seleções de Base e Feminina</td><td class="num du">+R$ 17,6 milhões</td></tr>
+              <tr><td>Copa do Brasil — Masculina</td><td class="num du">+R$ 9,8 milhões</td></tr>
+              <tr><td>Brasileiro Feminino</td><td class="num du">+R$ 4,9 milhões</td></tr>
+              <tr><td>Copa do Brasil — Feminina</td><td class="num du">+R$ 3,9 milhões</td></tr>
+              <tr><td>Super Copa do Brasil</td><td class="num du">+R$ 2,7 milhões</td></tr>
+              <tr><td>Campeonato Brasileiro Série D</td><td class="num du">+R$ 1,0 milhões</td></tr>
+              <tr><td>Campeonato Brasileiro Série C</td><td class="num du">+R$ 0,7 milhões</td></tr>
             </tbody>
           </table>
         </div>
@@ -630,8 +630,8 @@ footer p,.mono{color:#5A7AAA !important}
   </div>
     
 <div class="ccard receitas-dre-font" style="margin-top:20px;">
-    <div class="ctitle" style="margin-bottom:14px;">??? Patrocinadores</div>
-    <div class="csub" style="margin-bottom:18px;">Em 2025, a base de patrocinadores da CBF passou por uma reconfigura��o relevante de portf�lio, com o encerramento de contratos que representavam aproximadamente R$ 86 milh�es em receitas e a entrada de um novo parceiro comercial, respons�vel por R$ 2,6 milh�es. O efeito l�quido dessa movimenta��o explica a varia��o observada na receita de patroc�nio em rela��o ao exerc�cio anterior.</div>
+    <div class="ctitle" style="margin-bottom:14px;">🏷️ Patrocinadores</div>
+    <div class="csub" style="margin-bottom:18px;">Em 2025, a base de patrocinadores da CBF passou por uma reconfiguração relevante de portfólio, com o encerramento de contratos que representavam aproximadamente R$ 86 milhões em receitas e a entrada de um novo parceiro comercial, responsável por R$ 2,6 milhões. O efeito líquido dessa movimentação explica a variação observada na receita de patrocínio em relação ao exercício anterior.</div>
     <div class="two" style="gap:32px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;">
       <div style="min-width:0;">
         <div style="font-size:13px;font-weight:900;color:#C0392B;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">CONTRATOS ENCERRADOS</div>
@@ -639,12 +639,12 @@ footer p,.mono{color:#5A7AAA !important}
         <table class="std-table">
           <thead><tr><th>Patrocinador</th><th>Valor</th></tr></thead>
           <tbody>
-            <tr><td>Mastercard</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 6,4 milh�es</td></tr>
-            <tr><td>Gol Linhas A�reas</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 34,9 milh�es</td></tr>
-            <tr><td>Semp Toshiba</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 10,2 milh�es</td></tr>
-            <tr><td>Itaucard</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 6,4 milh�es</td></tr>
-            <tr><td>Pague Menos</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 9,4 milh�es</td></tr>
-            <tr><td>Neoenergia</td><td class="num dd" style="font-family:var(--font-mono);">-R$ 25,2 milh�es</td></tr>
+            <tr><td>Mastercard</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 6,4 milhões</td></tr>
+            <tr><td>Gol Linhas Aéreas</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 34,9 milhões</td></tr>
+            <tr><td>Semp Toshiba</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 10,2 milhões</td></tr>
+            <tr><td>Itaucard</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 6,4 milhões</td></tr>
+            <tr><td>Pague Menos</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 9,4 milhões</td></tr>
+            <tr><td>Neoenergia</td><td class="num dd" style="font-family:var(--font-mono);">−R$ 25,2 milhões</td></tr>
           </tbody>
         </table>
         </div>
@@ -655,7 +655,7 @@ footer p,.mono{color:#5A7AAA !important}
         <table class="std-table">
           <thead><tr><th>Patrocinador</th><th>Valor</th></tr></thead>
           <tbody>
-            <tr><td>Springer/Midea</td><td class="num du" style="font-family:var(--font-mono);">+R$ 2,6 milh�es</td></tr>
+            <tr><td>Springer/Midea</td><td class="num du" style="font-family:var(--font-mono);">+R$ 2,6 milhões</td></tr>
           </tbody>
         </table>
         </div>
@@ -664,101 +664,101 @@ footer p,.mono{color:#5A7AAA !important}
   </div>
 </div>
 
-<!-- - DESPESAS - -->
+<!-- ═ DESPESAS ═ -->
 <div id="despesas" class="page landscape">
-  <div class="stitle">Custos com Futebol e Despesas de Opera��o e Estrutura</div>
+  <div class="stitle">Custos com Futebol e Despesas de Operação e Estrutura</div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Sele��o Principal</div>
+      <div class="klabel">Seleção Principal</div>
       <div class="kval">R$ 281,1 Mi</div>
-      <div class="kdelta dn">? +39,7%</div>
+      <div class="kdelta dn">▲ +39,7%</div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Sele��es Femininas</div>
+      <div class="klabel">Seleções Femininas</div>
       <div class="kval">R$ 94,3 Mi</div>
-      <div class="kdelta up">? -19,1%</div>
+      <div class="kdelta up">▼ −19,1%</div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Sele��es de Base</div>
+      <div class="klabel">Seleções de Base</div>
       <div class="kval">R$ 44,7 Mi</div>
-      <div class="kdelta dn">? +65,6%</div>
+      <div class="kdelta dn">▲ +65,6%</div>
     </div>
     <div class="kcard" style="background:rgba(160,165,175,0.18);">
-      <div class="klabel">Fomento aos Estados e Competi��es</div>
+      <div class="klabel">Fomento aos Estados e Competições</div>
       <div class="kval">R$ 756,7 Mi</div>
-      <div class="kdelta dn">? +3,1%</div>
+      <div class="kdelta dn">▲ +3,1%</div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Administrativas</div>
       <div class="kval">R$ 369,1 Mi</div>
-      <div class="kdelta dn">? +153%</div>
+      <div class="kdelta dn">▲ +153%</div>
     </div>
     <div class="kcard" style="background:rgba(220,225,230,0.25);">
       <div class="klabel">Pessoal</div>
       <div class="kval">R$ 58,2 Mi</div>
-      <div class="kdelta dn">? +15,6%</div>
+      <div class="kdelta dn">▲ +15,6%</div>
     </div>
   </div>
 
   <div class="ccard" style="margin-bottom:20px;">
-    <div class="ctitle" style="margin-bottom:4px;">Custos das Sele��es 2025-2024</div>
+    <div class="ctitle" style="margin-bottom:4px;">Custos das Seleções 2025-2024</div>
     <div class="cwrap" style="height:300px;"><canvas id="c8"></canvas></div>
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro � 2025-2024</div>
+    <div class="ctitle" style="margin-bottom:16px;">Investimento Total no Futebol Brasileiro · 2025-2024</div>
     <div class="std-table-wrap">
     <table class="std-table std-table--3col">
       <thead><tr><th></th><th>2025 (R$Mi)</th><th>2024 (R$Mi)</th><th>Var.</th></tr></thead>
       <tbody>
-        <tr class="dre-header"><td colspan="4">Custos com Sele��es</td></tr>
-        <tr><td>Sele��o Principal</td><td class="num" style="font-family:var(--font-mono);">281,1</td><td class="num" style="font-family:var(--font-mono);">201,1</td><td class="num dd" style="font-family:var(--font-mono);">? +39,7%</td></tr>
-        <tr><td>Sele��es de Base</td><td class="num" style="font-family:var(--font-mono);">44,7</td><td class="num" style="font-family:var(--font-mono);">27,0</td><td class="num dd" style="font-family:var(--font-mono);">? +65,6%</td></tr>
-        <tr><td>Sele��es Femininas</td><td class="num" style="font-family:var(--font-mono);">94,3</td><td class="num" style="font-family:var(--font-mono);">116,5</td><td class="num du" style="font-family:var(--font-mono);">? -19,1%</td></tr>
+        <tr class="dre-header"><td colspan="4">Custos com Seleções</td></tr>
+        <tr><td>Seleção Principal</td><td class="num" style="font-family:var(--font-mono);">281,1</td><td class="num" style="font-family:var(--font-mono);">201,1</td><td class="num dd" style="font-family:var(--font-mono);">▲ +39,7%</td></tr>
+        <tr><td>Seleções de Base</td><td class="num" style="font-family:var(--font-mono);">44,7</td><td class="num" style="font-family:var(--font-mono);">27,0</td><td class="num dd" style="font-family:var(--font-mono);">▲ +65,6%</td></tr>
+        <tr><td>Seleções Femininas</td><td class="num" style="font-family:var(--font-mono);">94,3</td><td class="num" style="font-family:var(--font-mono);">116,5</td><td class="num du" style="font-family:var(--font-mono);">▼ −19,1%</td></tr>
         <tr class="dre-header"><td colspan="4">Fomento</td></tr>
-        <tr><td>Contribui��o ao Fomento nos Estados e Competi��es</td><td class="num" style="font-family:var(--font-mono);">756,7</td><td class="num" style="font-family:var(--font-mono);">734,1</td><td class="num dd" style="font-family:var(--font-mono);">? +3,1%</td></tr>
-        <tr class="dre-emphasis"><td>Total Custos com Futebol</td><td class="num" style="font-family:var(--font-mono);">1.176,7</td><td class="num" style="font-family:var(--font-mono);">1.078,7</td><td class="num dd" style="font-family:var(--font-mono);">? +9,1%</td></tr>
+        <tr><td>Contribuição ao Fomento nos Estados e Competições</td><td class="num" style="font-family:var(--font-mono);">756,7</td><td class="num" style="font-family:var(--font-mono);">734,1</td><td class="num dd" style="font-family:var(--font-mono);">▲ +3,1%</td></tr>
+        <tr class="dre-emphasis"><td>Total Custos com Futebol</td><td class="num" style="font-family:var(--font-mono);">1.176,7</td><td class="num" style="font-family:var(--font-mono);">1.078,7</td><td class="num dd" style="font-family:var(--font-mono);">▲ +9,1%</td></tr>
       </tbody>
     </table>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELE��O PRINCIPAL +R$ 79,9Mi</div>
-      <p>Servi�os Contratados +R$ 92,7Mi, Pessoal +R$ 5,9Mi, Gerais -R$ 13,9Mi, Util. e Servi�os -R$ 4,7Mi, Ocupa��o -R$ 0,1Mi.</p>
+      <div class="ilabel">SELEÇÃO PRINCIPAL +R$ 79,9Mi</div>
+      <p>Serviços Contratados +R$ 92,7Mi, Pessoal +R$ 5,9Mi, Gerais -R$ 13,9Mi, Util. e Serviços -R$ 4,7Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELE��ES DE BASE +R$ 17,7Mi</div>
-      <p>Servi�os Contratados +R$ 11,3Mi, Pessoal +R$ 4,2Mi, Gerais +R$ 1,7Mi, Util. e Servi�os +R$ 0,5Mi.</p>
+      <div class="ilabel">SELEÇÕES DE BASE +R$ 17,7Mi</div>
+      <p>Serviços Contratados +R$ 11,3Mi, Pessoal +R$ 4,2Mi, Gerais +R$ 1,7Mi, Util. e Serviços +R$ 0,5Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">SELE��ES FEMININAS -R$ 22,2Mi</div>
-      <p>Gerais -R$ 15,0Mi, Servi�os Contratados -R$ 11,9Mi, Pessoal +R$ 4,5Mi, Util. e Servi�os +R$ 0,3Mi, Ocupa��o -R$ 0,1Mi.</p>
+      <div class="ilabel">SELEÇÕES FEMININAS -R$ 22,2Mi</div>
+      <p>Gerais -R$ 15,0Mi, Serviços Contratados -R$ 11,9Mi, Pessoal +R$ 4,5Mi, Util. e Serviços +R$ 0,3Mi, Ocupação -R$ 0,1Mi.</p>
     </div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">CONTRIBUI��O AO FOMENTO DO FUTEBOL +R$ 22,6Mi</div>
-      <p>Gerais +R$ 29,8Mi, Servi�os Contratados +R$ 4,4Mi, Pessoal +R$ 2,5Mi, Util. e Servi�os +R$ 3,0Mi, Competi��es -R$ 10,4Mi, Ocupa��o -R$ 6,5Mi, PAF -R$ 0,2Mi.</p>
+      <div class="ilabel">CONTRIBUIÇÃO AO FOMENTO DO FUTEBOL +R$ 22,6Mi</div>
+      <p>Gerais +R$ 29,8Mi, Serviços Contratados +R$ 4,4Mi, Pessoal +R$ 2,5Mi, Util. e Serviços +R$ 3,0Mi, Competições -R$ 10,4Mi, Ocupação -R$ 6,5Mi, PAF -R$ 0,2Mi.</p>
     </div>
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:4px;">Competi��es</div>
+    <div class="ctitle" style="margin-bottom:4px;">Competições</div>
     <div class="std-table-wrap">
       <table class="std-table std-table--3col">
-        <thead><tr><th>Competi��es</th><th style="color:#FFDC02 !important;">2025 (R$Mi)</th><th style="color:#FFDC02 !important;">2024 (R$Mi)</th><th style="color:#FFDC02 !important;">Var.</th></tr></thead>
+        <thead><tr><th>Competições</th><th style="color:#FFDC02 !important;">2025 (R$Mi)</th><th style="color:#FFDC02 !important;">2024 (R$Mi)</th><th style="color:#FFDC02 !important;">Var.</th></tr></thead>
         <tbody>
-          <tr><td>Brasileiro S�rie A</td><td class="num" style="font-family:var(--font-mono);">21</td><td class="num" style="font-family:var(--font-mono);">12</td><td class="num dd" style="font-family:var(--font-mono);">? +9</td></tr>
-          <tr><td>Brasileiro S�rie B</td><td class="num" style="font-family:var(--font-mono);">69</td><td class="num" style="font-family:var(--font-mono);">159</td><td class="num du" style="font-family:var(--font-mono);">? -90</td></tr>
-          <tr><td>Brasileiro S�rie C</td><td class="num" style="font-family:var(--font-mono);">74</td><td class="num" style="font-family:var(--font-mono);">66</td><td class="num dd" style="font-family:var(--font-mono);">? +8</td></tr>
-          <tr><td>Brasileiro S�rie D</td><td class="num" style="font-family:var(--font-mono);">115</td><td class="num" style="font-family:var(--font-mono);">101</td><td class="num dd" style="font-family:var(--font-mono);">? +14</td></tr>
-          <tr><td>Brasileiro Feminino</td><td class="num" style="font-family:var(--font-mono);">59</td><td class="num" style="font-family:var(--font-mono);">28</td><td class="num dd" style="font-family:var(--font-mono);">? +31</td></tr>
-          <tr><td>Brasileiro Sub-20</td><td class="num" style="font-family:var(--font-mono);">13</td><td class="num" style="font-family:var(--font-mono);">8</td><td class="num dd" style="font-family:var(--font-mono);">? +5</td></tr>
-          <tr><td>Copa do Brasil Masculino</td><td class="num" style="font-family:var(--font-mono);">2</td><td class="num" style="font-family:var(--font-mono);">8</td><td class="num du" style="font-family:var(--font-mono);">? -6</td></tr>
-          <tr><td>Copa do Brasil Feminina <span style="font-size:10px;color:#FFDC02;font-weight:700;">NOVO</span></td><td class="num" style="font-family:var(--font-mono);">21</td><td class="num" style="font-family:var(--font-mono);">�</td><td class="num" style="font-family:var(--font-mono);color:#FFDC02 !important;font-weight:700;">NOVO</td></tr>
-          <tr><td>Copa do Nordeste</td><td class="num" style="font-family:var(--font-mono);">56</td><td class="num" style="font-family:var(--font-mono);">53</td><td class="num dd" style="font-family:var(--font-mono);">? +3</td></tr>
-          <tr><td>Supercopa do Brasil</td><td class="num" style="font-family:var(--font-mono);">15</td><td class="num" style="font-family:var(--font-mono);">13</td><td class="num dd" style="font-family:var(--font-mono);">? +2</td></tr>
-          <tr><td>Copa Verde</td><td class="num" style="font-family:var(--font-mono);">6</td><td class="num" style="font-family:var(--font-mono);">5</td><td class="num dd" style="font-family:var(--font-mono);">? +1</td></tr>
-          <tr><td>Outras Competi��es</td><td class="num" style="font-family:var(--font-mono);">39</td><td class="num" style="font-family:var(--font-mono);">22</td><td class="num dd" style="font-family:var(--font-mono);">? +17</td></tr>
-          <tr class="dre-emphasis"><td>Total Competi��es</td><td class="num" style="font-family:var(--font-mono);">477</td><td class="num" style="font-family:var(--font-mono);">487</td><td class="num dd" style="font-family:var(--font-mono);">? -10</td></tr>
+          <tr><td>Brasileiro Série A</td><td class="num" style="font-family:var(--font-mono);">21</td><td class="num" style="font-family:var(--font-mono);">12</td><td class="num dd" style="font-family:var(--font-mono);">▲ +9</td></tr>
+          <tr><td>Brasileiro Série B</td><td class="num" style="font-family:var(--font-mono);">69</td><td class="num" style="font-family:var(--font-mono);">159</td><td class="num du" style="font-family:var(--font-mono);">▼ −90</td></tr>
+          <tr><td>Brasileiro Série C</td><td class="num" style="font-family:var(--font-mono);">74</td><td class="num" style="font-family:var(--font-mono);">66</td><td class="num dd" style="font-family:var(--font-mono);">▲ +8</td></tr>
+          <tr><td>Brasileiro Série D</td><td class="num" style="font-family:var(--font-mono);">115</td><td class="num" style="font-family:var(--font-mono);">101</td><td class="num dd" style="font-family:var(--font-mono);">▲ +14</td></tr>
+          <tr><td>Brasileiro Feminino</td><td class="num" style="font-family:var(--font-mono);">59</td><td class="num" style="font-family:var(--font-mono);">28</td><td class="num dd" style="font-family:var(--font-mono);">▲ +31</td></tr>
+          <tr><td>Brasileiro Sub-20</td><td class="num" style="font-family:var(--font-mono);">13</td><td class="num" style="font-family:var(--font-mono);">8</td><td class="num dd" style="font-family:var(--font-mono);">▲ +5</td></tr>
+          <tr><td>Copa do Brasil Masculino</td><td class="num" style="font-family:var(--font-mono);">2</td><td class="num" style="font-family:var(--font-mono);">8</td><td class="num du" style="font-family:var(--font-mono);">▼ −6</td></tr>
+          <tr><td>Copa do Brasil Feminina <span style="font-size:10px;color:#FFDC02;font-weight:700;">NOVO</span></td><td class="num" style="font-family:var(--font-mono);">21</td><td class="num" style="font-family:var(--font-mono);">—</td><td class="num" style="font-family:var(--font-mono);color:#FFDC02 !important;font-weight:700;">NOVO</td></tr>
+          <tr><td>Copa do Nordeste</td><td class="num" style="font-family:var(--font-mono);">56</td><td class="num" style="font-family:var(--font-mono);">53</td><td class="num dd" style="font-family:var(--font-mono);">▲ +3</td></tr>
+          <tr><td>Supercopa do Brasil</td><td class="num" style="font-family:var(--font-mono);">15</td><td class="num" style="font-family:var(--font-mono);">13</td><td class="num dd" style="font-family:var(--font-mono);">▲ +2</td></tr>
+          <tr><td>Copa Verde</td><td class="num" style="font-family:var(--font-mono);">6</td><td class="num" style="font-family:var(--font-mono);">5</td><td class="num dd" style="font-family:var(--font-mono);">▲ +1</td></tr>
+          <tr><td>Outras Competições</td><td class="num" style="font-family:var(--font-mono);">39</td><td class="num" style="font-family:var(--font-mono);">22</td><td class="num dd" style="font-family:var(--font-mono);">▲ +17</td></tr>
+          <tr class="dre-emphasis"><td>Total Competições</td><td class="num" style="font-family:var(--font-mono);">477</td><td class="num" style="font-family:var(--font-mono);">487</td><td class="num dd" style="font-family:var(--font-mono);">▼ −10</td></tr>
         </tbody>
       </table>
     </div>
@@ -771,7 +771,7 @@ footer p,.mono{color:#5A7AAA !important}
 
   <div class="ccard" style="margin-top:20px;">
     <div class="ctitle" style="margin-bottom:4px;">Despesas Administrativas</div>
-    <div class="csub" style="margin-bottom:20px;">Varia��o de 223 milh�es</div>
+    <div class="csub" style="margin-bottom:20px;">Variação de 223 milhões</div>
 
     <div style="background:#EEF4FC; padding:20px; border-radius:10px; display:grid; grid-template-columns:1fr 1fr; gap:20px;">
 
@@ -783,7 +783,7 @@ footer p,.mono{color:#5A7AAA !important}
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Jur�dico</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Jurídico</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+97,9M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -793,7 +793,7 @@ footer p,.mono{color:#5A7AAA !important}
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:41%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Viagens e Representa��es</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Viagens e Representações</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+21,7M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:22%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -810,20 +810,20 @@ footer p,.mono{color:#5A7AAA !important}
         </div>
       </div>
 
-      <!-- Servi�os Contratados -->
+      <!-- Serviços Contratados -->
       <div style="background:#D6E4F7 !important; border:1px solid #B0C8E8 !important; border-left:4px solid #1A4FBF !important; border-radius:10px; padding:18px 20px; margin-bottom:0;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
-          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Servi�os Contratados</div>
+          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Serviços Contratados</div>
           <div style="font-size:13px;color:var(--pos);font-weight:600;">+48,3M <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;">(+59,7%)</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Servi�os PJ</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Serviços PJ</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+27,6M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Servi�os PF</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Serviços PF</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+20,7M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:75%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -840,25 +840,25 @@ footer p,.mono{color:#5A7AAA !important}
         </div>
       </div>
 
-      <!-- Despesas com Ocupa��o -->
+      <!-- Despesas com Ocupação -->
       <div style="background:#FFFFFF !important; border:1px solid #B0C8E8 !important; border-left:4px solid #193375 !important; border-radius:10px; padding:18px 20px; margin-bottom:0;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
-          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Despesas com Ocupa��o</div>
+          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Despesas com Ocupação</div>
           <div style="font-size:13px;color:var(--pos);font-weight:600;">+0,4M <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;">(+5,2%)</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Alugu�is e Condom�nio</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Aluguéis e Condomínio</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+1,4M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Deprecia��es e Amortiz.</div>
-            <div style="font-family:var(--font-mono);font-size:12px;color:var(--neg);min-width:60px;text-align:right;">-1,2M</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Depreciações e Amortiz.</div>
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--neg);min-width:60px;text-align:right;">−1,2M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:86%;height:100%;background:var(--neg);border-radius:4px;"></div></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Manuten��o e Reparos</div>
+            <div style="flex:1;font-size:12px;color:rgba(255,255,255,.7);">Manutenção e Reparos</div>
             <div style="font-family:var(--font-mono);font-size:12px;color:var(--pos);min-width:60px;text-align:right;">+0,2M</div>
             <div style="width:100px;height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;"><div style="width:14%;height:100%;background:var(--pos);border-radius:4px;"></div></div>
           </div>
@@ -870,10 +870,10 @@ footer p,.mono{color:#5A7AAA !important}
         </div>
       </div>
 
-      <!-- Utilidades e Servi�os -->
+      <!-- Utilidades e Serviços -->
       <div style="background:#D6E4F7 !important; border:1px solid #B0C8E8 !important; border-left:4px solid #1A4FBF !important; border-radius:10px; padding:18px 20px; margin-bottom:0;">
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;">
-          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Despesas com Utilidades e Servi�os</div>
+          <div style="font-size:14px;font-weight:700;color:var(--cbf-yellow);">Despesas com Utilidades e Serviços</div>
           <div style="font-size:13px;color:var(--pos);font-weight:600;">+11,6M <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:400;">(+142,6%)</span></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
@@ -898,15 +898,15 @@ footer p,.mono{color:#5A7AAA !important}
     </div>
 
     <div class="insight warn" style="margin-top:14px;">
-      <div class="ilabel">?? Desvio Principal</div>
-      <p>O aumento de <strong>+153%</strong> nas despesas administrativas foi impulsionado principalmente por eventos n�o recorrentes, com destaque para gastos jur�dicos, constitui��o de PCLD em 2025, servi�os especializados com honor�rios de �xito e despesas com viagens institucionais. Esses fatores concentraram <strong>R$ 188 milh�es</strong> do total de <strong>R$ 223 milh�es</strong> de acr�scimo no per�odo.</p>
+      <div class="ilabel">⚠️ Desvio Principal</div>
+      <p>O aumento de <strong>+153%</strong> nas despesas administrativas foi impulsionado principalmente por eventos não recorrentes, com destaque para gastos jurídicos, constituição de PCLD em 2025, serviços especializados com honorários de êxito e despesas com viagens institucionais. Esses fatores concentraram <strong>R$ 188 milhões</strong> do total de <strong>R$ 223 milhões</strong> de acréscimo no período.</p>
     </div>
   </div>
 </div>
 
-<!-- - BALANCO - -->
+<!-- ═ BALANCO ═ -->
 <div id="balanco" class="page portrait">
-  <div class="stitle">Demonstra��o do Resultado</div>
+  <div class="stitle">Demonstração do Resultado</div>
 
   <div class="ccard dre-clean-wrap">
     <div class="dre-subtitle" style="padding:16px 20px 0 20px;">Em milhares de Reais</div>
@@ -914,45 +914,45 @@ footer p,.mono{color:#5A7AAA !important}
       <thead><tr><th></th><th style="text-align:right;">2025</th><th style="text-align:right;">2024</th><th style="text-align:right;">Var. %</th></tr></thead>
       <tbody>
         <tr class="dre-header"><td colspan="4">Receita Bruta</td></tr>
-        <tr><td>Patroc�nios</td><td class="num">437.931</td><td class="num">451.397</td><td class="num dd">? -3,0%</td></tr>
-        <tr><td>Direito de Transmiss�o e Comerciais</td><td class="num">637.903</td><td class="num">723.900</td><td class="num dd">? -11,9%</td></tr>
-        <tr><td>Bilheteria e Premia��es</td><td class="num">54.828</td><td class="num">66.963</td><td class="num dd">? -18,1%</td></tr>
-        <tr><td>Registros e Transfer�ncias</td><td class="num">51.034</td><td class="num">38.393</td><td class="num du">? +32,9%</td></tr>
-        <tr><td>Programa de Desenvolvimento</td><td class="num">7.041</td><td class="num">15.724</td><td class="num dd">? -55,2%</td></tr>
-        <tr><td>CBF Academy</td><td class="num">4.591</td><td class="num">5.957</td><td class="num dd">? -22,9%</td></tr>
-        <tr class="dre-row-total"><td>Total das Receitas</td><td class="num">1.193.328</td><td class="num">1.302.334</td><td class="num dd">? -8,4%</td></tr>
-        <tr><td>Dedu��es da Receita</td><td class="num">(83.956)</td><td class="num">(82.473)</td><td class="num dd">? +1,8%</td></tr>
-        <tr class="dre-row-total"><td>Receita L�quida</td><td class="num">1.109.372</td><td class="num">1.219.861</td><td class="num dd">? -9,1%</td></tr>
+        <tr><td>Patrocínios</td><td class="num">437.931</td><td class="num">451.397</td><td class="num dd">▼ −3,0%</td></tr>
+        <tr><td>Direito de Transmissão e Comerciais</td><td class="num">637.903</td><td class="num">723.900</td><td class="num dd">▼ −11,9%</td></tr>
+        <tr><td>Bilheteria e Premiações</td><td class="num">54.828</td><td class="num">66.963</td><td class="num dd">▼ −18,1%</td></tr>
+        <tr><td>Registros e Transferências</td><td class="num">51.034</td><td class="num">38.393</td><td class="num du">▲ +32,9%</td></tr>
+        <tr><td>Programa de Desenvolvimento</td><td class="num">7.041</td><td class="num">15.724</td><td class="num dd">▼ −55,2%</td></tr>
+        <tr><td>CBF Academy</td><td class="num">4.591</td><td class="num">5.957</td><td class="num dd">▼ −22,9%</td></tr>
+        <tr class="dre-row-total"><td>Total das Receitas</td><td class="num">1.193.328</td><td class="num">1.302.334</td><td class="num dd">▼ −8,4%</td></tr>
+        <tr><td>Deduções da Receita</td><td class="num">(83.956)</td><td class="num">(82.473)</td><td class="num dd">▲ +1,8%</td></tr>
+        <tr class="dre-row-total"><td>Receita Líquida</td><td class="num">1.109.372</td><td class="num">1.219.861</td><td class="num dd">▼ −9,1%</td></tr>
 
         <tr class="dre-header"><td colspan="4">Custos com Futebol</td></tr>
-        <tr><td>Sele��o Principal</td><td class="num">(281.071)</td><td class="num">(201.149)</td><td class="num dd">? +39,7%</td></tr>
-        <tr><td>Sele��es de Base</td><td class="num">(44.709)</td><td class="num">(26.997)</td><td class="num dd">? +65,6%</td></tr>
-        <tr><td>Sele��es Femininas</td><td class="num">(94.251)</td><td class="num">(116.467)</td><td class="num du">? -19,1%</td></tr>
-        <tr><td>Contribui��o ao Fomento nos Estados e Competi��es</td><td class="num">(756.674)</td><td class="num">(734.119)</td><td class="num dd">? +3,1%</td></tr>
-        <tr class="dre-row-total"><td>Total dos Custos com Futebol</td><td class="num">(1.176.706)</td><td class="num">(1.078.732)</td><td class="num dd">? +9,1%</td></tr>
-        <tr class="dre-row-total dre-emphasis"><td>Super�vit / D�ficit Bruto</td><td class="num">(67.334)</td><td class="num">141.129</td><td class="num dd">? -147,7%</td></tr>
+        <tr><td>Seleção Principal</td><td class="num">(281.071)</td><td class="num">(201.149)</td><td class="num dd">▲ +39,7%</td></tr>
+        <tr><td>Seleções de Base</td><td class="num">(44.709)</td><td class="num">(26.997)</td><td class="num dd">▲ +65,6%</td></tr>
+        <tr><td>Seleções Femininas</td><td class="num">(94.251)</td><td class="num">(116.467)</td><td class="num du">▼ −19,1%</td></tr>
+        <tr><td>Contribuição ao Fomento nos Estados e Competições</td><td class="num">(756.674)</td><td class="num">(734.119)</td><td class="num dd">▲ +3,1%</td></tr>
+        <tr class="dre-row-total"><td>Total dos Custos com Futebol</td><td class="num">(1.176.706)</td><td class="num">(1.078.732)</td><td class="num dd">▲ +9,1%</td></tr>
+        <tr class="dre-row-total dre-emphasis"><td>Superávit / Déficit Bruto</td><td class="num">(67.334)</td><td class="num">141.129</td><td class="num dd">▼ −147,7%</td></tr>
 
         <tr class="dre-header"><td colspan="4">Despesas Operacionais</td></tr>
-        <tr><td>Despesas com Pessoal</td><td class="num">(58.195)</td><td class="num">(50.344)</td><td class="num dd">? +15,6%</td></tr>
-        <tr><td>Despesas Administrativas</td><td class="num">(369.076)</td><td class="num">(145.822)</td><td class="num dd">? +153,1%</td></tr>
-        <tr><td>Impostos e Taxas</td><td class="num">(11.083)</td><td class="num">(12.125)</td><td class="num du">? -8,6%</td></tr>
-        <tr class="dre-row-total"><td>Total das Despesas Operacionais</td><td class="num">(438.354)</td><td class="num">(208.291)</td><td class="num dd">? +110,5%</td></tr>
+        <tr><td>Despesas com Pessoal</td><td class="num">(58.195)</td><td class="num">(50.344)</td><td class="num dd">▲ +15,6%</td></tr>
+        <tr><td>Despesas Administrativas</td><td class="num">(369.076)</td><td class="num">(145.822)</td><td class="num dd">▲ +153,1%</td></tr>
+        <tr><td>Impostos e Taxas</td><td class="num">(11.083)</td><td class="num">(12.125)</td><td class="num du">▼ −8,6%</td></tr>
+        <tr class="dre-row-total"><td>Total das Despesas Operacionais</td><td class="num">(438.354)</td><td class="num">(208.291)</td><td class="num dd">▲ +110,5%</td></tr>
 
         <tr class="dre-header"><td colspan="4">Resultado Financeiro</td></tr>
-        <tr><td>Receitas Financeiras</td><td class="num">317.910</td><td class="num">131.865</td><td class="num du">? +141,1%</td></tr>
-        <tr><td>Despesas Financeiras</td><td class="num">(12.250)</td><td class="num">(9.007)</td><td class="num dd">? +36,0%</td></tr>
-        <tr><td>Varia��o Cambial</td><td class="num">(9.983)</td><td class="num">69.911</td><td class="num dd">? -114,3%</td></tr>
-        <tr class="dre-row-total"><td>Total do Resultado Financeiro</td><td class="num">295.677</td><td class="num">192.769</td><td class="num du">? +53,4%</td></tr>
+        <tr><td>Receitas Financeiras</td><td class="num">317.910</td><td class="num">131.865</td><td class="num du">▲ +141,1%</td></tr>
+        <tr><td>Despesas Financeiras</td><td class="num">(12.250)</td><td class="num">(9.007)</td><td class="num dd">▲ +36,0%</td></tr>
+        <tr><td>Variação Cambial</td><td class="num">(9.983)</td><td class="num">69.911</td><td class="num dd">▼ −114,3%</td></tr>
+        <tr class="dre-row-total"><td>Total do Resultado Financeiro</td><td class="num">295.677</td><td class="num">192.769</td><td class="num du">▲ +53,4%</td></tr>
 
-        <tr><td>Outras Receitas Operacionais</td><td class="num">27.531</td><td class="num">41.994</td><td class="num dd">? -34,4%</td></tr>
+        <tr><td>Outras Receitas Operacionais</td><td class="num">27.531</td><td class="num">41.994</td><td class="num dd">▼ −34,4%</td></tr>
 
-        <tr class="dre-row-total"><td>Resultado Antes do IR/CSLL</td><td class="num">(182.480)</td><td class="num">167.601</td><td class="num dd">? -208,9%</td></tr>
-        <tr><td>IR e Contribui��o Social</td><td class="num">�</td><td class="num">(60.944)</td><td class="num du">? -100,0%</td></tr>
+        <tr class="dre-row-total"><td>Resultado Antes do IR/CSLL</td><td class="num">(182.480)</td><td class="num">167.601</td><td class="num dd">▼ −208,9%</td></tr>
+        <tr><td>IR e Contribuição Social</td><td class="num">—</td><td class="num">(60.944)</td><td class="num du">▼ −100,0%</td></tr>
         <tr>
-          <td style="background: #0D2257 !important;color: #FFFFFF !important;font-size: 14px !important;font-weight: 900 !important;padding: 14px 20px !important;border: none !important;">RESULTADO DO EXERC�CIO</td>
+          <td style="background: #0D2257 !important;color: #FFFFFF !important;font-size: 14px !important;font-weight: 900 !important;padding: 14px 20px !important;border: none !important;">RESULTADO DO EXERCÍCIO</td>
           <td style="background: #0D2257 !important;color: #FFFFFF !important;font-size: 13px !important;font-weight: 900 !important;text-align: right !important;padding: 14px 16px !important;border: none !important;">(182.480)</td>
           <td style="background: #0D2257 !important;color: #9EB3D8 !important;font-size: 13px !important;font-weight: 700 !important;text-align: right !important;padding: 14px 16px !important;border: none !important;">106.657</td>
-          <td style="background: #0D2257 !important;color: #FF4444 !important;font-size: 13px !important;font-weight: 700 !important;text-align: right !important;padding: 14px 16px !important;border: none !important;">? -271,1%</td>
+          <td style="background: #0D2257 !important;color: #FF4444 !important;font-size: 13px !important;font-weight: 700 !important;text-align: right !important;padding: 14px 16px !important;border: none !important;">▼ −271,1%</td>
         </tr>
       </tbody>
     </table>
@@ -966,46 +966,46 @@ footer p,.mono{color:#5A7AAA !important}
 
 
 
-<!-- - BALAN�O PATRIMONIAL - -->
+<!-- ═ BALANÇO PATRIMONIAL ═ -->
 <div id="bp" class="page landscape">
-  <div class="stitle">Composi��o Patrimonial</div>
+  <div class="stitle">Composição Patrimonial</div>
 
   <div class="kgrid" style="grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
     <div class="kcard">
       <div class="klabel">Liquidez</div>
       <div class="kval">R$ 1,997 Bi</div>
-      <div class="kdelta dn">? -18%</div>
+      <div class="kdelta dn">▼ −18%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Contas a Receber</div>
       <div class="kval">R$ 291,6 Mi</div>
-      <div class="kdelta up">? +10,6%</div>
+      <div class="kdelta up">▲ +10,6%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Tributos a Recuperar</div>
       <div class="kval">R$ 111,4 Mi</div>
-      <div class="kdelta up">? +111,7%</div>
+      <div class="kdelta up">▲ +111,7%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Fornecedores</div>
       <div class="kval">R$ 141,4 Mi</div>
-      <div class="kdelta up">? -8,3%</div>
+      <div class="kdelta up">▼ −8,3%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Receitas Antecipadas</div>
       <div class="kval">R$ 1,21 Bi</div>
-      <div class="kdelta dn">? -11,6%</div>
+      <div class="kdelta dn">▼ −11,6%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">Conting�ncias</div>
+      <div class="klabel">Contingências</div>
       <div class="kval">R$ 671,6 Mi</div>
-      <div class="kdelta dn">? +16,5%</div>
+      <div class="kdelta dn">▲ +16,5%</div>
     </div>
   </div>
 
 <div class="ccard dre-clean-wrap">
     <div class="bp-header">
-      <div class="ctitle" style="margin-bottom:4px;">Balan�o Patrimonial</div>
+      <div class="ctitle" style="margin-bottom:4px;">Balanço Patrimonial</div>
       <div class="dre-subtitle">Em milhares de reais</div>
     </div>
     <table class="dre-clean bp-unified">
@@ -1049,36 +1049,36 @@ footer p,.mono{color:#5A7AAA !important}
           <td class="bp-divider">Total Circulante</td><td class="num">610.750</td><td class="num">531.588</td>
         </tr>
         <tr class="dre-header">
-          <td colspan="3">N�o Circulante</td>
-          <td colspan="3" class="bp-divider">N�o Circulante</td>
+          <td colspan="3">Não Circulante</td>
+          <td colspan="3" class="bp-divider">Não Circulante</td>
         </tr>
         <tr>
-          <td>Dep�sitos Judiciais</td><td class="num">607.482</td><td class="num">520.585</td>
+          <td>Depósitos Judiciais</td><td class="num">607.482</td><td class="num">520.585</td>
           <td class="bp-divider">Receitas Antecipadas</td><td class="num">849.270</td><td class="num">1.067.009</td>
         </tr>
         <tr>
           <td>Imobilizado</td><td class="num">308.714</td><td class="num">267.801</td>
-          <td class="bp-divider">Provis�o Conting�ncias</td><td class="num">671.631</td><td class="num">576.539</td>
+          <td class="bp-divider">Provisão Contingências</td><td class="num">671.631</td><td class="num">576.539</td>
         </tr>
         <tr>
           <td>Outros</td><td class="num">61.587</td><td class="num">62.069</td>
           <td class="bp-divider bp-empty"></td><td class="bp-empty"></td><td class="bp-empty"></td>
         </tr>
         <tr class="dre-row-total">
-          <td>Total Ativo N�o Circulante</td><td class="num">977.783</td><td class="num">850.455</td>
-          <td class="bp-divider">Total Passivo N�o Circulante</td><td class="num">1.520.901</td><td class="num">1.643.548</td>
+          <td>Total Ativo Não Circulante</td><td class="num">977.783</td><td class="num">850.455</td>
+          <td class="bp-divider">Total Passivo Não Circulante</td><td class="num">1.520.901</td><td class="num">1.643.548</td>
         </tr>
         <tr class="dre-header">
           <td colspan="3" class="bp-empty-group"></td>
-          <td colspan="3" class="bp-divider">Patrim�nio L�quido</td>
+          <td colspan="3" class="bp-divider">Patrimônio Líquido</td>
         </tr>
         <tr>
           <td class="bp-empty"></td><td class="bp-empty"></td><td class="bp-empty"></td>
-          <td class="bp-divider">Patrim�nio Social</td><td class="num">1.442.301</td><td class="num">1.335.643</td>
+          <td class="bp-divider">Patrimônio Social</td><td class="num">1.442.301</td><td class="num">1.335.643</td>
         </tr>
         <tr>
           <td class="bp-empty"></td><td class="bp-empty"></td><td class="bp-empty"></td>
-          <td class="bp-divider">Resultado do Exerc�cio</td>
+          <td class="bp-divider">Resultado do Exercício</td>
           <td class="num" style="color:var(--neg);">(182.480)</td><td class="num" style="color:var(--pos);">106.657</td>
         </tr>
         <tr class="dre-row-total dre-emphasis">
@@ -1095,34 +1095,34 @@ footer p,.mono{color:#5A7AAA !important}
       <div class="cwrap" style="height:auto;"><div style="width:280px;height:280px;max-width:280px;margin:0 auto;"><canvas id="cbp1" width="280" height="280"></canvas></div></div>
       <div id="cbp1-legend" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin-top:10px;"></div>
       <div class="insight" style="margin-top:12px;">
-        <div class="ilabel">?? Composi��o</div>
-        <p>Ativo predominantemente composto por <strong>Caixa e Equivalentes (2 Bi)</strong>. Dep�sitos Judiciais somam R$607 milh�es (18% do ativo). Imobilizado representa R$309 milh�es na estrutura.</p>
+        <div class="ilabel">📋 Composição</div>
+        <p>Ativo predominantemente composto por <strong>Caixa e Equivalentes (2 Bi)</strong>. Depósitos Judiciais somam R$607 milhões (18% do ativo). Imobilizado representa R$309 milhões na estrutura.</p>
       </div>
     </div>
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Passivo + Patrim�nio L�quido</div>
+      <div class="ctitle" style="margin-bottom:4px;">Passivo + Patrimônio Líquido</div>
       <div class="cwrap" style="height:auto;"><div style="width:280px;height:280px;max-width:280px;margin:0 auto;"><canvas id="cbp2" width="280" height="280"></canvas></div></div>
       <div id="cbp2-legend" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin-top:10px;"></div>
       <div class="insight" style="margin-top:12px;">
-        <div class="ilabel">?? Nota</div>
-        <p>Fornecedores e Contas a Pagar incluem obriga��es contratuais e operacionais em curso. Provis�o para Conting�ncias cresceu 14% no ano (R$672 milh�es), refletindo processos judiciais tribut�rios, c�veis e trabalhistas ativos.</p>
+        <div class="ilabel">⚖️ Nota</div>
+        <p>Fornecedores e Contas a Pagar incluem obrigações contratuais e operacionais em curso. Provisão para Contingências cresceu 14% no ano (R$672 milhões), refletindo processos judiciais tributários, cíveis e trabalhistas ativos.</p>
       </div>
     </div>
   </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:4px;">Liquidez � 10 anos</div>
+    <div class="ctitle" style="margin-bottom:4px;">Liquidez – 10 anos</div>
     <div class="cwrap" style="height:260px;"><canvas id="cind1"></canvas></div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">?? Evolu��o da Liquidez</div>
-      <p>As disponibilidades da CBF evolu�ram de <strong>R$ 245 milh�es (2016)</strong> para <strong>R$ 1,997 bilh�o (2025)</strong>, crescimento de 8,2� na �ltima d�cada. A posi��o de caixa mant�m cobertura integral das obriga��es de curto prazo (3,27� o passivo circulante). O patamar elevado, sustentado pela gest�o financeira conservadora e pelo adiantamento contratual recebido em 2024, garante � CBF capacidade de honrar compromissos operacionais e investir no desenvolvimento do futebol brasileiro sem necessidade de endividamento.</p>
+      <div class="ilabel">💡 Evolução da Liquidez</div>
+      <p>As disponibilidades da CBF evoluíram de <strong>R$ 245 milhões (2016)</strong> para <strong>R$ 1,997 bilhão (2025)</strong>, crescimento de 8,2× na última década. A posição de caixa mantém cobertura integral das obrigações de curto prazo (3,27× o passivo circulante). O patamar elevado, sustentado pela gestão financeira conservadora e pelo adiantamento contratual recebido em 2024, garante à CBF capacidade de honrar compromissos operacionais e investir no desenvolvimento do futebol brasileiro sem necessidade de endividamento.</p>
     </div>
   </div>
 
   
 </div>
 
-<!-- - INDICADORES - -->
+<!-- ═ INDICADORES ═ -->
 <div id="indicadores" class="page landscape">
   <div class="stitle">Indicadores Financeiros</div>
 
@@ -1130,50 +1130,50 @@ footer p,.mono{color:#5A7AAA !important}
     <div class="kcard">
       <div class="klabel">Liquidez Corrente</div>
       <div class="kval">3,95</div>
-      <div class="kdelta dn">? -24,2%</div>
+      <div class="kdelta dn">▼ −24,2%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Geral</div>
       <div class="kval">1,59</div>
-      <div class="kdelta dn">? -4,2%</div>
+      <div class="kdelta dn">▼ −4,2%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Liquidez Imediata</div>
       <div class="kval">3,27</div>
-      <div class="kdelta dn">? -28,6%</div>
+      <div class="kdelta dn">▼ −28,6%</div>
     </div>
     <div class="kcard">
       <div class="klabel">EBITDA</div>
-      <div class="kval">-R$ 494 Mi</div>
-      <div class="kdelta dn">? -40,4%</div>
+      <div class="kval">−R$ 494 Mi</div>
+      <div class="kdelta dn">▼ −40,4%</div>
     </div>
     <div class="kcard">
-      <div class="klabel">�ndice Kanitz (Solv�ncia)</div>
+      <div class="klabel">Índice Kanitz (Solvência)</div>
       <div class="kval">17,33</div>
-      <div class="kdelta up">? Zona de Solv�ncia</div>
+      <div class="kdelta up">▲ Zona de Solvência</div>
     </div>
   </div>
 
   <div class="ccard" style="margin-bottom:20px;">
-    <div class="ctitle" style="margin-bottom:4px;">Demonstra��o do Fluxo de Caixa</div>
+    <div class="ctitle" style="margin-bottom:4px;">Demonstração do Fluxo de Caixa</div>
       <div class="csub" style="margin-bottom:16px;">Em milhares de reais</div>
       <div class="cwrap" style="height:380px;"><canvas id="cind2"></canvas></div>
       <div class="std-table-wrap" style="margin-top:16px;">
         <table class="std-table">
           <thead><tr><th></th><th>R$ Mi</th><th>Efeito</th></tr></thead>
           <tbody>
-            <tr class="dre-header"><td colspan="3">Atividades Operacionais � (R$ 330 milh�es)</td></tr>
-            <tr><td>D�ficit do Exerc�cio</td><td class="num">(182,5)</td><td class="num dd">-</td></tr>
-            <tr><td>Provis�es para Conting�ncias</td><td class="num du">+116,6</td><td class="num du">+</td></tr>
-            <tr><td>Deprecia��o e Amortiza��o</td><td class="num du">+6,3</td><td class="num du">+</td></tr>
-            <tr><td>Demais Provis�es</td><td class="num dd">(1,6)</td><td class="num dd">-</td></tr>
-            <tr><td>Varia��o em Ativos</td><td class="num dd">(191,5)</td><td class="num dd">-</td></tr>
-            <tr><td>Varia��o em Passivos</td><td class="num dd">(138,3)</td><td class="num dd">-</td></tr>
-            <tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num dd">(329,8)</td><td class="num dd">-</td></tr>
-            <tr class="dre-header"><td colspan="3">Atividades de Investimento � (R$ 45 milh�es)</td></tr>
-            <tr><td>Compra de Imobilizado</td><td class="num dd">(45,1)</td><td class="num dd">-</td></tr>
-            <tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num dd">(45,1)</td><td class="num dd">-</td></tr>
-            <tr class="dre-emphasis"><td><strong>Redu��o Total no Caixa</strong></td><td class="num dd"><strong>(436,2)</strong></td><td class="num dd"><strong>-</strong></td></tr>
+            <tr class="dre-header"><td colspan="3">Atividades Operacionais — (R$ 330 milhões)</td></tr>
+            <tr><td>Déficit do Exercício</td><td class="num">(182,5)</td><td class="num dd">−</td></tr>
+            <tr><td>Provisões para Contingências</td><td class="num du">+116,6</td><td class="num du">+</td></tr>
+            <tr><td>Depreciação e Amortização</td><td class="num du">+6,3</td><td class="num du">+</td></tr>
+            <tr><td>Demais Provisões</td><td class="num dd">(1,6)</td><td class="num dd">−</td></tr>
+            <tr><td>Variação em Ativos</td><td class="num dd">(191,5)</td><td class="num dd">−</td></tr>
+            <tr><td>Variação em Passivos</td><td class="num dd">(138,3)</td><td class="num dd">−</td></tr>
+            <tr class="dre-row-total"><td>Fluxo Operacional</td><td class="num dd">(329,8)</td><td class="num dd">−</td></tr>
+            <tr class="dre-header"><td colspan="3">Atividades de Investimento — (R$ 45 milhões)</td></tr>
+            <tr><td>Compra de Imobilizado</td><td class="num dd">(45,1)</td><td class="num dd">−</td></tr>
+            <tr class="dre-row-total"><td>Fluxo de Investimento</td><td class="num dd">(45,1)</td><td class="num dd">−</td></tr>
+            <tr class="dre-emphasis"><td><strong>Redução Total no Caixa</strong></td><td class="num dd"><strong>(436,2)</strong></td><td class="num dd"><strong>−</strong></td></tr>
             <tr class="dre-header"><td colspan="3">Saldos de Caixa</td></tr>
             <tr><td>Saldo Inicial (01/01/2025)</td><td class="num">2.433,3</td><td></td></tr>
             <tr><td>Saldo Final (31/12/2025)</td><td class="num">1.997,1</td><td></td></tr>
@@ -1181,58 +1181,58 @@ footer p,.mono{color:#5A7AAA !important}
         </table>
       </div>
       <div class="insight" style="margin-top:12px;">
-        <div class="ilabel">?? Leitura da DFC</div>
-        <p>A redu��o de <strong>R$ 436 milh�es</strong> no caixa � majoritariamente operacional (R$ 330 milh�es), impulsionada pelo d�ficit do exerc�cio (R$ 183 milh�es) e pelo aumento de dep�sitos judiciais (R$ 87 milh�es) e impostos a recuperar (R$ 59 milh�es). O fluxo de investimento (R$ 45 milh�es) reflete aquisi��o de imobilizado. N�o houve atividade de financiamento relevante no per�odo.</p>
+        <div class="ilabel">📋 Leitura da DFC</div>
+        <p>A redução de <strong>R$ 436 milhões</strong> no caixa é majoritariamente operacional (R$ 330 milhões), impulsionada pelo déficit do exercício (R$ 183 milhões) e pelo aumento de depósitos judiciais (R$ 87 milhões) e impostos a recuperar (R$ 59 milhões). O fluxo de investimento (R$ 45 milhões) reflete aquisição de imobilizado. Não houve atividade de financiamento relevante no período.</p>
       </div>
     </div>
 
   <div class="ccard">
-    <div class="ctitle" style="margin-bottom:16px;">An�lise de Indicadores</div>
+    <div class="ctitle" style="margin-bottom:16px;">Análise de Indicadores</div>
     <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;">
       <div style="background:#EEF4FC;border:1px solid #B0C8E8;border-radius:10px;padding:14px 16px;">
-        <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">�ndice de Solv�ncia (Kanitz)</div>
+        <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Índice de Solvência (Kanitz)</div>
         <div style="font-size:22px;font-weight:900;color:#0D2257;line-height:1.1;margin-bottom:8px;">17,33</div>
-        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Sinaliza posi��o patrimonial s�lida, baixo risco e boa liquidez. O indicador refor�a a capacidade de continuidade operacional e a confian�a institucional.</div>
+        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Sinaliza posição patrimonial sólida, baixo risco e boa liquidez. O indicador reforça a capacidade de continuidade operacional e a confiança institucional.</div>
       </div>
 
       <div style="background:#EEF4FC;border:1px solid #B0C8E8;border-radius:10px;padding:14px 16px;">
         <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Liquidez Imediata</div>
         <div style="font-size:22px;font-weight:900;color:#0D2257;line-height:1.1;margin-bottom:8px;">3,27 <span style="font-size:15px;font-weight:700;color:#3A5080;">(2024: 4,58)</span></div>
-        <div style="font-size:13px;line-height:1.65;color:#3A5080;">A cobertura imediata segue robusta: caixa dispon�vel de R$ 2,0Bi equivale a 3,27 vezes o passivo circulante de R$ 611Mi.</div>
+        <div style="font-size:13px;line-height:1.65;color:#3A5080;">A cobertura imediata segue robusta: caixa disponível de R$ 2,0Bi equivale a 3,27 vezes o passivo circulante de R$ 611Mi.</div>
       </div>
 
       <div style="background:#EEF4FC;border:1px solid #B0C8E8;border-radius:10px;padding:14px 16px;">
         <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Liquidez Corrente</div>
         <div style="font-size:22px;font-weight:900;color:#0D2257;line-height:1.1;margin-bottom:8px;">3,95 <span style="font-size:15px;font-weight:700;color:#3A5080;">(2024: 5,21)</span></div>
-        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Mesmo com redu��o, permanece em patamar confort�vel: para cada R$ 1,00 de obriga��o de curto prazo, h� R$ 3,95 em ativos circulantes.</div>
+        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Mesmo com redução, permanece em patamar confortável: para cada R$ 1,00 de obrigação de curto prazo, há R$ 3,95 em ativos circulantes.</div>
       </div>
 
       <div style="background:#EEF4FC;border:1px solid #B0C8E8;border-radius:10px;padding:14px 16px;">
         <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Liquidez Geral</div>
         <div style="font-size:22px;font-weight:900;color:#0D2257;line-height:1.1;margin-bottom:8px;">1,59 <span style="font-size:15px;font-weight:700;color:#3A5080;">(2024: 1,66)</span></div>
-        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Leve queda explicada pelo crescimento do passivo n�o circulante, sem comprometer a folga para cobertura das obriga��es totais.</div>
+        <div style="font-size:13px;line-height:1.65;color:#3A5080;">Leve queda explicada pelo crescimento do passivo não circulante, sem comprometer a folga para cobertura das obrigações totais.</div>
       </div>
 
       <div style="background:#EEF4FC;border:1px solid #B0C8E8;border-radius:10px;padding:14px 16px;grid-column:1 / -1;">
         <div style="font-size:11px;font-weight:800;color:var(--pos);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">EBITDA</div>
-        <div style="font-size:22px;font-weight:900;color:var(--neg);line-height:1.1;margin-bottom:8px;">-R$ 494 Mi <span style="font-size:15px;font-weight:700;color:#3A5080;">(margem -40,4%)</span></div>
-        <div style="font-size:13px;line-height:1.65;color:#3A5080;">A opera��o recorrente apresentou gera��o negativa no per�odo. O resultado financeiro de R$ 318 milh�es sustentou o caixa, por�m n�o comp�e o EBITDA. F�rmula: D�ficit (-R$182Mi) - Receita Financeira (+R$318Mi) + D&amp;A (R$6,7Mi) = -R$494Mi.</div>
+        <div style="font-size:22px;font-weight:900;color:var(--neg);line-height:1.1;margin-bottom:8px;">−R$ 494 Mi <span style="font-size:15px;font-weight:700;color:#3A5080;">(margem −40,4%)</span></div>
+        <div style="font-size:13px;line-height:1.65;color:#3A5080;">A operação recorrente apresentou geração negativa no período. O resultado financeiro de R$ 318 milhões sustentou o caixa, porém não compõe o EBITDA. Fórmula: Déficit (−R$182Mi) − Receita Financeira (+R$318Mi) + D&amp;A (R$6,7Mi) = −R$494Mi.</div>
       </div>
     </div>
     <div style="margin-top:14px;background:#F6FAFF;border:1px solid #B0C8E8;border-radius:10px;padding:12px 14px;">
-      <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#0D2257;margin-bottom:10px;">S�ntese Executiva</div>
+      <div style="font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#0D2257;margin-bottom:10px;">Síntese Executiva</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <div style="flex:1 1 220px;min-width:220px;background:#ECF9F1;border:1px solid #BEE7CD;border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#19AE47;margin-bottom:4px;">Solidez</div>
-          <div style="font-size:13px;line-height:1.55;color:#2A5A40;">Liquidez e solv�ncia permanecem robustas.</div>
+          <div style="font-size:13px;line-height:1.55;color:#2A5A40;">Liquidez e solvência permanecem robustas.</div>
         </div>
         <div style="flex:1 1 220px;min-width:220px;background:#FFF8E8;border:1px solid #F2D89C;border-radius:8px;padding:10px 12px;">
-          <div style="font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#F0A500;margin-bottom:4px;">Aten��o</div>
-          <div style="font-size:13px;line-height:1.55;color:#6A5323;">EBITDA negativo sinaliza press�o operacional.</div>
+          <div style="font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#F0A500;margin-bottom:4px;">Atenção</div>
+          <div style="font-size:13px;line-height:1.55;color:#6A5323;">EBITDA negativo sinaliza pressão operacional.</div>
         </div>
         <div style="flex:1 1 260px;min-width:260px;background:#EEF4FF;border:1px solid #BFD1F4;border-radius:8px;padding:10px 12px;">
           <div style="font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#1A4FBF;margin-bottom:4px;">Oportunidade</div>
-          <div style="font-size:13px;line-height:1.55;color:#27467D;">Disciplina de custos e normaliza��o de receitas para recomposi��o de margem.</div>
+          <div style="font-size:13px;line-height:1.55;color:#27467D;">Disciplina de custos e normalização de receitas para recomposição de margem.</div>
         </div>
       </div>
     </div>
@@ -1240,30 +1240,30 @@ footer p,.mono{color:#5A7AAA !important}
 
 </div>
 
-<!-- - HISTORICO - -->
+<!-- ═ HISTORICO ═ -->
 <div id="historico" class="page landscape">
-  <div class="stitle">Evolu��o Financeira<br><span style="color:var(--yellow)">2021 ? 2025</span></div>
+  <div class="stitle">Evolução Financeira<br><span style="color:var(--yellow)">2021 → 2025</span></div>
 
   <div class="ccard" style="margin-bottom:20px;">
     <div class="ctitle" style="margin-bottom:4px;">Receita Bruta</div>
     <div class="cwrap" style="height:260px;"><canvas id="c11"></canvas></div>
     <div class="insight" style="margin-top:12px;">
-      <div class="ilabel">?? Perspectiva 2026�2027</div>
-      <p>A queda de receita em 2025 (-8,4%) � pontual, ciclo de jogos mais fraco. <strong>2026</strong> projetado como ano excepcional com a Copa do Mundo FIFA. Em <strong>2027</strong>, entrada em vigor do <strong>novo contrato Nike</strong> representa salto estrutural de receita de patroc�nio. A CBF possui R$2 bilh�es em caixa para suportar este ciclo transit�rio.</p>
+      <div class="ilabel">📈 Perspectiva 2026–2027</div>
+      <p>A queda de receita em 2025 (−8,4%) é pontual, ciclo de jogos mais fraco. <strong>2026</strong> projetado como ano excepcional com a Copa do Mundo FIFA. Em <strong>2027</strong>, entrada em vigor do <strong>novo contrato Nike</strong> representa salto estrutural de receita de patrocínio. A CBF possui R$2 bilhões em caixa para suportar este ciclo transitório.</p>
     </div>
   </div>
 
   <div class="two">
     <div class="ccard">
-      <div class="ctitle" style="margin-bottom:4px;">Demonstra��o do Resultado</div>
+      <div class="ctitle" style="margin-bottom:4px;">Demonstração do Resultado</div>
       <div class="cwrap" style="height:250px;"><canvas id="c12"></canvas></div>
     </div>
     <div class="ccard dre-indicadores">
-      <div class="ctitle" style="margin-bottom:14px;">Demonstra��o do Resultado � Indicadores</div>
-      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Receita Bruta: +22,9% (2021?2025)</span><span class="pv">R$971?R$1.193 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-receita" style="width:45%;--pf-color:#F5C900;"></div></div></div>
-      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Invest. Futebol: +70,6% (2021?2025)</span><span class="pv">R$690?R$1.177 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-invest" style="width:65%;--pf-color:#009C3B;"></div></div></div>
-      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Despesas: +157,6% (2021?2025)</span><span class="pv">R$170?R$438 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-despesas" style="width:80%;--pf-color:#003DA5;"></div></div></div>
-      <div class="pi"><div class="ph"><span class="pl">Resultado: -364% (2021?2025)</span><span class="pv">R$69?R$-182 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-resultado" style="width:90%;--pf-color:#FFFFFF;"></div></div></div>
+      <div class="ctitle" style="margin-bottom:14px;">Demonstração do Resultado – Indicadores</div>
+      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Receita Bruta: +22,9% (2021→2025)</span><span class="pv">R$971→R$1.193 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-receita" style="width:45%;--pf-color:#F5C900;"></div></div></div>
+      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Invest. Futebol: +70,6% (2021→2025)</span><span class="pv">R$690→R$1.177 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-invest" style="width:65%;--pf-color:#009C3B;"></div></div></div>
+      <div class="pi" style="margin-bottom:22px;"><div class="ph"><span class="pl">Despesas: +157,6% (2021→2025)</span><span class="pv">R$170→R$438 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-despesas" style="width:80%;--pf-color:#003DA5;"></div></div></div>
+      <div class="pi"><div class="ph"><span class="pl">Resultado: −364% (2021→2025)</span><span class="pv">R$69→R$−182 Mi</span></div><div class="pb" style="height:9px;"><div class="pf pf-resultado" style="width:90%;--pf-color:#FFFFFF;"></div></div></div>
     </div>
   </div>
 
@@ -1288,9 +1288,9 @@ footer p,.mono{color:#5A7AAA !important}
 
 
 
-<!-- - COMPETI��ES - -->
+<!-- ═ COMPETIÇÕES ═ -->
 <div id="competicoes" class="page landscape" style="height:auto;min-height:auto;overflow:visible;padding-bottom:24px;">
-  <div class="stitle">Demonstra��o de Resultados por Competi��o</div>
+  <div class="stitle">Demonstração de Resultados por Competição</div>
   <div class="csub" style="margin-top:-20px;margin-bottom:24px;font-size:13px;color:rgba(255,255,255,.5);">em milhares de reais</div>
 
   <div class="ccard" style="padding:0;overflow:visible;background:#FFFFFF;border:1px solid #B0C8E8;border-radius:10px;box-shadow:0 2px 8px rgba(13,34,87,.08);height:auto;min-height:auto;padding-bottom:24px;">
@@ -1312,10 +1312,10 @@ footer p,.mono{color:#5A7AAA !important}
         <thead>
           <tr id="comp-head">
             <th></th>
-            <th>Br. S�rie A</th>
-            <th>Br. S�rie B</th>
-            <th>Br. S�rie C</th>
-            <th>Br. S�rie D</th>
+            <th>Br. Série A</th>
+            <th>Br. Série B</th>
+            <th>Br. Série C</th>
+            <th>Br. Série D</th>
             <th>Copa do Brasil</th>
             <th>Copa do Nordeste</th>
             <th>Fem. A1</th>
@@ -1331,38 +1331,38 @@ footer p,.mono{color:#5A7AAA !important}
 
   <script>
   (function(){
-    // Dados: null = zero (exibe "�"), valores negativos j� negativos
+    // Dados: null = zero (exibe "–"), valores negativos já negativos
     var rows = [
       // tipo: 'section' | 'detail' | 'subtotal' | 'result'
       {t:'section', label:'RECEITAS'},
-      {t:'detail',  label:'Direito de Transmiss�o',            v:[0,0,14805875,1000000,727600359,75980972,22900000,0,0]},
-      {t:'detail',  label:'Publicidade / Patroc�nio',          v:[80200000,44000000,0,0,0,0,0,0,0]},
+      {t:'detail',  label:'Direito de Transmissão',            v:[0,0,14805875,1000000,727600359,75980972,22900000,0,0]},
+      {t:'detail',  label:'Publicidade / Patrocínio',          v:[80200000,44000000,0,0,0,0,0,0,0]},
       {t:'subtotal',label:'Total de Receitas',                 v:[80200000,44000000,14805875,1000000,727600359,75980972,22900000,0,0]},
       {t:'section', label:'CUSTOS OPERACIONAIS'},
-      {t:'detail',  label:'Log�stica (passagens e estadias)',  v:[-7931678,-47373028,-34150667,-62873496,-24056306,-7761600,-9783681,-5598304,-4749465]},
+      {t:'detail',  label:'Logística (passagens e estadias)',  v:[-7931678,-47373028,-34150667,-62873496,-24056306,-7761600,-9783681,-5598304,-4749465]},
       {t:'detail',  label:'PAF Arbitragem',                   v:[0,-12320077,-3591754,-6228621,0,0,-1308558,-412557,-420820]},
       {t:'detail',  label:'Tecnologia do VAR',               v:[-9663030,-6790804,-437720,-38980,-1666732,-245311,-344698,-41500,-112406]},
       {t:'detail',  label:'Doping',                           v:[-882960,-967731,-140685,-26305,-149510,0,-46570,-53580,-11460]},
       {t:'detail',  label:'Seguros',                          v:[-1093719,-887244,-466929,-1042534,-239025,-164053,-5774,-114702,-411]},
-      {t:'detail',  label:'Pr�mios, Trof�us e Placas',        v:[-62070,-42700,-43300,-42902,0,-63900,-53150,-40900,-39700]},
-      {t:'detail',  label:'Publicidade / Serv. Publicit�rios',v:[-2969848,0,0,-880632,0,0,0,0,0]},
+      {t:'detail',  label:'Prêmios, Troféus e Placas',        v:[-62070,-42700,-43300,-42902,0,-63900,-53150,-40900,-39700]},
+      {t:'detail',  label:'Publicidade / Serv. Publicitários',v:[-2969848,0,0,-880632,0,0,0,0,0]},
       {t:'detail',  label:'Correios e Malotes',               v:[-50589,-125368,-11734,-110021,-43792,-4780,-12244,-26212,-36677]},
-      {t:'detail',  label:'Condu��es',                        v:[-301992,-29325,-3541,-24914,-15423,-72718,-2393,-468,-156]},
+      {t:'detail',  label:'Conduções',                        v:[-301992,-29325,-3541,-24914,-15423,-72718,-2393,-468,-156]},
       {t:'detail',  label:'Material Esportivo',               v:[0,0,-419,-299,0,0,-2227,-279,-279]},
-      {t:'detail',  label:'Lanches e Refei��es',              v:[-283,-1843,-791,-1410,0,-140,0,-741,0]},
-      {t:'detail',  label:'Loca��es Diversas',                v:[0,-5253,-3742,-37493,0,-11965,-3875,-5519,0]},
-      {t:'detail',  label:'Outros Servi�os Profissionais',    v:[0,-6216,-1066323,-75380,-48000,-7702,-170180,-213621,-318502]},
+      {t:'detail',  label:'Lanches e Refeições',              v:[-283,-1843,-791,-1410,0,-140,0,-741,0]},
+      {t:'detail',  label:'Locações Diversas',                v:[0,-5253,-3742,-37493,0,-11965,-3875,-5519,0]},
+      {t:'detail',  label:'Outros Serviços Profissionais',    v:[0,-6216,-1066323,-75380,-48000,-7702,-170180,-213621,-318502]},
       {t:'detail',  label:'Taxas e Emolumentos',             v:[-2025,0,0,0,0,0,0,-511,0]},
-      {t:'detail',  label:'Serv. Inform�tica / Mat. Gr�fico', v:[0,0,0,0,0,-7381,0,0,-279]},
+      {t:'detail',  label:'Serv. Informática / Mat. Gráfico', v:[0,0,0,0,0,-7381,0,0,-279]},
       {t:'subtotal',label:'Total de Custos Operacionais',     v:[-22958195,-68549590,-39917605,-71272966,-26218788,-8339550,-11733350,-6508894,-5689876]},
       {t:'section', label:'REPASSES FINANCEIROS'},
-      {t:'detail',  label:'Cotas / Dir. Transmiss�o (repasse)',v:[0,0,-33752000,-43852000,-450032750,-46609326,-9900000,-3030030,-1942000]},
-      {t:'detail',  label:'Subs�dios',                        v:[0,0,0,0,0,-6480000,0,0,0]},
-      {t:'detail',  label:'Antecipa��es a Clubes',            v:[0,-40000000,0,0,0,0,0,0,0]},
+      {t:'detail',  label:'Cotas / Dir. Transmissão (repasse)',v:[0,0,-33752000,-43852000,-450032750,-46609326,-9900000,-3030030,-1942000]},
+      {t:'detail',  label:'Subsídios',                        v:[0,0,0,0,0,-6480000,0,0,0]},
+      {t:'detail',  label:'Antecipações a Clubes',            v:[0,-40000000,0,0,0,0,0,0,0]},
       {t:'subtotal',label:'Total de Repasses',                v:[0,-40000000,-33752000,-43852000,-450032750,-53089326,-9900000,-3030030,-1942000]},
       {t:'section', label:'OUTROS'},
-      {t:'detail',  label:'Reembolso Custo Log�stico',        v:[7225595,0,0,0,0,0,0,0,0]},
-      {t:'result',  label:'RESULTADO L�QUIDO',                v:[64467400,-64549590,-58863730,-114124966,251348821,14552096,1266650,-9538924,-7631876]}
+      {t:'detail',  label:'Reembolso Custo Logístico',        v:[7225595,0,0,0,0,0,0,0,0]},
+      {t:'result',  label:'RESULTADO LÍQUIDO',                v:[64467400,-64549590,-58863730,-114124966,251348821,14552096,1266650,-9538924,-7631876]}
     ];
 
     function fmt(n) {
@@ -1415,7 +1415,7 @@ footer p,.mono{color:#5A7AAA !important}
 
     tbody.innerHTML = html;
 
-    // Cabe�alho e primeira coluna agora usam sticky nativo via CSS inline.
+    // Cabeçalho e primeira coluna agora usam sticky nativo via CSS inline.
 
   })();
   </script>
@@ -1437,7 +1437,7 @@ function sp(id) {
   const tabIdx = ids.indexOf(id);
   if (tabIdx >= 0) document.querySelectorAll('.ntab')[tabIdx].classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
-  // Limpar done para for�ar recria��o dos charts desta p�gina
+  // Limpar done para forçar recriação dos charts desta página
   done.clear();
   setTimeout(initCharts, 80);
 }
@@ -1536,7 +1536,7 @@ function normalizeChartConfig(cfg){
   return cfg;
 }
 
-// Plugin para exibir valores nas barras/pontos dos gr�ficos
+// Plugin para exibir valores nas barras/pontos dos gráficos
 const barValuePlugin = {
   id: 'barValues',
   afterDatasetsDraw(chart) {
@@ -1557,7 +1557,7 @@ const barValuePlugin = {
         } else {
           ctx.textBaseline = val >= 0 ? 'bottom' : 'top';
           const yPos = val >= 0 ? el.y - 4 : el.y + 20;
-          ctx.fillText(val < 0 ? '-'+Math.abs(val) : val, el.x, yPos);
+          ctx.fillText(val < 0 ? '−'+Math.abs(val) : val, el.x, yPos);
         }
         ctx.restore();
       });
@@ -1585,25 +1585,25 @@ function safeChart(id, cfg) {
   Chart.defaults.borderColor = '#B0C8E8';
 
 
-// ------------------------------------------------------
-// DADOS DIN�MICOS � injetados pelo Supabase/servidor
+// ══════════════════════════════════════════════════════
+// DADOS DINÂMICOS — injetados pelo Supabase/servidor
 // Quando window.__CBF_DADOS__ existe, usa esses dados.
-// Caso contr�rio, usa os valores hardcoded abaixo (fallback).
-// ------------------------------------------------------
+// Caso contrário, usa os valores hardcoded abaixo (fallback).
+// ══════════════════════════════════════════════════════
 
 const _D = window.__CBF_DADOS__ || null;
 
-// -- Helpers --
+// ── Helpers ──
 function _bi(v, fb) { return v != null ? v : fb; }
 function _fmtBi(v) {
-  if (v == null) return '�';
+  if (v == null) return '—';
   const n = Math.abs(v);
-  if (n >= 1000) return (v < 0 ? '- ' : '') + 'R$ ' + (n/1000).toFixed(2).replace('.',',') + ' Bi';
-  return (v < 0 ? '- ' : '') + 'R$ ' + Math.round(n) + ' Mi';
+  if (n >= 1000) return (v < 0 ? '− ' : '') + 'R$ ' + (n/1000).toFixed(2).replace('.',',') + ' Bi';
+  return (v < 0 ? '− ' : '') + 'R$ ' + Math.round(n) + ' Mi';
 }
 function _fmtMi(v) {
-  if (v == null) return '�';
-  return (v < 0 ? '- ' : '') + 'R$ ' + Math.abs(Math.round(v)) + ' Mi';
+  if (v == null) return '—';
+  return (v < 0 ? '− ' : '') + 'R$ ' + Math.abs(Math.round(v)) + ' Mi';
 }
 function _pct(a, b) {
   if (!a || !b || b === 0) return '';
@@ -1611,7 +1611,7 @@ function _pct(a, b) {
   return (parseFloat(p) >= 0 ? '+' : '') + p + '%';
 }
 
-// -- Dados para os gr�ficos (com fallback hardcoded) --
+// ── Dados para os gráficos (com fallback hardcoded) ──
 const GD = {
   // Receitas doughnut (c1)
   rec_composicao: _D?.receitas_composicao || [638, 438, 55, 51, 12],
@@ -1619,7 +1619,7 @@ const GD = {
   // Custos doughnut (c2)
   cus_composicao: _D?.custos_composicao || [757, 281, 94, 45],
   
-  // Resultado hist�rico (c3, c11, c12)
+  // Resultado histórico (c3, c11, c12)
   hist_labels:    _D?.labels || ['2021','2022','2023','2024','2025'],
   hist_resultado: _D?.resultado_serie || [69, 143, 238, 107, -182],
   hist_receita:   _D?.receita_serie   || [971, 1072, 1172, 1302, 1193],
@@ -1627,14 +1627,14 @@ const GD = {
   hist_caixa:     _D?.caixa_serie     || [1040, 1040, 1041, 2433, 1997],
   hist_despesas:  _D?.despesas_serie  || [170, 199, 162, 208, 438],
   
-  // Comparativo receitas (c4) � per�odo atual vs anterior
+  // Comparativo receitas (c4) — período atual vs anterior
   comp_2025: _D?.receitas_composicao
     ? [_D.receitas_composicao[0], _D.receitas_composicao[1],
        _D.receitas_composicao[2], _D.receitas_composicao[3]]
     : [638, 438, 55, 51],
-  comp_2024: [724, 451, 67, 38],  // TODO: puxar do per�odo anterior no Supabase
+  comp_2024: [724, 451, 67, 38],  // TODO: puxar do período anterior no Supabase
   
-  // Sele��es (c8)
+  // Seleções (c8)
   sel_2025: _D ? [
     Math.round((_D.custo_selecao_principal||0)),
     Math.round((_D.custo_selecao_base||0)),
@@ -1653,7 +1653,7 @@ const GD = {
     Math.round((_D.custo_selecao_base||0))
   ] : [757, 281, 369, 94, 58, 45],
   
-  // Balan�o (cbp1, cbp2, cbp3)
+  // Balanço (cbp1, cbp2, cbp3)
   ativo_composicao: _D ? [
     Math.round(_D.caixa_equivalentes||0),
     Math.round((_D.contas_receber||0)),
@@ -1672,7 +1672,7 @@ const GD = {
   ativo_hist:  _D?.caixa_serie ? _D.caixa_serie.map(v => Math.round(v * 3.4 / 2)) : [1620,1872,2161,3617,3391],
   caixa_hist:  _D?.caixa_serie || [724,888,1041,2433,1997],
 
-  // Balan�o Patrimonial 10 anos (cbp3)
+  // Balanço Patrimonial 10 anos (cbp3)
   bp_labels_10yr: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
   bp_ativo_10yr:  [800, 960, 1200, 1400, 1500, 1620, 1872, 2161, 3617, 3391],
   bp_caixa_10yr:  [245, 361, 517, 697, 873, 724, 888, 1041, 2433, 1997],
@@ -1681,8 +1681,8 @@ const GD = {
   disp_labels: ['2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'],
   disp_data:   [245,361,517,697,873,724,888,1041,2433,1997],
   
-  // DFC (cind2) � dados conforme DFC 31/12/2025
-  dfc_labels: ['D�ficit','Ajustes s/ caixa','Contas a Receber','Impostos a Recup.','Dep. Judiciais','Outros Ativos','Fornecedores','Tributos/Encargos','Rec. Diferida','Investimentos'],
+  // DFC (cind2) — dados conforme DFC 31/12/2025
+  dfc_labels: ['Déficit','Ajustes s/ caixa','Contas a Receber','Impostos a Recup.','Dep. Judiciais','Outros Ativos','Fornecedores','Tributos/Encargos','Rec. Diferida','Investimentos'],
   dfc_data: [-182.5, 121.2, -49.5, -58.8, -86.9, 3.6, 6.3, 16.1, -161.0, -45.1],
   
   // Liquidez (cliq)
@@ -1693,15 +1693,15 @@ const GD = {
   ] : [3.95, 1.59, 3.27],
   liq_2024: [5.21, 1.66, 4.58],
 
-  // Liquidez hist�rica 5 anos (Corrente, Geral, Imediata)
+  // Liquidez histórica 5 anos (Corrente, Geral, Imediata)
   liq_hist_corrente: [4.12, 4.85, 5.45, 5.21, 3.95],
   liq_hist_geral:    [1.42, 1.55, 1.68, 1.66, 1.59],
   liq_hist_imediata: [3.50, 4.10, 4.72, 4.58, 3.27],
 };
 
-// -- Atualizar KPI cards no DOM com dados din�micos --
+// ── Atualizar KPI cards no DOM com dados dinâmicos ──
 function _atualizarKPIs() {
-  if (!_D) return; // sem dados din�micos, mant�m os hardcoded no HTML
+  if (!_D) return; // sem dados dinâmicos, mantém os hardcoded no HTML
 
   const periodo = _D.periodoFormatado || '2025';
 
@@ -1709,18 +1709,18 @@ function _atualizarKPIs() {
   
   if (el('lbl-periodo'))    el('lbl-periodo').textContent    = `Receita Bruta ${periodo}`;
   if (el('kv-receita-bruta')) el('kv-receita-bruta').textContent = _fmtBi(_D.receita_bruta);
-  if (el('kd-receita-bruta')) el('kd-receita-bruta').textContent = '? ' + _pct(_D.receita_bruta, _D.receita_bruta_anterior) + ' vs anterior';
+  if (el('kd-receita-bruta')) el('kd-receita-bruta').textContent = '▼ ' + _pct(_D.receita_bruta, _D.receita_bruta_anterior) + ' vs anterior';
   if (el('kv-resultado'))   el('kv-resultado').textContent   = _fmtMi(_D.resultado_exercicio);
   if (el('kv-custos'))      el('kv-custos').textContent      = _fmtBi(_D.custos_futebol);
   if (el('kv-caixa'))       el('kv-caixa').textContent       = _fmtBi(_D.caixa_equivalentes);
   if (el('kv-ativo'))       el('kv-ativo').textContent       = _fmtBi(_D.ativo_total);
   if (el('kv-rec-fin'))     el('kv-rec-fin').textContent     = _fmtMi(_D.rec_financeiras);
-  if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} � ${periodo}`;
+  if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} · ${periodo}`;
 
-  // Atualizar t�tulo do header
+  // Atualizar título do header
   const hTitle = document.querySelector('.htitles p');
   if (hTitle && _D.source_file) {
-    hTitle.textContent = `Demonstra��es Financeiras � ${periodo} � ${_D.source_file}`;
+    hTitle.textContent = `Demonstrações Financeiras · ${periodo} · ${_D.source_file}`;
   }
 
   // Atualizar ano no header
@@ -1728,10 +1728,10 @@ function _atualizarKPIs() {
   if (yr && _D.periodo) yr.textContent = _D.periodo.split('-')[0];
 }
 
-// Executar atualiza��o de KPIs imediatamente
+// Executar atualização de KPIs imediatamente
 _atualizarKPIs();
 
-// -- Helpers para doughnut interativo --
+// ── Helpers para doughnut interativo ──
 function _doughnutLabels(showVal) {
   return function(chart) {
     const ds = chart.data.datasets[0];
@@ -1767,7 +1767,7 @@ function _renderFlowLegend(containerId, labels, data, colors) {
 function initCharts() {
   // c1 - Receita 2025 doughnut - dados reais
   safeChart('c1', {type:'doughnut', data:{
-    labels:['Transmiss�o/Comercial','Patroc�nios','Bilheteria','Registros','Programa Desenvolvimento + Academy'],
+    labels:['Transmissão/Comercial','Patrocínios','Bilheteria','Registros','Programa Desenvolvimento + Academy'],
     datasets:[{data:GD.rec_composicao, backgroundColor:['#193375','#1A4FBF','#4A7ACC','#7AAEE8','#B0C8E8'], borderWidth:0, borderColor:'transparent', hoverBorderWidth:0, hoverOffset:4}]
   }, options:{cutout:'58%', responsive:false, maintainAspectRatio:false, width:280, height:280,
     plugins:{
@@ -1787,7 +1787,7 @@ function initCharts() {
     }
   }});
 
-  // c3 - Resultado 2021-2025 - dados reais com d�ficit 2025
+  // c3 - Resultado 2021-2025 - dados reais com déficit 2025
   safeChart('c3', {type:'bar', data:{
     labels:GD.hist_labels,
     datasets:[{label:'Resultado (R$Mi)', data:GD.hist_resultado,
@@ -1799,7 +1799,7 @@ function initCharts() {
 
   // c4 - Comp 2024 vs 2025 - dados reais
   safeChart('c4', {type:'bar', data:{
-    labels:['Transmiss�o e Comerciais','Patroc�nios','Bilheteria','Registros'],
+    labels:['Transmissão e Comerciais','Patrocínios','Bilheteria','Registros'],
     datasets:[  
       {label:'2025 (R$Mi)', data:GD.comp_2025, backgroundColor:C.y, borderRadius:4},
       {label:'2024 (R$Mi)', data:GD.comp_2024, backgroundColor:'#009C3B', borderRadius:4}
@@ -1817,9 +1817,9 @@ function initCharts() {
     },
     scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
-  // c8 - Sele��es e Fomento 2025-2024
+  // c8 - Seleções e Fomento 2025-2024
   safeChart('c8', {type:'bar', data:{
-    labels:['Sel. Principal','Sel. Base','Sel. Femininas','Fomento Estados e Competi��es'],
+    labels:['Sel. Principal','Sel. Base','Sel. Femininas','Fomento Estados e Competições'],
     datasets:[
       {label:'2025 (R$Mi)', data:GD.sel_2025, backgroundColor:C.y, borderRadius:4},
       {label:'2024 (R$Mi)', data:GD.sel_2024, backgroundColor:'#009C3B', borderRadius:4}
@@ -1837,7 +1837,7 @@ function initCharts() {
     },
     scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
-  // c11 - S�rie hist�rica receita 2021-2025 real
+  // c11 - Série histórica receita 2021-2025 real
   safeChart('c11', {type:'bar', data:{
     labels:GD.hist_labels,
     datasets:[{label:'Receita Bruta (R$Mi)', data:GD.hist_receita,
@@ -1846,7 +1846,7 @@ function initCharts() {
       borderWidth:0, borderRadius:6}]
   }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}, plugins:[barValuePlugin]});
 
-  // c12 - DRE Hist�rica 2021-2025 (Receita, Custos, Despesas, Resultado)
+  // c12 - DRE Histórica 2021-2025 (Receita, Custos, Despesas, Resultado)
   safeChart('c12', {type:'line', data:{
     labels:['2021','2022','2023','2024','2025'],
     datasets:[
@@ -1857,7 +1857,7 @@ function initCharts() {
     ]
   }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}});
 
-  // -- BALAN�O PATRIMONIAL --
+  // ── BALANÇO PATRIMONIAL ──
   safeChart('cbp1', {type:'doughnut', data:{
     labels:['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'],
     datasets:[{data:GD.ativo_composicao, backgroundColor:['#193375','#1A4FBF','#4A7ACC','#7AAEE8','#B0C8E8'], borderWidth:0, borderColor:'transparent', hoverBorderWidth:0, hoverOffset:4}]
@@ -1868,17 +1868,17 @@ function initCharts() {
   _renderFlowLegend('cbp1-legend', ['Caixa/Equiv.','Contas a Receber CP','Demais CP','Dep. Judiciais LP','Demais LP'], GD.ativo_composicao, ['#193375','#1A4FBF','#4A7ACC','#7AAEE8','#B0C8E8']);
 
   safeChart('cbp2', {type:'doughnut', data:{
-    labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Conting�ncias','Patrim�nio L�quido'],
+    labels:['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'],
     datasets:[{data:GD.passivo_composicao, backgroundColor:['#193375','#1A4FBF','#4A7ACC','#7AAEE8'], borderWidth:0, borderColor:'transparent', hoverBorderWidth:0, hoverOffset:4}]
   }, options:{cutout:'58%', responsive:false, maintainAspectRatio:false, width:280, height:280, plugins:{
     legend:{display:false, position:'bottom', align:'center', onClick:_doughnutClick, labels:{color:'#0D2257', font:{family:'Arial, sans-serif', size:11, weight:'400'}, padding:14, boxWidth:12, boxHeight:12, usePointStyle:false, generateLabels:_doughnutLabels(false)}},
     tooltip:{backgroundColor:'#0D2257', titleColor:'#FFFFFF', bodyColor:'#9EB3D8', borderColor:'#1A4FBF', borderWidth:1, padding:10, callbacks:{label:_doughnutTooltip}}
   }}});
-  _renderFlowLegend('cbp2-legend', ['Passivo Circulante','Rec. Antecipadas LP','Prov. Conting�ncias','Patrim�nio L�quido'], GD.passivo_composicao, ['#193375','#1A4FBF','#4A7ACC','#7AAEE8']);
+  _renderFlowLegend('cbp2-legend', ['Passivo Circulante','Rec. Antecipadas LP','Prov. Contingências','Patrimônio Líquido'], GD.passivo_composicao, ['#193375','#1A4FBF','#4A7ACC','#7AAEE8']);
 
-  // cbp3 removed � Evolu��o do Ativo Total chart no longer displayed
+  // cbp3 removed — Evolução do Ativo Total chart no longer displayed
 
-  // -- INDICADORES --
+  // ── INDICADORES ──
   safeChart('cind1', {type:'line', data:{
     labels:GD.disp_labels,
     datasets:[{label:'Disponibilidades (R$Mi)', data:GD.disp_data,
@@ -1899,9 +1899,9 @@ function initCharts() {
     },
     scales:{x:{grid:{display:false}, ticks:{font:{size:12}, maxRotation:45}}, y:{suggestedMin:-220, grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}, plugins:[barValuePlugin]});
 
-  // cliq removed � Liquidez chart moved to S�rie Hist�rica as individual per-index charts
+  // cliq removed — Liquidez chart moved to Série Histórica as individual per-index charts
 
-  // -- LIQUIDEZ HIST�RICA (S�rie Hist�rica) --
+  // ── LIQUIDEZ HISTÓRICA (Série Histórica) ──
   const liqHistLabels = ['2021','2022','2023','2024','2025'];
   const liqHistOpts = (max) => ({maintainAspectRatio:false,
     plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y.toFixed(2)}}},
@@ -1910,7 +1910,7 @@ function initCharts() {
   safeChart('cliq_geral', {type:'bar', data:{labels:liqHistLabels, datasets:[{data:GD.liq_hist_geral, backgroundColor:['#009C3B','#009C3B','#009C3B','#009C3B',C.y], borderRadius:4}]}, options:liqHistOpts(3), plugins:[barValuePlugin]});
   safeChart('cliq_imediata', {type:'bar', data:{labels:liqHistLabels, datasets:[{data:GD.liq_hist_imediata, backgroundColor:['#009C3B','#009C3B','#009C3B','#009C3B',C.y], borderRadius:4}]}, options:liqHistOpts(6), plugins:[barValuePlugin]});
 
-  // -- DESPESAS OPERACIONAIS --
+  // ── DESPESAS OPERACIONAIS ──
   safeChart('cdespop1', {type:'bar', data:{
     labels:['Desp. Administrativas','Desp. Pessoal','Total OPEX'],
     datasets:[
@@ -1919,11 +1919,11 @@ function initCharts() {
     ]
   }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
-  // -- OR�ADO X REALIZADO --
+  // ── ORÇADO X REALIZADO ──
   safeChart('corc1', {type:'bar', data:{
     labels:['Receita Total','Invest. Futebol','Desp. Op+Fin','Tributos','Resultado'],
     datasets:[
-      {label:'Or�ado (R$Mi)', data:[1685,1037,244,223,181], backgroundColor:'#4A4A4A', borderRadius:5},
+      {label:'Orçado (R$Mi)', data:[1685,1037,244,223,181], backgroundColor:'#4A4A4A', borderRadius:5},
       {label:'Realizado (R$Mi)', data:[1539,1177,460,84,-182],
         backgroundColor:['#C0392B','#009C3B','#C0392B','#009C3B','#C0392B'], borderRadius:5}
     ]
@@ -1934,14 +1934,14 @@ function initCharts() {
         const orc=[1685,1037,244,223,181]; const real=[1539,1177,460,84,-182];
         const i=ctx.dataIndex;
         const pct=orc[i]!==0?((real[i]-orc[i])/Math.abs(orc[i])*100).toFixed(0):'n/a';
-        return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===1?' ('+pct+'% vs or�ado)':'');
+        return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===1?' ('+pct+'% vs orçado)':'');
       }}}
     },
     scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
   safeChart('corc2', {type:'bar', data:{
-    labels:['Transmiss�o','Patroc�nios','Bilheteria','Registros','Rec. Financeira'],
-    datasets:[{label:'Desvio vs Or�ado (R$Mi)', data:[-82,-12,-15,13,118],
+    labels:['Transmissão','Patrocínios','Bilheteria','Registros','Rec. Financeira'],
+    datasets:[{label:'Desvio vs Orçado (R$Mi)', data:[-82,-12,-15,13,118],
       backgroundColor:(ctx)=>ctx.raw<0?'#C0392B':'#009C3B', borderRadius:4}]
   }, options:{indexAxis:'y', maintainAspectRatio:false,
     plugins:{
@@ -1949,7 +1949,7 @@ function initCharts() {
       tooltip:{callbacks:{label:function(ctx){
         const orc=[720,450,70,38,200]; const i=ctx.dataIndex;
         const pct=(ctx.parsed.x/orc[i]*100).toFixed(1);
-        return ' R$ '+ctx.parsed.x+' Mi ('+pct+'% do or�ado)';
+        return ' R$ '+ctx.parsed.x+' Mi ('+pct+'% do orçado)';
       }}}
     },
     scales:{x:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}, y:{grid:{display:false}}}}});
@@ -1958,13 +1958,13 @@ function initCharts() {
 async function exportPDF() {
   const btn = document.querySelector('.pdf-btn');
   const origHTML = btn.innerHTML;
-  btn.innerHTML = '? Gerando PDF...';
+  btn.innerHTML = '⏳ Gerando PDF...';
   btn.disabled = true;
 
   const pages = document.querySelectorAll('.page');
   pages.forEach(p => { p.style.display = 'block'; });
 
-  // Normalizar styles inline problem�ticos
+  // Normalizar styles inline problemáticos
   const _fixed = [];
   document.querySelectorAll('[style]').forEach(el => {
     const orig = el.getAttribute('style') || '';
@@ -1979,7 +1979,7 @@ async function exportPDF() {
     if (Object.keys(patch).length) { Object.assign(el.style, patch); _fixed.push({ el, orig }); }
   });
 
-  // Recriar charts na largura de impress�o
+  // Recriar charts na largura de impressão
   const PRINT_W = 1122;
   const cwraps = document.querySelectorAll('.cwrap');
   const origWrapStyles = [];
@@ -2002,7 +2002,7 @@ async function exportPDF() {
     });
   }
 
-  // Remove backdrop-filter inline � Chrome/Edge renderiza como bloco preto opaco na impress�o
+  // Remove backdrop-filter inline — Chrome/Edge renderiza como bloco preto opaco na impressão
   const _blurFixed = [];
   document.querySelectorAll('.kcard, .ccard, .aicard, nav, [style*="backdrop-filter"]').forEach(el => {
     const origStyle = el.getAttribute('style') || '';
@@ -2016,7 +2016,7 @@ async function exportPDF() {
   printStyle.textContent = `
     @media print {
       html, body, .main { background: #0D1117 !important; }
-      /* Disable backdrop-filter � Chrome/Edge renders it as opaque black overlay */
+      /* Disable backdrop-filter – Chrome/Edge renders it as opaque black overlay */
       *, *::before, *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
       .page {
         background: #0D1117 !important;
@@ -2072,10 +2072,10 @@ async function exportPDF() {
 initCharts();
 </script>
 <script>
-// ----------------------------------------------------------
-// AUTO-FETCH: busca dados do Supabase e faz merge com hist�rico
+// ══════════════════════════════════════════════════════════
+// AUTO-FETCH: busca dados do Supabase e faz merge com histórico
 // Dados anteriores a 2025 mantidos do hardcode; Supabase completa
-// ----------------------------------------------------------
+// ══════════════════════════════════════════════════════════
 (async function() {
   const SUPA_URL  = 'https://uqthbzqpsgfflljxepen.supabase.co';
   const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxdGhienFwc2dmZmxsanhlcGVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkyMTYsImV4cCI6MjA4OTA4NTIxNn0.bdZUNrd9TlErrs4uhCzzas9cKnUhzSKGOpkVQXIK1yA';
@@ -2086,7 +2086,7 @@ initCharts();
     'Content-Type': 'application/json'
   };
 
-  // Dados hist�ricos hardcoded (2021-2024) � fonte: DFS auditadas
+  // Dados históricos hardcoded (2021-2024) — fonte: DFS auditadas
   const HIST = {
     '2021': { label:'2021', receita:971,  resultado:69,  custos:690,  caixa:1040 },
     '2022': { label:'2022', receita:1072, resultado:143, custos:702,  caixa:1040 },
@@ -2097,13 +2097,13 @@ initCharts();
   function fmtPeriodo(p) {
     if (!p) return p;
     const [ano, mes] = p.split('-');
-    if (!mes) return p; // j� � s� ano
+    if (!mes) return p; // já é só ano
     const m = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
     return m[parseInt(mes)-1] + '/' + ano;
   }
 
   try {
-    // Buscar configura��es
+    // Buscar configurações
     const cfgRes = await fetch(SUPA_URL + '/rest/v1/configuracao?select=chave,valor', { headers });
     const cfgList = await cfgRes.json();
     const cfgMap = Object.fromEntries((cfgList || []).map((c) => [c.chave, c.valor]));
@@ -2120,13 +2120,13 @@ initCharts();
     const temBalancete = Array.isArray(balancetes) && balancetes.length > 0;
 
     // Decidir fonte de dados principal:
-    // - Se h� balancete mais recente que as DFs ? usar balancete como dado atual
-    // - Caso contr�rio ? usar DFs anuais
+    // - Se há balancete mais recente que as DFs → usar balancete como dado atual
+    // - Caso contrário → usar DFs anuais
     let d, fonteAtual;
     if (temBalancete && ultimoBalancete) {
       const bal = balancetes.find(x => x.periodo === ultimoBalancete) || balancetes[balancetes.length - 1];
       const dfAnual = (supa || []).find(x => x.periodo === periodo) || (supa || [])[supa.length - 1];
-      // Balancete prevalece se for de um per�odo mais recente
+      // Balancete prevalece se for de um período mais recente
       if (!dfAnual || bal.periodo > dfAnual.periodo) {
         d = bal; fonteAtual = 'balancete';
       } else {
@@ -2138,9 +2138,9 @@ initCharts();
       fonteAtual = 'dfs';
     }
 
-    console.log('[CBF] Fonte:', fonteAtual, '| Per�odo:', d?.periodo);
+    console.log('[CBF] Fonte:', fonteAtual, '| Período:', d?.periodo);
 
-    // -- Merge hist�rico: hardcode (anos anteriores) + Supabase (2025+) --
+    // ── Merge histórico: hardcode (anos anteriores) + Supabase (2025+) ──
     // Montar mapa de anos do Supabase
     const supaMap = {};
     supa.forEach(row => {
@@ -2164,14 +2164,14 @@ initCharts();
     const cus_serie   = anos.map(a => merged[a].custos);
     const caixa_serie = anos.map(a => merged[a].caixa);
 
-    // Montar __CBF_DADOS__ com dados do per�odo atual + s�rie completa
+    // Montar __CBF_DADOS__ com dados do período atual + série completa
     window.__CBF_DADOS__ = {
       periodo,
       periodoFormatado: fmtPeriodo(periodo),
       source_file: d.source_file,
       geradoEm: d.updated_at,
 
-      // KPIs do per�odo atual
+      // KPIs do período atual
       receita_bruta:       +d.receita_bruta,
       receita_liquida:     +d.receita_liquida,
       resultado_exercicio: +(d.resultado_exercicio ?? d.resultado_periodo ?? 0),
@@ -2185,14 +2185,14 @@ initCharts();
       fluxo_operacional:   +d.fluxo_operacional,
       fluxo_investimento:  +d.fluxo_investimento,
 
-      // S�rie hist�rica completa (hardcode + Supabase merged)
+      // Série histórica completa (hardcode + Supabase merged)
       labels,
       receita_serie:   rec_serie,
       resultado_serie: res_serie,
       custos_serie:    cus_serie,
       caixa_serie,
 
-      // Doughnuts per�odo atual
+      // Doughnuts período atual
       receitas_composicao: [
         Math.round(Math.abs(+d.rec_transmissao) / 1000),
         Math.round(Math.abs(+d.rec_patrocinio) / 1000),
@@ -2227,7 +2227,7 @@ initCharts();
       patrimonio_social:     +d.patrimonio_social,
     };
 
-    // Atualizar GD com s�rie completa (merged)
+    // Atualizar GD com série completa (merged)
     if (typeof GD !== 'undefined') {
       GD.hist_labels      = labels;
       GD.hist_resultado   = res_serie;
@@ -2256,7 +2256,7 @@ initCharts();
     // Atualizar KPIs no DOM
     if (typeof _atualizarKPIs === 'function') _atualizarKPIs();
 
-    // Recriar gr�ficos com dados completos
+    // Recriar gráficos com dados completos
     if (typeof done !== 'undefined') done.clear();
     if (typeof chartInstances !== 'undefined') {
       Object.keys(chartInstances).forEach(id => {
@@ -2266,24 +2266,24 @@ initCharts();
     }
     if (typeof initCharts === 'function') initCharts();
 
-    // Barra de info no rodap�
+    // Barra de info no rodapé
     const bar = document.createElement('div');
     bar.id = 'cbf-info-bar';
     bar.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:rgba(0,156,59,.92);backdrop-filter:blur(4px);color:#fff;font-size:11px;padding:5px 20px;display:flex;justify-content:space-between;align-items:center;z-index:9999;font-family:DM Sans,system-ui,sans-serif';
-    const tipoLabel = fonteAtual === 'balancete' ? '?? Balancete' : '?? DFS';
-    bar.innerHTML = '<span>' + tipoLabel + ' <strong>' + fmtPeriodo(d.periodo) + '</strong> � ' + (d.source_file||'CBF') + ' � Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">?? Admin</a>';
+    const tipoLabel = fonteAtual === 'balancete' ? '📋 Balancete' : '📊 DFS';
+    bar.innerHTML = '<span>' + tipoLabel + ' <strong>' + fmtPeriodo(d.periodo) + '</strong> · ' + (d.source_file||'CBF') + ' · Atualizado: ' + new Date(d.updated_at).toLocaleString("pt-BR") + '</span><a href="/admin" style="color:#F5C900;text-decoration:none;font-weight:600">⚙️ Admin</a>';
     document.body.appendChild(bar);
 
-    console.log('[CBF] ? Dados carregados. Per�odo:', periodo, '| S�rie:', anos.join(','));
+    console.log('[CBF] ✅ Dados carregados. Período:', periodo, '| Série:', anos.join(','));
 
   } catch(err) {
-    console.warn('[CBF] ?? Erro ao buscar dados do Supabase:', err.message);
+    console.warn('[CBF] ⚠️ Erro ao buscar dados do Supabase:', err.message);
   }
 })();
 </script>
 
 
-<!-- DEV: Auto-reload DESATIVADO para an�lise -->
+<!-- DEV: Auto-reload DESATIVADO para análise -->
 <!--
 <script>
 (function(){
@@ -2300,7 +2300,7 @@ initCharts();
 -->
 
 <script>
-// - LOGIN SYSTEM -
+// ═ LOGIN SYSTEM ═
 (function(){
   const CREDENTIALS = {
     'cbf': 'cbf2025',
@@ -2335,7 +2335,7 @@ initCharts();
     if (CREDENTIALS.hasOwnProperty(user) && CREDENTIALS[user] === pass) {
       showDashboard();
     } else {
-      document.getElementById('login-error').textContent = 'Usu�rio ou senha incorretos (user: "' + user + '")';
+      document.getElementById('login-error').textContent = 'Usuário ou senha incorretos (user: "' + user + '")';
       document.getElementById('login-pass').value = '';
       document.getElementById('login-pass').focus();
     }
