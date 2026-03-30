@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !serviceKey) return null
+  return createClient(url, serviceKey)
+}
 
 export async function POST(req: NextRequest) {
   // Verificar autenticação
   const authCookie = req.cookies.get('admin_auth')
   if (!authCookie || authCookie.value !== process.env.ADMIN_PASSWORD) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+  }
+
+  const supabase = getSupabase()
+  if (!supabase) {
+    return NextResponse.json({ error: 'Supabase não configurado no ambiente' }, { status: 500 })
   }
 
   try {
