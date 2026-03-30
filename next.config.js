@@ -4,9 +4,6 @@ const nextConfig = {
   env: {
     NEXT_TELEMETRY_DISABLED: '1',
   },
-  turbopack: {
-    root: __dirname,
-  },
 }
 
 module.exports = nextConfig

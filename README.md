@@ -7,6 +7,27 @@
 Upload xlsx → Supabase Storage → Edge Function → Claude API → Banco de Dados → Vercel rebuild → Dashboard atualizado
 ```
 
+## Desenvolvimento Local
+
+Para rodar localmente no VS Code:
+
+```bash
+npm install
+npm run dev
+```
+
+Abra uma destas URLs no navegador:
+
+```text
+http://localhost:3000
+http://localhost:3000/dashboard
+http://localhost:3000/dashboard.html
+```
+
+Não use `http://localhost:5501/public/dashboard.html` para este projeto. O dashboard é servido pelo Next.js, não por um servidor estático separado.
+
+Observação prática: manter o projeto fora do OneDrive ajuda a evitar conflitos de sincronização e file watching, mas não era a causa direta do erro `ERR_CONNECTION_REFUSED`.
+
 ---
 
 ## 1. Configurar Supabase
