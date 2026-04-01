@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
+<link rel="icon" href="/assets/imagens/bola-brasileirao-2025.png">
 <title>⚙️ CBF Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -345,8 +346,12 @@ footer p,.mono{color:#5A7AAA !important}
   .home-btn-primary,.home-btn-secondary{width:100% !important;text-align:center !important}
   #overview .kgrid,#receitas .kgrid,#despesas .kgrid,#bp .kgrid,#indicadores .kgrid{grid-template-columns:1fr !important}
   .two,.cgrid,.c32{grid-template-columns:1fr !important;display:grid !important;gap:14px !important}
-  .ccard{padding:14px 12px !important;overflow-x:auto !important}
-  .ccard table{min-width:760px !important}
+  .ccard{padding:14px 12px !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-x:contain !important}
+  .ccard table{min-width:760px !important;width:max-content !important;max-width:none !important;display:table !important}
+  .cwrap{overflow-x:auto !important;overflow-y:hidden !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-x:contain !important}
+  .cwrap canvas{min-width:560px !important;max-width:none !important}
+  #balanco .dre-clean-wrap{overflow-x:auto !important}
+  #balanco table.dre-clean{min-width:900px !important}
   #competicoes .competicoes-table-wrap{overflow-x:auto !important}
   #competicoes .competicoes-table{min-width:980px !important;table-layout:auto !important}
   #competicoes .competicoes-table thead th,

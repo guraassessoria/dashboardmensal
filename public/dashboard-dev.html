@@ -223,8 +223,12 @@ footer p,.mono{color:#5A7AAA !important}
   .home-btn-primary,.home-btn-secondary{width:100% !important;text-align:center !important}
   #overview .kgrid,#receitas .kgrid,#despesas .kgrid,#bp .kgrid,#indicadores .kgrid{grid-template-columns:1fr !important}
   .two,.cgrid,.c32{grid-template-columns:1fr !important;display:grid !important;gap:14px !important}
-  .ccard{padding:14px 12px !important;overflow-x:auto !important}
-  .ccard table{min-width:760px !important}
+  .ccard{padding:14px 12px !important;overflow-x:auto !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-x:contain !important}
+  .ccard table{min-width:760px !important;width:max-content !important;max-width:none !important;display:table !important}
+  .cwrap{overflow-x:auto !important;overflow-y:hidden !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-x:contain !important}
+  .cwrap canvas{min-width:560px !important;max-width:none !important}
+  #balanco .dre-clean-wrap{overflow-x:auto !important}
+  #balanco table.dre-clean{min-width:900px !important}
   footer{padding:18px 12px !important;flex-direction:column !important;text-align:center !important}
 }
 
