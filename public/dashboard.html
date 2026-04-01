@@ -2161,10 +2161,10 @@ function initCharts() {
 
   // ── DESPESAS OPERACIONAIS ──
   safeChart('cdespop1', {type:'bar', data:{
-    labels:['Desp. Administrativas','Desp. Pessoal','Total OPEX'],
+    labels:['Com Pessoal','Despesas Administrativas','Impostos e Taxas','Total Despesas Operacionais'],
     datasets:[
-      {label:'2025', data:[369.1,58.2,427.3], backgroundColor:'#C0392B', borderRadius:5},
-      {label:'2024', data:[145.8,50.3,196.1], backgroundColor:'#009C3B', borderRadius:4}
+      {label:'2025', data:[58.195,369.076,11.083,438.354], backgroundColor:'#C0392B', borderRadius:5},
+      {label:'2024', data:[50.344,145.822,12.125,208.291], backgroundColor:'#009C3B', borderRadius:4}
     ]
   }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
