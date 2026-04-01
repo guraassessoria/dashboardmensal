@@ -693,40 +693,46 @@ footer p,.mono{color:#5A7AAA !important}
   </div>
 
   <!-- Mini-card PJ -->
-  <div style="margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-left:3px solid var(--pos);border-radius:0 8px 8px 0;padding:12px 14px;">
-    <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Principais vetores - Serviços PJ +27,6M</div>
-    <div style="display:flex;flex-direction:column;gap:4px;">
+  <div style="margin-top:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-left:3px solid var(--pos);border-radius:0 8px 8px 0;padding:0;">
+    <div onclick="var c=document.getElementById('pj-detail');var a=document.getElementById('pj-arrow');var open=c.style.display!=='none';c.style.display=open?'none':'block';a.style.transform=open?'rotate(0deg)':'rotate(180deg)';" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;">
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.9);letter-spacing:.5px;text-transform:uppercase;">Principais vetores · Serviços PJ +27,6M</div>
+      <svg id="pj-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Assessoria e Consultoria</div>
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+10,5M</div>
+    <div id="pj-detail" style="display:none;padding:0 14px 12px;border-top:1px solid rgba(255,255,255,.1);">
+      <div style="display:flex;flex-direction:column;gap:4px;padding-top:10px;">
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Assessoria e Consultoria</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+10,5M</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Feng Fan, HM Gestão, Incentives, S9VR</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Serviços de TI</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+9,4M</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Netz Tecnologia, Solor, Ironfence IA</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Outros Serviços PJ</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+6,9M</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">LIESA, Vicaro Comunicações, Souza Lima, BS Siffert</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Advogados e Auditoria</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--neg);font-weight:600;">−1,9M</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Bucchianeri, Trengrouse (encerrados)</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:6px;margin-top:4px;">
+          <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.9);">Total líquido</div>
+          <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--pos);">+27,6M</div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);">Inclui estornos e créditos do período</div>
+
       </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Feng Fan, HM Gestão, Incentives, S9VR</div>
-
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Serviços de TI</div>
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+9,4M</div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Netz Tecnologia, Solor, Ironfence IA</div>
-
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Outros Serviços PJ</div>
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--pos);font-weight:600;">+6,9M</div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">LIESA, Vicaro Comunicações, Souza Lima, BS Siffert</div>
-
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <div style="font-size:11px;color:rgba(255,255,255,.8);font-weight:600;">Advogados e Auditoria</div>
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--neg);font-weight:600;">-1,9M</div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px;">Bucchianeri, Trengrouse (encerrados)</div>
-
-      <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:6px;margin-top:4px;">
-        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.9);">Total líquido</div>
-        <div style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--pos);">+27,6M</div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.35);">Inclui estornos e créditos do período</div>
-
     </div>
   </div>
 
