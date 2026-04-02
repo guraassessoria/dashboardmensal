@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 export async function POST(req: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json({ error: 'Supabase não configurado no ambiente' }, { status: 500 })
-  }
-
-  const supabase = createClient(supabaseUrl, serviceRoleKey)
-
   // Verificar autenticação
   const authCookie = req.cookies.get('admin_auth')
   if (!authCookie || authCookie.value !== process.env.ADMIN_PASSWORD) {
@@ -74,13 +71,13 @@ export async function POST(req: NextRequest) {
 
     // Disparar Edge Function de processamento (assíncrono)
     const funcName = tipoDocumento === 'balancete' ? 'process-balancete' : 'process-upload'
-    const edgeFunctionUrl = `${supabaseUrl}/functions/v1/${funcName}`
+    const edgeFunctionUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/${funcName}`
     
     fetch(edgeFunctionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${serviceRoleKey}`
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
       },
       body: JSON.stringify({
         upload_id: uploadRecord.id,
