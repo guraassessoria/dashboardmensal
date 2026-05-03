@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "check-env": "powershell -ExecutionPolicy Bypass -File \"scripts/check-env.ps1\"",
+    "sync-prod": "powershell -ExecutionPolicy Bypass -File \"scripts/sync-preview-with-production.ps1\""
   },
   "dependencies": {
     "next": "14.2.29",

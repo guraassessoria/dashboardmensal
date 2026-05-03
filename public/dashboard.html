@@ -13,12 +13,14 @@
 /* When font files are available, add @font-face declarations here */
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <style>
 .sticky-chrome{position:sticky;top:0;z-index:200;}
 
-:root{--cbf-amarelo:#FFDC02;--cbf-azul-escuro:#0D2257;--cbf-azul-navy:#1A4FBF;--cbf-azul-medio:#193375;--cbf-azul-claro:#D6E4F7;--cbf-azul-zebra:#EEF4FC;--cbf-page-bg:#0D1E4A;--cbf-borda:#B0C8E8;--cbf-label:#3A5080;--cbf-valor:#0D2257;--cbf-muted:#5A7AAA;--cbf-verde:#19AE47;--cbf-vermelho:#C0392B;--green:var(--cbf-verde);--gl:var(--cbf-verde);--gd:#004D26;--yellow:var(--cbf-amarelo);--blue:var(--cbf-azul-navy);--bm:var(--cbf-azul-medio);--white:#FFFFFF;--dark:var(--cbf-page-bg);--d2:var(--cbf-azul-escuro);--gray:var(--cbf-label);--g2:var(--cbf-muted);--bdr:var(--cbf-borda);--card:var(--cbf-azul-claro);--pos:var(--cbf-verde);--neg:var(--cbf-vermelho);--font-heading:'Prometo','Bebas Neue',sans-serif;--font-body:'Noka','DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--cbf-yellow:var(--cbf-amarelo);--cbf-blue:var(--cbf-azul-navy);--cbf-green:var(--cbf-verde);--cbf-white:#FFFFFF;--cbf-dark:var(--cbf-azul-escuro);--cbf-gray-light:var(--cbf-azul-zebra);--cbf-gray-mid:var(--cbf-borda);--cbf-neg:var(--cbf-vermelho)}
+:root{--cbf-amarelo:#FFDC02;--cbf-azul-escuro:#0D2257;--cbf-azul-navy:#1A4FBF;--cbf-azul-medio:#193375;--cbf-azul-claro:#D6E4F7;--cbf-azul-zebra:#EEF4FC;--cbf-page-bg:#12306C;--cbf-page-bg-soft:#1A417F;--cbf-surface:#F8FBFF;--cbf-surface-alt:#EDF4FF;--cbf-borda:#B0C8E8;--cbf-label:#294774;--cbf-valor:#081A44;--cbf-muted:#4A6796;--cbf-grid:#CAD8EC;--cbf-verde:#19AE47;--cbf-vermelho:#C0392B;--green:var(--cbf-verde);--gl:var(--cbf-verde);--gd:#004D26;--yellow:var(--cbf-amarelo);--blue:var(--cbf-azul-navy);--bm:var(--cbf-azul-medio);--white:#FFFFFF;--dark:var(--cbf-page-bg);--d2:var(--cbf-azul-escuro);--gray:var(--cbf-label);--g2:var(--cbf-muted);--bdr:var(--cbf-borda);--card:var(--cbf-surface-alt);--pos:var(--cbf-verde);--neg:var(--cbf-vermelho);--font-heading:'Prometo','Bebas Neue',sans-serif;--font-body:'Noka','DM Sans',sans-serif;--font-mono:'DM Mono',monospace;--cbf-yellow:var(--cbf-amarelo);--cbf-blue:var(--cbf-azul-navy);--cbf-green:var(--cbf-verde);--cbf-white:#FFFFFF;--cbf-dark:var(--cbf-azul-escuro);--cbf-gray-light:var(--cbf-azul-zebra);--cbf-gray-mid:var(--cbf-borda);--cbf-neg:var(--cbf-vermelho)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:var(--font-body);background:var(--cbf-page-bg);color:var(--cbf-valor);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--font-body);background:radial-gradient(circle at top left,rgba(255,220,2,.10),transparent 18%),linear-gradient(180deg,var(--cbf-page-bg-soft) 0%,var(--cbf-page-bg) 30%,#0F275B 100%);color:var(--cbf-valor);min-height:100vh;overflow-x:hidden}
 header{position:relative;overflow:hidden;background:var(--cbf-amarelo);border-bottom:1px solid var(--cbf-borda)}
 .hbg{position:absolute;inset:0;background:transparent}
 .hstripe{position:absolute;bottom:0;left:0;right:0;height:0;background:transparent}
@@ -83,20 +85,22 @@ body.inicio-fit #inicio.page.active .home-hero{height:100%;min-height:0}
 
 .pdf-btn{flex-shrink:0;margin-right:16px;padding:7px 16px;background:transparent;border:1px solid #FFFFFF;border-radius:4px;color:#FFFFFF;font-size:15px;font-weight:600;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
 .pdf-btn:hover{background:#FFFFFF;color:var(--cbf-azul-escuro)}
+.ppt-btn{flex-shrink:0;margin-right:16px;padding:7px 16px;background:transparent;border:1px solid #FFFFFF;border-radius:4px;color:#FFFFFF;font-size:15px;font-weight:600;letter-spacing:.5px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s}
+.ppt-btn:hover{background:#FFFFFF;color:var(--cbf-azul-escuro)}
 
-body,.main-container,.page-wrapper,#app,.main,.page{background-color:var(--cbf-page-bg) !important}
+body,.main-container,.page-wrapper,#app,.main,.page{background-color:transparent !important}
 
-.slabel,.ctitle,.section-title,.panel-title,.quadro-titulo,.tt{color:#0D2257 !important;font-weight:900 !important;letter-spacing:1px !important;text-transform:uppercase}
-.stitle{color:#FFFFFF !important;font-weight:900 !important;letter-spacing:1px !important;text-transform:uppercase}
+.slabel,.ctitle,.section-title,.panel-title,.quadro-titulo,.tt{color:var(--cbf-valor) !important;font-weight:900 !important;letter-spacing:1px !important;text-transform:uppercase}
+.stitle{color:#FFFFFF !important;font-weight:900 !important;letter-spacing:1px !important;text-transform:uppercase;text-shadow:0 4px 18px rgba(0,0,0,.22)}
 .slabel{font-size:12px !important}
 .stitle{font-size:clamp(29px,3.2vw,45px) !important;line-height:1.1}
-.csub,.ksub,.tx,.pl,.pv,.airole,.aiuse,.quadro-subtitulo,.section-subtitle{color:var(--cbf-label) !important}
+.csub,.ksub,.tx,.pl,.pv,.airole,.aiuse,.quadro-subtitulo,.section-subtitle{color:var(--cbf-muted) !important}
 [style*="color:var(--white)"],[style*="color:#fff"],[style*="color:#FAFAFA"],[style*="color:rgba(255,255,255"],[style*="color:#B0B0B0"]{color:var(--cbf-azul-escuro) !important}
 .insight [style*="color:var(--yellow)"],.aiuse [style*="color:var(--yellow)"],td [style*="color:var(--yellow)"],p [style*="color:var(--yellow)"]{color:var(--cbf-azul-escuro) !important}
 
-.kcard,.ccard,.aicard,.card,.kpi-card,.quadro,.panel,.section-box{background:var(--cbf-azul-claro) !important;border:1px solid var(--cbf-borda) !important;border-radius:10px !important;backdrop-filter:none !important}
-.kcard::before{background:linear-gradient(90deg,#7AAEE8,#D6E4F7) !important}
-.klabel,.ainame,td{color:var(--cbf-azul-escuro) !important}
+.kcard,.ccard,.aicard,.card,.kpi-card,.quadro,.panel,.section-box{background:linear-gradient(180deg,var(--cbf-surface) 0%,var(--cbf-surface-alt) 100%) !important;border:1px solid var(--cbf-borda) !important;border-radius:10px !important;backdrop-filter:none !important;box-shadow:0 18px 42px rgba(8,26,68,.14) !important}
+.kcard::before{background:linear-gradient(90deg,#1A4FBF,#8EBBED) !important}
+.klabel,.ainame,td{color:var(--cbf-valor) !important}
 .kval,.num,td.num{color:var(--cbf-azul-escuro) !important;font-weight:600 !important}
 .kdelta.up,.du,td.du{color:var(--cbf-verde) !important}
 .kdelta.dn,.dd,td.dd{color:var(--cbf-vermelho) !important}
@@ -105,12 +109,12 @@ body,.main-container,.page-wrapper,#app,.main,.page{background-color:var(--cbf-p
 table{width:100%;border-collapse:collapse;font-size:14px !important}
 table thead th,thead th,.table-header{background:#1A4FBF !important;color:#FFFFFF !important;font-weight:700 !important;border-bottom:1px solid var(--cbf-borda) !important;text-transform:uppercase;letter-spacing:1px}
 table thead th:nth-child(3){color:#FFDC02 !important}
-table tbody tr:nth-child(odd){background:var(--cbf-azul-zebra) !important}
-table tbody tr:nth-child(even){background:var(--cbf-azul-claro) !important}
+table tbody tr:nth-child(odd){background:#F8FBFF !important}
+table tbody tr:nth-child(even){background:#EDF4FF !important}
 table tbody td{color:#0D2257 !important;font-weight:400 !important;border-bottom:1px solid var(--cbf-borda) !important}
 table tbody td:nth-child(2){color:#0D2257 !important;font-weight:600 !important}
-table tbody td:nth-child(3){color:#5A7AAA !important;font-weight:400 !important}
-table tbody td:nth-child(4){color:#3A5080 !important;font-weight:600 !important}
+table tbody td:nth-child(3){color:#426394 !important;font-weight:500 !important}
+table tbody td:nth-child(4){color:#23457D !important;font-weight:700 !important}
 
 /* Ajustes apenas da aba Competições para encaixe sem scroll horizontal */
 #competicoes .competicoes-table-wrap{overflow:hidden !important;width:100% !important}
@@ -155,7 +159,7 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 #balanco .dre-row-total td.du,#balanco .dre-row-total td.dd{color:var(--cbf-azul-navy) !important}
 
 .insight,.aicard,.tx,.aiuse,.ph span,.pl,.pv,p,li{color:#0D2257 !important}
-.insight p,.aiuse,.tx{color:#3A5080 !important;font-weight:400 !important}
+.insight p,.aiuse,.tx{color:var(--cbf-muted) !important;font-weight:500 !important}
 .insight p strong,.aiuse strong,td strong,p strong,div strong,span strong{color:#0D2257 !important}
 #inicio .home-hero-content .home-sub{color:#FFFFFF !important;opacity:1 !important}
 #bp .stitle,#bp .stitle span{color:#FFFFFF !important}
@@ -163,13 +167,13 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 .receitas-dre-font *{font-family:var(--font-body) !important}
 .receitas-dre-font .num{font-family:var(--font-body) !important;font-weight:600 !important}
 .receitas-highlight-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
-.receitas-panel{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.10));border:1px solid rgba(176,200,232,.6);border-radius:14px;padding:14px;box-shadow:0 10px 20px rgba(13,34,87,.08)}
+.receitas-panel{background:linear-gradient(180deg,#F8FBFF,#EDF4FF);border:1px solid rgba(176,200,232,.8);border-radius:14px;padding:14px;box-shadow:0 12px 28px rgba(8,26,68,.12)}
 .receitas-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:2px 2px 10px;border-bottom:1px solid rgba(176,200,232,.55);margin-bottom:12px}
 .receitas-panel-title{font-size:14px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
 .receitas-panel-total{font-size:24px;font-weight:800;letter-spacing:.3px;color:var(--cbf-valor)}
 .receitas-panel-total.neg{color:var(--neg)}
 .receitas-panel-total.pos{color:var(--pos)}
-.receitas-item{background:rgba(255,255,255,.18);border:1px solid rgba(176,200,232,.45);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.receitas-item{background:rgba(255,255,255,.82);border:1px solid rgba(176,200,232,.65);border-radius:10px;padding:14px 16px;margin-bottom:10px}
 .receitas-item:last-child{margin-bottom:0}
 .receitas-item-main{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
 .receitas-item-name{font-size:17px;font-weight:800;line-height:1.15;color:var(--cbf-valor)}
@@ -194,7 +198,7 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 #balanco table.dre-clean tbody tr td{padding:11px 20px !important;border-bottom:1px solid #EEF4FC !important}
 #balanco table.dre-clean tbody tr td:first-child{color:#3A5080 !important;font-size:13px !important;font-weight:400 !important;text-align:left !important}
 #balanco table.dre-clean tbody tr td:nth-child(2){color:#0D2257 !important;font-size:13px !important;font-weight:600 !important;text-align:right !important}
-#balanco table.dre-clean tbody tr td:nth-child(3){color:#8AAAD4 !important;font-size:13px !important;font-weight:400 !important;text-align:right !important}
+#balanco table.dre-clean tbody tr td:nth-child(3){color:#4F71A6 !important;font-size:13px !important;font-weight:500 !important;text-align:right !important}
 #balanco table.dre-clean tbody tr td:nth-child(4){font-size:12px !important;font-weight:600 !important;text-align:right !important;color:var(--cbf-azul-navy) !important}
 #balanco table.dre-clean tbody tr td.du{color:var(--cbf-azul-navy) !important}
 #balanco table.dre-clean tbody tr td.dd{color:var(--cbf-azul-navy) !important}
@@ -270,7 +274,7 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 #bp table.dre-clean tbody tr td{padding:11px 20px !important;border-bottom:1px solid #EEF4FC !important;width:auto !important;min-width:0 !important}
 #bp table.dre-clean tbody tr td:first-child{color:#3A5080 !important;font-size:13px !important;font-weight:400 !important;text-align:left !important}
 #bp table.dre-clean tbody tr td:nth-child(2){color:#0D2257 !important;font-size:13px !important;font-weight:600 !important;text-align:right !important;width:120px !important;min-width:120px !important}
-#bp table.dre-clean tbody tr td:nth-child(3){color:#8AAAD4 !important;font-size:13px !important;font-weight:400 !important;text-align:right !important;width:120px !important;min-width:120px !important}
+#bp table.dre-clean tbody tr td:nth-child(3){color:#4F71A6 !important;font-size:13px !important;font-weight:500 !important;text-align:right !important;width:120px !important;min-width:120px !important}
 #bp table.dre-clean tbody tr.dre-header td{background:transparent !important;border-top:1px solid #D6E4F7 !important;border-bottom:1px solid #D6E4F7 !important;padding-top:10px !important;padding-bottom:10px !important;color:#0D2257 !important;font-size:12px !important;font-weight:700 !important;text-transform:uppercase !important;letter-spacing:.5px !important}
 #bp table.dre-clean tbody tr.dre-row-total td{background:#F0F5FF !important;border-top:1px solid #B0C8E8 !important;border-bottom:1px solid #B0C8E8 !important;padding-top:12px !important;padding-bottom:12px !important;color:#0D2257 !important;font-size:13px !important;font-weight:700 !important}
 #bp table.dre-clean tbody tr.dre-emphasis td{background:#0D2257 !important;padding-top:12px !important;padding-bottom:12px !important;border-top:4px solid #FFFFFF !important;border-bottom:4px solid #FFFFFF !important}
@@ -287,7 +291,7 @@ table tbody td[colspan]{text-align:left !important;padding-left:12px !important;
 #bp table.dre-clean.bp-unified tbody tr td.bp-divider{border-left:2px solid #D6E4F7 !important}
 #bp table.dre-clean.bp-unified tbody tr td:nth-child(4){color:#3A5080 !important;font-size:13px !important;font-weight:400 !important;text-align:left !important}
 #bp table.dre-clean.bp-unified tbody tr td:nth-child(5){color:#0D2257 !important;font-size:13px !important;font-weight:600 !important;text-align:right !important;width:120px !important;min-width:120px !important}
-#bp table.dre-clean.bp-unified tbody tr td:nth-child(6){color:#8AAAD4 !important;font-size:13px !important;font-weight:400 !important;text-align:right !important;width:120px !important;min-width:120px !important}
+#bp table.dre-clean.bp-unified tbody tr td:nth-child(6){color:#4F71A6 !important;font-size:13px !important;font-weight:500 !important;text-align:right !important;width:120px !important;min-width:120px !important}
 #bp table.dre-clean.bp-unified tbody tr.dre-header td.bp-empty-group{border:none !important;background:transparent !important}
 #bp table.dre-clean.bp-unified tbody tr.dre-row-total td:nth-child(4){color:#0D2257 !important;font-size:13px !important;font-weight:700 !important;text-align:left !important}
 #bp table.dre-clean.bp-unified tbody tr.dre-row-total td:nth-child(5),#bp table.dre-clean.bp-unified tbody tr.dre-row-total td:nth-child(6){color:#0D2257 !important}
@@ -337,7 +341,7 @@ footer p,.mono{color:#5A7AAA !important}
   nav{padding-right:0 !important}
   .ni{padding:0 8px !important;flex-wrap:nowrap !important;overflow-x:auto !important}
   .ntab{font-size:11px !important;padding:10px 10px !important;flex:0 0 auto !important}
-  .pdf-btn{width:calc(100% - 16px) !important;margin:8px !important;text-align:center !important}
+  .pdf-btn,.ppt-btn{display:none !important}
   .home-hero{min-height:430px !important}
   .home-hero-content{padding:24px 14px !important}
   .home-title{font-size:30px !important}
@@ -357,6 +361,29 @@ footer p,.mono{color:#5A7AAA !important}
   #competicoes .competicoes-table thead th,
   #competicoes .competicoes-table tbody td{white-space:nowrap !important;font-size:11px !important}
   footer{padding:18px 12px !important;flex-direction:column !important;text-align:center !important}
+  #historico .kgrid,#competicoes .kgrid{grid-template-columns:1fr !important}
+  .home-hero{min-height:320px !important}
+  .home-hero-image{background-size:cover !important;background-position:60% center !important}
+  .home-hero-left-gradient{background:linear-gradient(to right,#0D1E4A 50%,rgba(13,30,74,.85) 70%,rgba(13,30,74,.1) 100%) !important}
+  .std-table-wrap{overflow-x:auto !important}
+  .receitas-highlight-grid{grid-template-columns:1fr !important}
+}
+
+@media(max-width:480px){
+  .main{padding:14px 8px 60px !important}
+  .emblem,.emblem img{height:36px !important}
+  .htitles h1{font-size:10px !important}
+  .yr{font-size:18px !important}
+  .home-hero{min-height:240px !important}
+  .home-title{font-size:22px !important}
+  .home-sub{font-size:12px !important}
+  [style*="repeat(2,minmax"]{grid-template-columns:1fr !important}
+  [style*="repeat(3,minmax"]{grid-template-columns:1fr !important}
+  [style*="repeat(4,minmax"]{grid-template-columns:1fr !important}
+  [style*="repeat(5,minmax"]{grid-template-columns:1fr !important}
+  .kval{font-size:18px !important}
+  .cwrap canvas{min-width:280px !important}
+  .ntab{font-size:10px !important;padding:8px 7px !important}
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -372,7 +399,7 @@ footer p,.mono{color:#5A7AAA !important}
 .std-table tbody tr:hover{background:#F8FAFF !important;}
 .std-table tbody td{color:#0D2257 !important;font-size:13px !important;font-weight:600 !important;text-align:right !important;padding:11px 20px !important;border-bottom:1px solid #EEF4FC !important;width:auto !important;min-width:0 !important;}
 .std-table tbody td:first-child{color:#3A5080 !important;font-weight:400 !important;text-align:left !important;}
-.std-table.std-table--3col tbody td:nth-child(3){color:#8AAAD4 !important;font-weight:400 !important;}
+.std-table.std-table--3col tbody td:nth-child(3){color:#4F71A6 !important;font-weight:500 !important;}
 .std-table tbody td.du{color:#19AE47 !important;font-weight:600 !important;}
 .std-table tbody td.dd{color:#C0392B !important;font-weight:600 !important;}
 .std-table tbody tr.dre-header td{background:#F0F5FF !important;border-top:1px solid #B0C8E8 !important;border-bottom:1px solid #B0C8E8 !important;color:#0D2257 !important;font-size:13px !important;font-weight:700 !important;text-transform:uppercase !important;letter-spacing:.5px !important;padding:10px 20px !important;text-align:left !important;}
@@ -393,19 +420,20 @@ footer p,.mono{color:#5A7AAA !important}
 #balanco .std-table tbody tr.dre-emphasis td.dd{color:var(--cbf-azul-navy) !important;}
 
 /* ── PRINT / PDF STYLES ── */
-@page { size: A4 landscape; margin: 8mm 10mm; }
-@page portrait-only { size: A4 portrait; margin: 8mm 10mm; }
+@page { size: A4 landscape; margin: 6mm 8mm; }
 
 @media print {
-  @page          { size: A4 landscape; margin: 8mm 12mm; }
-  @page portrait { size: A4 portrait;  margin: 8mm 12mm; }
+  @page { size: A4 landscape; margin: 6mm 8mm; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: #0D1117 !important; background-color: #0D1117 !important; margin: 0 !important; padding: 0 !important; }
-  .sticky-chrome, nav, footer, .pdf-btn { display: none !important; }
+  .sticky-chrome, nav, footer, .pdf-btn, .ppt-btn { display: none !important; }
   .main { padding: 0 !important; margin: 0 auto !important; max-width: 100% !important; width: 100% !important; }
-  .page { display: block !important; width: 100% !important; padding: 10px 12px !important; margin: 0 !important; box-sizing: border-box !important; page-break-before: always !important; break-before: page !important; background: #0D1117 !important; background-color: #0D1117 !important; color: #FAFAFA !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .page { display: block !important; width: 100% !important; padding: 6px 8px !important; margin: 0 !important; box-sizing: border-box !important; page-break-before: always !important; break-before: page !important; background: #0D1117 !important; background-color: #0D1117 !important; color: #FAFAFA !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .page:first-of-type { page-break-before: avoid !important; break-before: avoid !important; }
-  .page.portrait { page: portrait; }
+  .page.portrait { page: auto !important; }
+  .stitle, .ctitle { break-after: avoid-page !important; page-break-after: avoid !important; }
+  .ccard, .kgrid, .insight, .std-table-wrap { break-inside: avoid-page !important; page-break-inside: avoid !important; }
+  p, li, td, th { orphans: 2; widows: 2; }
   .slabel { font-size: 8px !important; margin-bottom: 2px !important; }
   .stitle { font-size: 16px !important; margin-bottom: 6px !important; line-height: 1.1 !important; }
   .kgrid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important; gap: 5px !important; margin-bottom: 6px !important; width: 100% !important; }
@@ -419,8 +447,8 @@ footer p,.mono{color:#5A7AAA !important}
   .two, .cgrid, .c32 { display: grid !important; gap: 7px !important; width: 100% !important; box-sizing: border-box !important; }
   .two { grid-template-columns: 1fr 1fr !important; } .cgrid { grid-template-columns: 1fr 1fr !important; } .c32 { grid-template-columns: 2fr 1fr !important; }
   .cwrap { display: block !important; width: 100% !important; box-sizing: border-box !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  #overview  .cwrap { height: 150px !important; } #receitas .cwrap { height: 190px !important; } #despesas .cwrap { height: 160px !important; }
-  #bp .cwrap { height: 155px !important; } #indicadores .cwrap { height: 155px !important; } #historico .cwrap { height: 165px !important; }
+  #overview  .cwrap { height: 140px !important; } #receitas .cwrap { height: 178px !important; } #despesas .cwrap { height: 152px !important; }
+  #bp .cwrap { height: 148px !important; } #indicadores .cwrap { height: 148px !important; } #historico .cwrap { height: 158px !important; }
   .cwrap canvas { display: block !important; width: 100% !important; height: 100% !important; max-width: 100% !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   table { font-size: 9px !important; width: 100% !important; border-collapse: collapse !important; break-inside: avoid !important; }
   th { color: #B0B0B0 !important; font-size: 8px !important; padding: 3px 6px !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -432,8 +460,25 @@ footer p,.mono{color:#5A7AAA !important}
   .insight.warn { background: rgba(220,225,230,0.25) !important; border-left-color: rgba(220,225,230,0.5) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   .insight p { font-size: 8.5px !important; line-height: 1.4 !important; } .ilabel { font-size: 7.5px !important; margin-bottom: 2px !important; }
   #bp .kgrid { grid-template-columns: repeat(3,1fr) !important; } #bp .kval { font-size: 12px !important; }
+  #bp .cwrap { height: auto !important; min-height: 205px !important; }
+  #bp .cwrap > div[style*="width:280px"][style*="height:280px"] { width: 190px !important; height: 190px !important; max-width: 190px !important; }
+  #bp .cwrap > div[style*="width:280px"][style*="height:280px"] > canvas { width: 190px !important; height: 190px !important; }
   #indicadores .kgrid { grid-template-columns: repeat(3,1fr) !important; }
   #historico .cgrid { grid-template-columns: repeat(3,1fr) !important; }
+  #receitas .kgrid { gap: 8px !important; margin-bottom: 12px !important; }
+  #receitas .kcard { padding: 6px 7px !important; }
+  #receitas .kcard .kval { font-size: 12px !important; }
+  #receitas .ccard { padding: 6px 8px !important; margin-bottom: 5px !important; break-inside: auto !important; page-break-inside: auto !important; }
+  #receitas .ctitle { margin-bottom: 2px !important; }
+  #receitas .csub { margin-bottom: 4px !important; line-height: 1.35 !important; }
+  #receitas .cwrap { height: 168px !important; }
+  #receitas .insight { margin-top: 3px !important; padding: 4px 7px !important; }
+  #balanco .stitle { margin-bottom: 4px !important; }
+  #balanco .ccard { padding: 4px 7px !important; margin-bottom: 4px !important; }
+  #balanco table { font-size: 7.7px !important; line-height: 1.2 !important; }
+  #balanco th { padding: 2px 4px !important; font-size: 7.2px !important; }
+  #balanco td { padding: 2px 4px !important; }
+  #balanco .insight { margin-top: 2px !important; padding: 4px 6px !important; }
   #balanco table { font-size: 8px !important; } #balanco th { padding: 2px 5px !important; font-size: 7.5px !important; } #balanco td { padding: 3px 5px !important; } #balanco .ccard { padding: 5px 8px !important; } #balanco .insight p { font-size: 8px !important; }
   /* ── CRITICAL: disable backdrop-filter – Chrome/Edge renders it as opaque black in print ── */
   .kcard, .ccard, .aicard, nav, [style*="backdrop-filter"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
@@ -510,10 +555,15 @@ footer p,.mono{color:#5A7AAA !important}
     <button class="ntab" onclick="sp('indicadores')">Indicadores</button>
     <button class="ntab" onclick="sp('historico')">Série Histórica</button>
     <button class="ntab" onclick="sp('overview')">Resumo Executivo</button>
+    <button id="tab-usuarios" class="ntab" onclick="sp('usuarios')" style="display:none">Gestão de Usuários</button>
   </div>
   <button class="pdf-btn" title="Chrome/Edge: no diálogo de impressão, ative 'Gráficos de fundo' para preservar as cores" onclick="exportPDF()" title="No diálogo de impressão: ative Gráficos de fundo · desative Cabeçalhos e rodapés">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
     Exportar PDF
+  </button>
+  <button class="ppt-btn ppt-action" title="Exporta todas as telas para PowerPoint em modo paisagem" onclick="exportPPT(this)">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:-2px;margin-right:5px"><path d="M4 4h16v16H4z"/><path d="M8 8h5a3 3 0 0 1 0 6H8z"/><path d="M8 14v2"/><path d="M13 14l2 2"/></svg>
+    Exportar PPT
   </button>
 </nav>
 </div>
@@ -533,6 +583,7 @@ footer p,.mono{color:#5A7AAA !important}
       <div class="home-actions">
         <button class="home-btn-primary" onclick="sp('bp')">→ Acessar o Dashboard</button>
         <button class="home-btn-secondary" onclick="exportPDF()">↓ Exportar PDF</button>
+        <button class="home-btn-secondary ppt-action" data-export-ppt="true" onclick="exportPPT(this)">↓ Exportar PPT</button>
       </div>
     </div>
   </div>
@@ -604,6 +655,50 @@ footer p,.mono{color:#5A7AAA !important}
   </div>
 </div>
 
+<div id="usuarios" class="page landscape">
+  <div class="stitle">Gestão de Usuários</div>
+
+  <div class="ccard" style="margin-bottom:18px;">
+    <div class="ctitle" style="margin-bottom:8px;">Criar novo usuário</div>
+    <p class="csub" style="margin-bottom:14px;">Usuários criados aqui passam a acessar este dashboard imediatamente.</p>
+
+    <form id="users-create-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
+      <div>
+        <label style="display:block;font-size:12px;color:#3A5080;margin-bottom:6px;">Usuário</label>
+        <input id="users-create-username" type="text" style="width:100%;padding:11px 12px;border:1px solid #B0C8E8;border-radius:8px;background:#FFFFFF;color:#0D2257;" placeholder="ex: financeiro.cbf" required />
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;color:#3A5080;margin-bottom:6px;">Senha</label>
+        <input id="users-create-password" type="password" style="width:100%;padding:11px 12px;border:1px solid #B0C8E8;border-radius:8px;background:#FFFFFF;color:#0D2257;" required />
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;padding-bottom:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:8px;color:#0D2257;font-size:13px;font-weight:600;">
+          <input id="users-create-is-admin" type="checkbox" style="accent-color:#193375;" />
+          Administrador
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;color:#0D2257;font-size:13px;font-weight:600;">
+          <input id="users-create-is-active" type="checkbox" style="accent-color:#193375;" checked />
+          Ativo
+        </label>
+      </div>
+      <div>
+        <button type="submit" class="home-btn-primary" style="padding:11px 18px;width:100%;">Criar usuário</button>
+      </div>
+    </form>
+
+    <div id="users-admin-feedback" style="display:none;margin-top:12px;padding:10px 12px;border-radius:8px;border:1px solid #B0C8E8;background:#EEF4FC;color:#0D2257;font-size:12px;"></div>
+  </div>
+
+  <div class="ccard">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="ctitle">Usuários cadastrados</div>
+      <button id="users-reload-btn" type="button" class="home-btn-secondary" style="padding:9px 14px;">Atualizar lista</button>
+    </div>
+    <div id="users-list" style="display:grid;gap:12px;"></div>
+    <p id="users-empty" class="csub" style="display:none;">Nenhum usuário cadastrado.</p>
+  </div>
+</div>
+
 <!-- ═ RECEITAS ═ -->
 <div id="receitas" class="page landscape">
   <div class="stitle">Receitas</div>
@@ -611,28 +706,28 @@ footer p,.mono{color:#5A7AAA !important}
   <div class="kgrid" style="grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
     <div class="kcard">
       <div class="klabel">Direitos de Transmissão e Comerciais</div>
-      <div class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
-      <div class="kdelta dn">▼ −11,9%</div>
+      <div id="rv-transm" class="kval" style="font-size:28px;">R$ 637,9 Mi</div>
+      <div id="rd-transm" class="kdelta dn">▼ −11,9%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Patrocínios</div>
-      <div class="kval" style="font-size:28px;">R$ 437,9 Mi</div>
-      <div class="kdelta dn">▼ −3,0%</div>
+      <div id="rv-patroc" class="kval" style="font-size:28px;">R$ 437,9 Mi</div>
+      <div id="rd-patroc" class="kdelta dn">▼ −3,0%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Bilheteria e Premiações</div>
-      <div class="kval" style="font-size:28px;">R$ 54,8 Mi</div>
-      <div class="kdelta dn">▼ −18,1%</div>
+      <div id="rv-bilh" class="kval" style="font-size:28px;">R$ 54,8 Mi</div>
+      <div id="rd-bilh" class="kdelta dn">▼ −18,1%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Registros e Transferências</div>
-      <div class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
-      <div class="kdelta up">▲ +32,9%</div>
+      <div id="rv-reg" class="kval" style="font-size:28px;">R$ 51,0 Mi</div>
+      <div id="rd-reg" class="kdelta up">▲ +32,9%</div>
     </div>
     <div class="kcard">
       <div class="klabel">Prog. Desenvolvimento + Academy</div>
-      <div class="kval" style="font-size:28px;">R$ 11,6 Mi</div>
-      <div class="kdelta dn">▼ −46%</div>
+      <div id="rv-prog" class="kval" style="font-size:28px;">R$ 11,6 Mi</div>
+      <div id="rd-prog" class="kdelta dn">▼ −46%</div>
     </div>
   </div>
 
@@ -1800,12 +1895,14 @@ footer p,.mono{color:#5A7AAA !important}
 
 <script>
 function sp(id) {
+  if (id === 'usuarios' && !window.__CBF_CAN_MANAGE_USERS__) return;
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
   const el = document.getElementById(id);
   if (!el) return;
   el.classList.add('active');
-  const ids = ['inicio','bp','balanco','receitas','despesas','competicoes','indicadores','historico','overview'];
+  const ids = ['inicio','bp','balanco','receitas','despesas','competicoes','indicadores','historico','overview','usuarios'];
   const tabIdx = ids.indexOf(id);
   if (tabIdx >= 0) document.querySelectorAll('.ntab')[tabIdx].classList.add('active');
   document.body.classList.toggle('inicio-fit', id === 'inicio');
@@ -1822,13 +1919,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Sticky chrome handled by CSS wrapper
 
-Chart.defaults.color = '#3A5080';
-Chart.defaults.borderColor = '#B0C8E8';
+Chart.defaults.color = '#294774';
+Chart.defaults.borderColor = '#CAD8EC';
 Chart.defaults.font.family = "'DM Sans', sans-serif";
 Chart.defaults.font.size = 11;
 Chart.defaults.responsive = true;
   Chart.defaults.maintainAspectRatio = false;
-  Chart.defaults.plugins.legend.labels.color = '#0D2257';
+  Chart.defaults.plugins.legend.labels.color = '#17356F';
 Chart.defaults.plugins.legend.labels.boxWidth = 12;
 Chart.defaults.plugins.legend.labels.font = {size:11};
 
@@ -1855,7 +1952,7 @@ function normalizeChartConfig(cfg){
   ['x','y','r'].forEach(axis => {
     if (!scales[axis]) return;
     const axisCfg = scales[axis];
-    axisCfg.ticks = Object.assign({}, axisCfg.ticks || {}, {color:'#3A5080', font:Object.assign({}, (axisCfg.ticks||{}).font || {}, {size:11})});
+    axisCfg.ticks = Object.assign({}, axisCfg.ticks || {}, {color:'#294774', font:Object.assign({}, (axisCfg.ticks||{}).font || {}, {size:11})});
     axisCfg.grid = Object.assign({}, axisCfg.grid || {}, {color:'rgba(176, 200, 232, 0.4)', borderDash:[4,4]});
   });
 
@@ -1959,8 +2056,8 @@ function safeChart(id, cfg) {
 
 
   // Force Version 4 text and grid colors on all chart elements
-  Chart.defaults.color = '#3A5080';
-  Chart.defaults.borderColor = '#B0C8E8';
+  Chart.defaults.color = '#294774';
+  Chart.defaults.borderColor = '#CAD8EC';
 
 
 // ══════════════════════════════════════════════════════
@@ -2095,6 +2192,30 @@ function _atualizarKPIs() {
   if (el('kv-rec-fin'))     el('kv-rec-fin').textContent     = _fmtMi(_D.rec_financeiras);
   if (el('ks-fonte'))       el('ks-fonte').textContent       = `Fonte: ${_D.source_file || 'DFS CBF'} · ${periodo}`;
 
+  // Cards de Receitas — atualização via Supabase
+  const _fmtRecMi = (v) => Number.isFinite(v) ? 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' Mi' : null;
+  const _deltaRec = (cur, prv) => {
+    if (!Number.isFinite(cur) || !Number.isFinite(prv) || prv === 0) return null;
+    const pct = (cur - prv) / Math.abs(prv) * 100;
+    const r = +pct.toFixed(1);
+    return { text: (r >= 0 ? '+' : '') + String(r).replace('.', ',') + '%', isUp: r >= 0 };
+  };
+  const _REC_PRV = [724, 451, 67, 38, 21.5]; // 2024 Mi: transmissão, patrocínio, bilheteria, registros, prog+acad
+  const _REC_CUR = [_D.rec_transmissao_mi, _D.rec_patrocinio_mi, _D.rec_bilheteria_mi, _D.rec_registros_mi, _D.rec_progacademy_mi];
+  const _REC_VIDS = ['rv-transm','rv-patroc','rv-bilh','rv-reg','rv-prog'];
+  const _REC_DIDS = ['rd-transm','rd-patroc','rd-bilh','rd-reg','rd-prog'];
+  _REC_CUR.forEach((cur, i) => {
+    const txt = _fmtRecMi(cur);
+    if (txt && el(_REC_VIDS[i])) el(_REC_VIDS[i]).textContent = txt;
+    const delta = _deltaRec(cur, _REC_PRV[i]);
+    const dEl = el(_REC_DIDS[i]);
+    if (delta && dEl) {
+      dEl.classList.remove('up', 'dn');
+      dEl.classList.add(delta.isUp ? 'up' : 'dn');
+      dEl.textContent = (delta.isUp ? '▲ ' : '▼ ') + delta.text;
+    }
+  });
+
   // Atualizar título do header
   const hTitle = document.querySelector('.htitles p');
   if (hTitle && _D.source_file) {
@@ -2184,7 +2305,7 @@ function initCharts() {
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
-      legend:{position:'bottom',labels:{color:'#ffffff',boxWidth:10}},
+      legend:{position:'bottom',labels:{color:'#17356F',boxWidth:10}},
       tooltip:{callbacks:{
         label:function(ctx){
           const v2025=[638,438,55,51]; const v2024=[724,451,67,38];
@@ -2193,7 +2314,7 @@ function initCharts() {
         }
       }}
     },
-    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
+    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
   // c8 - Seleções e Fomento 2025-2024
   safeChart('c8', {type:'bar', data:{
@@ -2204,7 +2325,7 @@ function initCharts() {
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
-      legend:{position:'bottom',labels:{color:'#ffffff',boxWidth:10}},
+      legend:{position:'bottom',labels:{color:'#17356F',boxWidth:10}},
       tooltip:{callbacks:{
         label:function(ctx){
           const v2025=[281,45,94,757]; const v2024=[201,27,116,731];
@@ -2213,7 +2334,7 @@ function initCharts() {
         }
       }}
     },
-    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
+    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
   // c11 - Série histórica receita 2021-2025 real
   safeChart('c11', {type:'bar', data:{
@@ -2233,7 +2354,7 @@ function initCharts() {
       {label:'Despesas (R$Mi)', data:GD.hist_despesas, borderColor:'#003DA5', pointBackgroundColor:'#003DA5', backgroundColor:'transparent', tension:.4, pointRadius:5, borderWidth:2},
       {label:'Resultado (R$Mi)', data:GD.hist_resultado, borderColor:'#ffffff', pointBackgroundColor:'#ffffff', backgroundColor:'transparent', tension:.4, pointRadius:5, borderWidth:2}
     ]
-  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}}}});
+  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#17356F', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>v+'Mi'}}}}});
 
   // ── BALANÇO PATRIMONIAL ──
   safeChart('cbp1', {type:'doughnut', data:{
@@ -2295,7 +2416,7 @@ function initCharts() {
       {label:'2025', data:[58.195,369.076,11.083,438.354], backgroundColor:'#C0392B', borderRadius:5},
       {label:'2024', data:[50.344,145.822,12.125,208.291], backgroundColor:'#009C3B', borderRadius:4}
     ]
-  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
+  }, options:{maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{color:'#17356F', boxWidth:10}}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
   // ── ORÇADO X REALIZADO ──
   safeChart('corc1', {type:'bar', data:{
@@ -2307,7 +2428,7 @@ function initCharts() {
     ]
   }, options:{maintainAspectRatio:false,
     plugins:{
-      legend:{position:'bottom', labels:{color:'#ffffff', boxWidth:10}},
+      legend:{position:'bottom', labels:{color:'#17356F', boxWidth:10}},
       tooltip:{callbacks:{label:function(ctx){
         const orc=[1685,1037,244,223,181]; const real=[1539,1177,460,84,-182];
         const i=ctx.dataIndex;
@@ -2315,7 +2436,7 @@ function initCharts() {
         return ' R$ '+ctx.parsed.y+' Mi'+(ctx.datasetIndex===1?' ('+pct+'% vs orçado)':'');
       }}}
     },
-    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
+    scales:{x:{grid:{display:false}}, y:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>'R$'+v+'Mi'}}}}});
 
   safeChart('corc2', {type:'bar', data:{
     labels:['Transmissão','Patrocínios','Bilheteria','Registros','Rec. Financeira'],
@@ -2330,7 +2451,7 @@ function initCharts() {
         return ' R$ '+ctx.parsed.x+' Mi ('+pct+'% do orçado)';
       }}}
     },
-    scales:{x:{grid:{color:'rgba(255,255,255,.05)'}, ticks:{callback:v=>v+'Mi'}}, y:{grid:{display:false}}}}});
+    scales:{x:{grid:{color:'rgba(13,34,87,.12)'}, ticks:{callback:v=>v+'Mi'}}, y:{grid:{display:false}}}}});
 }
 
 async function exportPDF() {
@@ -2338,6 +2459,32 @@ async function exportPDF() {
   const origHTML = btn.innerHTML;
   btn.innerHTML = '⏳ Gerando PDF...';
   btn.disabled = true;
+
+  const orderedTabIds = Array.from(document.querySelectorAll('nav .ntab'))
+    .filter((tab) => getComputedStyle(tab).display !== 'none' && getComputedStyle(tab).visibility !== 'hidden')
+    .map((tab) => tab.getAttribute('onclick')?.match(/sp\('([^']+)'\)/)?.[1])
+    .filter(Boolean);
+
+  const mainEl = document.querySelector('main.main');
+  const pagesById = new Map(Array.from(document.querySelectorAll('.page')).map((page) => [page.id, page]));
+  const originalOrder = Array.from(pagesById.keys());
+
+  if (mainEl && orderedTabIds.length) {
+    const used = new Set();
+    orderedTabIds.forEach((id) => {
+      const page = pagesById.get(id);
+      if (page) {
+        mainEl.appendChild(page);
+        used.add(id);
+      }
+    });
+    originalOrder.forEach((id) => {
+      if (!used.has(id)) {
+        const page = pagesById.get(id);
+        if (page) mainEl.appendChild(page);
+      }
+    });
+  }
 
   const pages = document.querySelectorAll('.page');
   pages.forEach(p => { p.style.display = 'block'; });
@@ -2393,7 +2540,11 @@ async function exportPDF() {
   printStyle.id = '__cbf_print_fix__';
   printStyle.textContent = `
     @media print {
+      @page { size: A4 landscape; margin: 6mm 8mm; }
       html, body, .main { background: #0D1117 !important; }
+      .page, .page.portrait { page: auto !important; }
+      .stitle, .ctitle { break-after: avoid-page !important; page-break-after: avoid !important; }
+      .ccard, .kgrid, .insight, .std-table-wrap { break-inside: avoid-page !important; page-break-inside: avoid !important; }
       /* Disable backdrop-filter – Chrome/Edge renders it as opaque black overlay */
       *, *::before, *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
       .page {
@@ -2435,6 +2586,12 @@ async function exportPDF() {
           if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
           else cw.removeAttribute('style');
         });
+        if (mainEl) {
+          originalOrder.forEach((id) => {
+            const page = pagesById.get(id);
+            if (page) mainEl.appendChild(page);
+          });
+        }
         const activeId = document.querySelector('.ntab.active')
           ?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1] || 'overview';
         pages.forEach(p => { p.style.display = (p.id === activeId) ? 'block' : ''; });
@@ -2446,6 +2603,357 @@ async function exportPDF() {
       }, 1000);
     }, 600);
   }, 2500);
+}
+
+async function exportPPT(triggerBtn) {
+  if (typeof html2canvas === 'undefined' || typeof PptxGenJS === 'undefined') {
+    alert('Bibliotecas de exportação de PPT não carregadas. Recarregue a página e tente novamente.');
+    return;
+  }
+
+  const buttons = Array.from(document.querySelectorAll('.ppt-action'));
+  const btn = triggerBtn || buttons[0] || null;
+  const origHTML = btn ? btn.innerHTML : '';
+  buttons.forEach((button) => { button.disabled = true; });
+  if (btn) btn.innerHTML = '⏳ Gerando PPT...';
+
+  const orderedTabIds = Array.from(document.querySelectorAll('nav .ntab'))
+    .filter((tab) => getComputedStyle(tab).display !== 'none' && getComputedStyle(tab).visibility !== 'hidden')
+    .map((tab) => tab.getAttribute('onclick')?.match(/sp\('([^']+)'\)/)?.[1])
+    .filter(Boolean);
+
+  const tabLabels = new Map(
+    Array.from(document.querySelectorAll('nav .ntab')).map((tab) => [
+      tab.getAttribute('onclick')?.match(/sp\('([^']+)'\)/)?.[1],
+      (tab.textContent || '').trim()
+    ])
+  );
+
+  const mainEl = document.querySelector('main.main');
+  const pagesById = new Map(Array.from(document.querySelectorAll('.page')).map((page) => [page.id, page]));
+  const originalOrder = Array.from(pagesById.keys());
+  const originalActiveIds = Array.from(document.querySelectorAll('.page.active')).map((page) => page.id);
+
+  if (mainEl && orderedTabIds.length) {
+    const used = new Set();
+    orderedTabIds.forEach((id) => {
+      const page = pagesById.get(id);
+      if (page) {
+        mainEl.appendChild(page);
+        used.add(id);
+      }
+    });
+    originalOrder.forEach((id) => {
+      if (!used.has(id)) {
+        const page = pagesById.get(id);
+        if (page) mainEl.appendChild(page);
+      }
+    });
+  }
+
+  const pages = Array.from(document.querySelectorAll('.page'));
+  pages.forEach((page) => {
+    page.style.display = 'block';
+    page.classList.add('active');
+  });
+
+  const _fixed = [];
+  document.querySelectorAll('[style]').forEach((el) => {
+    const orig = el.getAttribute('style') || '';
+    const patch = {};
+    if (/display\s*:\s*flex/.test(orig) || /grid-template-columns/.test(orig)) { patch.width = '100%'; patch.boxSizing = 'border-box'; }
+    if (/flex-shrink\s*:\s*0/.test(orig)) patch.flexShrink = '1';
+    if (/min-width\s*:\s*240px/.test(orig)) { patch.minWidth = '0'; patch.flex = '1'; }
+    if (/gap\s*:\s*32px/.test(orig)) patch.gap = '8px';
+    if (/font-size\s*:\s*56px/.test(orig)) patch.fontSize = '26px';
+    if (/font-size\s*:\s*80px/.test(orig)) patch.fontSize = '32px';
+    if (/font-size\s*:\s*70px/.test(orig)) patch.fontSize = '30px';
+    if (Object.keys(patch).length) { Object.assign(el.style, patch); _fixed.push({ el, orig }); }
+  });
+
+  const cwraps = document.querySelectorAll('.cwrap');
+  const origWrapStyles = [];
+  cwraps.forEach((cw, i) => {
+    origWrapStyles[i] = cw.getAttribute('style') || '';
+    cw.style.display = 'block';
+  });
+
+  const _blurFixed = [];
+  document.querySelectorAll('.kcard, .ccard, .aicard, nav, [style*="backdrop-filter"]').forEach((el) => {
+    const origStyle = el.getAttribute('style') || '';
+    _blurFixed.push({ el, origStyle });
+    el.style.backdropFilter = 'none';
+    el.style.webkitBackdropFilter = 'none';
+  });
+
+  const captureStyle = document.createElement('style');
+  captureStyle.id = '__cbf_ppt_fix__';
+  captureStyle.textContent = `
+    html, body, .main {
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+    }
+    .page {
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+      color: #081A44 !important;
+    }
+    .kcard, .ccard, .aicard {
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+      box-shadow: none !important;
+    }
+    .insight, .insight.warn {
+      background: #EEF4FC !important;
+      background-color: #EEF4FC !important;
+      border: 1px solid #D6E4F7 !important;
+    }
+    .stitle, .slabel, .ctitle, .csub, .klabel, .kval, .ksub, .tx, .pl, .pv,
+    table th, table td, .insight p, .insight .ilabel, .tt {
+      color: #0D2257 !important;
+    }
+    canvas {
+      background: #FFFFFF !important;
+      background-color: #FFFFFF !important;
+    }
+    *, *::before, *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+  `;
+  document.head.appendChild(captureStyle);
+
+  function paintBg() {
+    document.querySelectorAll('canvas').forEach((cv) => {
+      if (!cv.width || !cv.height) return;
+      const ctx2 = cv.getContext('2d');
+      if (!ctx2) return;
+      ctx2.save();
+      ctx2.globalCompositeOperation = 'destination-over';
+      ctx2.fillStyle = '#FFFFFF';
+      ctx2.fillRect(0, 0, cv.width, cv.height);
+      ctx2.restore();
+    });
+  }
+
+  function canvasSliceToDataUrl(sourceCanvas, top, height) {
+    const sliceCanvas = document.createElement('canvas');
+    sliceCanvas.width = sourceCanvas.width;
+    sliceCanvas.height = height;
+    const sliceCtx = sliceCanvas.getContext('2d');
+    if (!sliceCtx) return sourceCanvas.toDataURL('image/png');
+    sliceCtx.fillStyle = '#FFFFFF';
+    sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+    sliceCtx.drawImage(
+      sourceCanvas,
+      0,
+      top,
+      sourceCanvas.width,
+      height,
+      0,
+      0,
+      sourceCanvas.width,
+      height
+    );
+    return sliceCanvas.toDataURL('image/png');
+  }
+
+  function getChartSafeRanges(page, canvasHeight) {
+    const pageRect = page.getBoundingClientRect();
+    const pageHeightCss = Math.max(page.scrollHeight, Math.round(pageRect.height), 1);
+    const scaleY = canvasHeight / pageHeightCss;
+    const blocks = new Set();
+
+    page.querySelectorAll('.cwrap, canvas').forEach((el) => {
+      const block = el.closest('.ccard') || el.closest('.kcard') || el;
+      blocks.add(block);
+    });
+
+    const ranges = [];
+    blocks.forEach((block) => {
+      const rect = block.getBoundingClientRect();
+      const topCss = Math.max(0, rect.top - pageRect.top);
+      const bottomCss = Math.min(pageHeightCss, rect.bottom - pageRect.top);
+      if (bottomCss - topCss < 20) return;
+      const padCss = 8;
+      const start = Math.max(0, Math.floor((topCss - padCss) * scaleY));
+      const end = Math.min(canvasHeight, Math.ceil((bottomCss + padCss) * scaleY));
+      ranges.push([start, end]);
+    });
+
+    ranges.sort((a, b) => a[0] - b[0]);
+    const merged = [];
+    for (const range of ranges) {
+      if (!merged.length || range[0] > merged[merged.length - 1][1]) {
+        merged.push(range.slice());
+      } else {
+        merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], range[1]);
+      }
+    }
+
+    return merged;
+  }
+
+  try {
+    done.clear();
+    Object.keys(chartInstances).forEach((id) => { try { chartInstances[id].destroy(); } catch (e) {} delete chartInstances[id]; });
+    initCharts();
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    paintBg();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE';
+    pptx.author = 'GitHub Copilot';
+    pptx.company = 'CBF';
+    pptx.subject = 'Dashboard financeiro';
+    pptx.title = 'CBF Dashboard';
+    pptx.lang = 'pt-BR';
+
+    const slideW = 13.333;
+    const slideH = 7.5;
+    const marginX = 0.25;
+    const headerY = 0.18;
+    const imageY = 0.7;
+    const usableW = slideW - (marginX * 2);
+    const usableH = slideH - imageY - 0.3;
+    const targetAspect = usableW / usableH;
+
+    for (const id of orderedTabIds) {
+      const page = pagesById.get(id);
+      if (!page) continue;
+
+      const canvas = await html2canvas(page, {
+        backgroundColor: '#FFFFFF',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        windowWidth: Math.max(document.documentElement.clientWidth, page.scrollWidth, 1400),
+        windowHeight: Math.max(document.documentElement.clientHeight, page.scrollHeight, 900)
+      });
+
+      const title = tabLabels.get(id) || page.querySelector('.stitle')?.textContent?.trim() || id;
+      const maxSliceHeight = Math.max(1, Math.floor(canvas.width / targetAspect));
+      const minSliceHeight = Math.max(360, Math.floor(maxSliceHeight * 0.45));
+      const chartSafeRanges = getChartSafeRanges(page, canvas.height);
+      const slices = [];
+      let offset = 0;
+
+      while (offset < canvas.height) {
+        const remaining = canvas.height - offset;
+        if (remaining <= maxSliceHeight) {
+          slices.push({ top: offset, height: remaining });
+          break;
+        }
+
+        let cut = offset + maxSliceHeight;
+        let guard = 0;
+
+        while (guard < 10) {
+          guard += 1;
+          const conflict = chartSafeRanges.find(([start, end]) => cut > start && cut < end);
+          if (!conflict) break;
+
+          const [start, end] = conflict;
+          if (start - offset >= minSliceHeight) {
+            cut = start;
+          } else {
+            cut = Math.min(canvas.height, end);
+          }
+        }
+
+        if (cut <= offset) {
+          cut = Math.min(canvas.height, offset + maxSliceHeight);
+        }
+
+        slices.push({ top: offset, height: cut - offset });
+        offset = cut;
+      }
+
+      slices.forEach((slice, index) => {
+        const imgData = canvasSliceToDataUrl(canvas, slice.top, slice.height);
+        const slide = pptx.addSlide();
+        slide.background = { color: 'FFFFFF' };
+
+        slide.addText(title, {
+          x: marginX,
+          y: headerY,
+          w: usableW - 1.4,
+          h: 0.28,
+          fontFace: 'Arial',
+          fontSize: 18,
+          bold: true,
+          color: '0D2257',
+          margin: 0
+        });
+
+        if (slices.length > 1) {
+          slide.addText(`Parte ${index + 1}/${slices.length}`, {
+            x: slideW - marginX - 1.2,
+            y: headerY + 0.02,
+            w: 1.2,
+            h: 0.22,
+            align: 'right',
+            fontFace: 'Arial',
+            fontSize: 9,
+            color: '5A7AAA',
+            margin: 0
+          });
+        }
+
+        slide.addShape(pptx.ShapeType.line, {
+          x: marginX,
+          y: 0.5,
+          w: usableW,
+          h: 0,
+          line: { color: 'D6E4F7', width: 1 }
+        });
+
+        const imageHeight = Math.min(usableH, usableW * (slice.height / canvas.width));
+        slide.addImage({
+          data: imgData,
+          x: marginX,
+          y: imageY,
+          w: usableW,
+          h: imageHeight
+        });
+      });
+    }
+
+    await pptx.writeFile({ fileName: `CBF_Dashboard_${new Date().toISOString().slice(0, 10)}.pptx` });
+  } finally {
+    const s = document.getElementById('__cbf_ppt_fix__');
+    if (s) s.remove();
+    _blurFixed.forEach(({ el, origStyle }) => {
+      if (origStyle) el.setAttribute('style', origStyle);
+      else el.removeAttribute('style');
+    });
+    _fixed.forEach(({ el, orig }) => el.setAttribute('style', orig));
+    cwraps.forEach((cw, i) => {
+      if (origWrapStyles[i]) cw.setAttribute('style', origWrapStyles[i]);
+      else cw.removeAttribute('style');
+    });
+    pages.forEach((page) => {
+      page.classList.toggle('active', originalActiveIds.includes(page.id));
+    });
+    if (mainEl) {
+      originalOrder.forEach((id) => {
+        const page = pagesById.get(id);
+        if (page) mainEl.appendChild(page);
+      });
+    }
+    const activeId = document.querySelector('.ntab.active')?.getAttribute('onclick')?.match(/'(\w+)'/)?.[1]
+      || originalActiveIds[0]
+      || 'overview';
+    pages.forEach((page) => { page.style.display = page.id === activeId ? 'block' : ''; });
+    document.body.classList.toggle('inicio-fit', activeId === 'inicio');
+    done.clear();
+    Object.keys(chartInstances).forEach((id) => { try { chartInstances[id].destroy(); } catch (e) {} delete chartInstances[id]; });
+    initCharts();
+    buttons.forEach((button) => { button.disabled = false; });
+    if (btn) btn.innerHTML = origHTML;
+  }
 }
 initCharts();
 </script>
@@ -2578,6 +3086,11 @@ initCharts();
         Math.round(Math.abs(+d.rec_registros) / 1000),
         Math.round((Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000),
       ],
+      rec_transmissao_mi:  Math.abs(+d.rec_transmissao) / 1000,
+      rec_patrocinio_mi:   Math.abs(+d.rec_patrocinio) / 1000,
+      rec_bilheteria_mi:   Math.abs(+d.rec_bilheteria) / 1000,
+      rec_registros_mi:    Math.abs(+d.rec_registros) / 1000,
+      rec_progacademy_mi:  (Math.abs(+d.rec_desenvolvimento) + Math.abs(+d.rec_academy)) / 1000,
       custos_composicao: [
         Math.round(Math.abs(+d.custo_fomento) / 1000),
         Math.round(Math.abs(+d.custo_selecao_principal) / 1000),
@@ -2678,40 +3191,308 @@ initCharts();
 -->
 
 <script>
-// ═ LOGIN SYSTEM ═
+// ═ LOGIN + GESTAO DE USUARIOS ═
 (function(){
-  const CREDENTIALS = {
+  const BASE_CREDENTIALS = {
     'cbf': 'cbf2025',
     'admin': 'dashboard2025',
     'valdecir.souza': 'cbf@123',
     'antonio.junior': 'cbf@123',
     'luiz.gomes': 'cbf@123'
   };
-  const SESSION_KEY = 'cbf_dashboard_auth';
+  const DEFAULT_ADMINS = ['admin', 'antonio.junior', 'luiz.gomes'];
 
-  function isAuthenticated() {
-    return sessionStorage.getItem(SESSION_KEY) === 'true';
+  const SESSION_KEY = 'cbf_dashboard_auth';
+  const SESSION_USER_KEY = 'cbf_dashboard_auth_user';
+  const USERS_STORAGE_KEY = 'cbf_dashboard_users';
+
+  window.__CBF_CAN_MANAGE_USERS__ = false;
+
+  function normalizeUser(value) {
+    return String(value || '').trim().toLowerCase();
   }
 
-  function showDashboard() {
+  function nowIso() {
+    return new Date().toISOString();
+  }
+
+  function defaultUsers() {
+    const timestamp = nowIso();
+    return Object.keys(BASE_CREDENTIALS).map((username) => ({
+      id: 'base_' + username.replace(/[^a-z0-9_.-]/gi, '_'),
+      username,
+      password: BASE_CREDENTIALS[username],
+      is_admin: DEFAULT_ADMINS.includes(username),
+      is_active: true,
+      source: 'base',
+      created_at: timestamp,
+      updated_at: timestamp
+    }));
+  }
+
+  function loadManagedUsers() {
+    let stored = [];
+    try {
+      stored = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+    } catch (_err) {
+      stored = [];
+    }
+    const normalizedStored = Array.isArray(stored)
+      ? stored
+          .map((item) => ({
+            id: String(item.id || ('local_' + Math.random().toString(36).slice(2))),
+            username: normalizeUser(item.username),
+            password: String(item.password || ''),
+            is_admin: !!item.is_admin,
+            is_active: item.is_active !== false,
+            source: 'local',
+            created_at: item.created_at || nowIso(),
+            updated_at: item.updated_at || nowIso()
+          }))
+          .filter((item) => item.username && item.password)
+      : [];
+
+    const byUser = new Map();
+    defaultUsers().forEach((user) => byUser.set(user.username, user));
+    normalizedStored.forEach((user) => byUser.set(user.username, user));
+
+    return Array.from(byUser.values()).sort((a, b) => a.username.localeCompare(b.username));
+  }
+
+  function persistLocalUsers(users) {
+    const onlyLocal = users.filter((u) => u.source === 'local');
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(onlyLocal));
+  }
+
+  function getUserByCredentials(username, password) {
+    const user = normalizeUser(username);
+    const pass = String(password || '');
+    return loadManagedUsers().find((item) => item.username === user && item.password === pass && item.is_active);
+  }
+
+  function isAuthenticated() {
+    return sessionStorage.getItem(SESSION_KEY) === 'true' && !!sessionStorage.getItem(SESSION_USER_KEY);
+  }
+
+  function activeUser() {
+    const user = normalizeUser(sessionStorage.getItem(SESSION_USER_KEY));
+    if (!user) return null;
+    return loadManagedUsers().find((item) => item.username === user && item.is_active) || null;
+  }
+
+  function setUsersTabVisibility(canManage) {
+    const tab = document.getElementById('tab-usuarios');
+    if (!tab) return;
+    tab.style.display = canManage ? '' : 'none';
+  }
+
+  function showFeedback(message, type) {
+    const box = document.getElementById('users-admin-feedback');
+    if (!box) return;
+    if (!message) {
+      box.style.display = 'none';
+      box.textContent = '';
+      return;
+    }
+    box.style.display = 'block';
+    box.textContent = message;
+    box.style.borderColor = type === 'error' ? '#C0392B' : '#19AE47';
+    box.style.background = type === 'error' ? 'rgba(192,57,43,.08)' : 'rgba(25,174,71,.08)';
+  }
+
+  function showDashboard(userProfile) {
+    const profile = userProfile || activeUser();
+    const canManageUsers = !!(profile && profile.is_admin);
+
+    window.__CBF_CAN_MANAGE_USERS__ = canManageUsers;
+    setUsersTabVisibility(canManageUsers);
+
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('dashboard-content').style.display = 'block';
     sessionStorage.setItem(SESSION_KEY, 'true');
+    if (profile) sessionStorage.setItem(SESSION_USER_KEY, profile.username);
+
+    if (!canManageUsers) {
+      if (document.getElementById('usuarios') && document.getElementById('usuarios').classList.contains('active')) {
+        sp('inicio');
+      }
+    } else {
+      renderUsers();
+    }
+
     if (typeof done !== 'undefined') done.clear();
     if (typeof initCharts === 'function') setTimeout(initCharts, 100);
   }
 
+  function renderUsers() {
+    const list = document.getElementById('users-list');
+    const empty = document.getElementById('users-empty');
+    if (!list || !empty) return;
+
+    const users = loadManagedUsers();
+    if (!users.length) {
+      list.innerHTML = '';
+      empty.style.display = '';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = users.map((user) => {
+      const roleText = user.is_admin ? 'Administrador' : 'Usuário padrão';
+      const statusText = user.is_active ? 'Ativo' : 'Inativo';
+      const sourceBadge = user.source === 'base' ? '<span style="font-size:10px;border:1px solid #B0C8E8;border-radius:999px;padding:2px 8px;color:#3A5080;">Base</span>' : '<span style="font-size:10px;border:1px solid #1A4FBF;border-radius:999px;padding:2px 8px;color:#1A4FBF;">Local</span>';
+      const disableDelete = user.source === 'base' ? 'disabled' : '';
+      const disableDeleteStyle = user.source === 'base' ? 'opacity:.45;cursor:not-allowed;' : '';
+      return '<div style="border:1px solid #D6E4F7;border-radius:12px;padding:14px;background:#F9FBFE;">'
+        + '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">'
+        +   '<div style="font-size:15px;font-weight:700;color:#0D2257;">' + user.username + '</div>'
+        +   '<div style="display:flex;gap:6px;align-items:center;">' + sourceBadge + '</div>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;align-items:center;">'
+        +   '<div style="font-size:12px;color:#3A5080;">Perfil: <strong style="color:#0D2257;">' + roleText + '</strong></div>'
+        +   '<div style="font-size:12px;color:#3A5080;">Status: <strong style="color:#0D2257;">' + statusText + '</strong></div>'
+        +   '<div style="display:flex;gap:8px;justify-content:flex-end;">'
+        +     '<button type="button" data-action="toggle-admin" data-user="' + user.username + '" class="home-btn-secondary" style="padding:7px 10px;">Permissão</button>'
+        +     '<button type="button" data-action="toggle-active" data-user="' + user.username + '" class="home-btn-secondary" style="padding:7px 10px;">Ativar/Inativar</button>'
+        +     '<button type="button" data-action="delete" data-user="' + user.username + '" class="home-btn-secondary" style="padding:7px 10px;border-color:#C0392B;color:#C0392B;' + disableDeleteStyle + '" ' + disableDelete + '>Excluir</button>'
+        +   '</div>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+
+    Array.from(list.querySelectorAll('button[data-action]')).forEach((btn) => {
+      btn.addEventListener('click', function() {
+        const action = btn.getAttribute('data-action');
+        const username = normalizeUser(btn.getAttribute('data-user'));
+        if (!action || !username) return;
+        mutateUser(action, username);
+      });
+    });
+  }
+
+  function mutateUser(action, username) {
+    const users = loadManagedUsers();
+    const idx = users.findIndex((u) => u.username === username);
+    if (idx < 0) return;
+
+    const target = users[idx];
+    const current = activeUser();
+
+    if (action === 'delete') {
+      if (target.source === 'base') {
+        showFeedback('Usuários base não podem ser excluídos.', 'error');
+        return;
+      }
+      users.splice(idx, 1);
+      persistLocalUsers(users);
+      showFeedback('Usuário excluído com sucesso.', 'success');
+      renderUsers();
+      return;
+    }
+
+    if (action === 'toggle-admin') {
+      if (target.source === 'base') {
+        showFeedback('Permissão de usuários base não pode ser alterada.', 'error');
+        return;
+      }
+      target.is_admin = !target.is_admin;
+    }
+
+    if (action === 'toggle-active') {
+      if (current && current.username === target.username) {
+        showFeedback('Você não pode desativar o usuário logado.', 'error');
+        return;
+      }
+      target.is_active = !target.is_active;
+    }
+
+    target.updated_at = nowIso();
+    users[idx] = target;
+    persistLocalUsers(users);
+    showFeedback('Alteração salva.', 'success');
+    renderUsers();
+
+    const refreshedCurrent = activeUser();
+    window.__CBF_CAN_MANAGE_USERS__ = !!(refreshedCurrent && refreshedCurrent.is_admin);
+    setUsersTabVisibility(window.__CBF_CAN_MANAGE_USERS__);
+    if (!window.__CBF_CAN_MANAGE_USERS__ && document.getElementById('usuarios').classList.contains('active')) {
+      sp('inicio');
+    }
+  }
+
+  function bindUserAdminEvents() {
+    const form = document.getElementById('users-create-form');
+    const reloadBtn = document.getElementById('users-reload-btn');
+
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = normalizeUser(document.getElementById('users-create-username').value);
+        const password = String(document.getElementById('users-create-password').value || '');
+        const isAdmin = !!document.getElementById('users-create-is-admin').checked;
+        const isActive = !!document.getElementById('users-create-is-active').checked;
+
+        if (!username || !password) {
+          showFeedback('Usuário e senha são obrigatórios.', 'error');
+          return;
+        }
+
+        const users = loadManagedUsers();
+        if (users.some((u) => u.username === username)) {
+          showFeedback('Já existe um usuário com este nome.', 'error');
+          return;
+        }
+
+        const now = nowIso();
+        users.push({
+          id: 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+          username,
+          password,
+          is_admin: isAdmin,
+          is_active: isActive,
+          source: 'local',
+          created_at: now,
+          updated_at: now
+        });
+
+        persistLocalUsers(users);
+        form.reset();
+        document.getElementById('users-create-is-active').checked = true;
+        showFeedback('Usuário criado com sucesso.', 'success');
+        renderUsers();
+      });
+    }
+
+    if (reloadBtn) {
+      reloadBtn.addEventListener('click', function() {
+        showFeedback('', 'success');
+        renderUsers();
+      });
+    }
+  }
+
+  bindUserAdminEvents();
+
   if (isAuthenticated()) {
-    showDashboard();
+    const profile = activeUser();
+    if (profile) {
+      showDashboard(profile);
+    } else {
+      sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(SESSION_USER_KEY);
+    }
   }
 
   document.getElementById('login-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    var user = document.getElementById('login-user').value.trim().toLowerCase();
-    var pass = document.getElementById('login-pass').value.trim();
-    console.log('[LOGIN] user:', JSON.stringify(user), 'pass:', JSON.stringify(pass));
-    if (CREDENTIALS.hasOwnProperty(user) && CREDENTIALS[user] === pass) {
-      showDashboard();
+    var user = normalizeUser(document.getElementById('login-user').value);
+    var pass = String(document.getElementById('login-pass').value || '');
+
+    var profile = getUserByCredentials(user, pass);
+    if (profile) {
+      document.getElementById('login-error').textContent = '';
+      showDashboard(profile);
     } else {
       document.getElementById('login-error').textContent = 'Usuário ou senha incorretos (user: "' + user + '")';
       document.getElementById('login-pass').value = '';
